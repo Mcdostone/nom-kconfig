@@ -19,17 +19,18 @@ Parsing relies on the [nom library](https://github.com/rust-bakery/nom).
 ## Getting started
 
 ```bash
-cargo add kconfig-nom
+cargo add nom-kconfig
 ```
 
 ```rust
-use std::{
-    fs::{self},
-    path::{Path, PathBuf},
-};
-extern crate kconfig;
+use std::path::PathBuf;
+use nom_kconfig::{kconfig::{parse_kconfig}, KconfigInput, KconfigFile};
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    match parser.parse(current_kconfig, input.as_ref()) {
+    let kconfig_file = KconfigFile::new(PathBuf::from("/path/to/kernel-dir"), PathBuf::from("Kconfig"));
+    let input = kconfig_file.read_to_string().unwrap();
+    let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
+    println!("{:?}", kconfig);
     Ok(())
 }
 ```

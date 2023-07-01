@@ -195,20 +195,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
 
 [[package]]
-name = "kconfig"
-version = "0.1.0"
-dependencies = [
- "clap",
- "nom",
- "nom_locate",
- "regex",
- "serde",
- "serde_json",
- "test-case",
- "walkdir",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.146"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -240,6 +226,20 @@ checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
 dependencies = [
  "memchr",
  "minimal-lexical",
+]
+
+[[package]]
+name = "nom-kconfig"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "nom",
+ "nom_locate",
+ "regex",
+ "serde",
+ "serde_json",
+ "test-case",
+ "walkdir",
 ]
 
 [[package]]
