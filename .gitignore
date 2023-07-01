@@ -1,0 +1,7 @@
+/target
+ok
+Kconfig
+.idea/
+.vscode
+*.json
+*.profraw
