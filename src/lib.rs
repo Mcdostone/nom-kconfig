@@ -6,7 +6,6 @@ use std::{fs, io};
 pub mod attribute;
 pub mod entry;
 pub mod kconfig;
-//pub mod parser;
 pub mod symbol;
 pub mod util;
 

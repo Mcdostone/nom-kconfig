@@ -40,8 +40,4 @@ fn parse_attribute_test(input: &str, expected: Attribute) {
         parse_attribute(input),
         Ok(("",expected))
     )
-
-/* 
-    map(ws(parse_type), Attribute::Type),
-*/
 }

@@ -25,18 +25,3 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     #[allow(clippy::let_and_return)]
     ok
 }
-
-/*fn is_architecture_related(kconfig: &PathBuf, kernel_dir: &PathBuf) -> Option<String> {
-    match kconfig.starts_with(kernel_dir.join("arch")) {
-        true => {
-            let ok = kconfig
-                .strip_prefix(kernel_dir)
-                .unwrap()
-                .components()
-                .nth(1)
-                .unwrap();
-            Some(ok.to_owned().as_os_str().to_str().unwrap().to_string())
-        }
-        false => None,
-    }
-}*/
