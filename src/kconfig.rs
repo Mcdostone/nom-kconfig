@@ -21,6 +21,8 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
             entries: d,
         }
     })(input);
+    // TODO
+    #[allow(clippy::let_and_return)]
     ok
 }
 

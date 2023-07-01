@@ -1,8 +1,7 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        range::{parse_range, Range},
-    }, symbol::Symbol,
+    attribute::range::{parse_range, Range},
+    symbol::Symbol,
 };
 
 #[test]

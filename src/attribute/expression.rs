@@ -123,7 +123,6 @@ pub fn parse_hex_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     )(input)
 }
 
-
 pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     map_res(
         recognize(pair(opt(char('-')), digit1)),
