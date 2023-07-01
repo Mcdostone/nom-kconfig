@@ -116,6 +116,14 @@ pub fn parse_if_expression_attribute(input: KconfigInput) -> IResult<KconfigInpu
     )(input)
 }
 
+pub fn parse_hex_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
+    map_res(
+        recognize(pair(opt(char('-')), digit1)),
+        |d: KconfigInput| FromStr::from_str(d.fragment()),
+    )(input)
+}
+
+
 pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     map_res(
         recognize(pair(opt(char('-')), digit1)),

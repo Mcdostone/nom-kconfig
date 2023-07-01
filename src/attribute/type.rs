@@ -36,6 +36,7 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, EntryType> {
 }
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
+#[serde(rename_all="lowercase")]
 pub enum Type {
     Bool,
     Tristate,

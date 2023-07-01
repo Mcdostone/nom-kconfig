@@ -42,7 +42,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
 }
 
 fn is_dynamic_source(file: &str) -> bool {
-    let re = Regex::new("$(.+)").unwrap();
+    let re = Regex::new("\\$(.+)").unwrap();
     re.is_match(file)
 }
 
