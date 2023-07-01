@@ -20,7 +20,7 @@ pub struct Range {
 }
 
 pub fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
-    
+    // TODO semantic controls: lhs < rhs
     alt((
         map(tuple((ws(parse_number), ws(parse_number))), |(l, r)| (Symbol::Constant(l.to_string()), Symbol::Constant(r.to_string()))),
         tuple((ws(parse_symbol), ws(parse_symbol))),
@@ -31,7 +31,6 @@ pub fn parse_range(input: KconfigInput) -> IResult<KconfigInput, Range> {
     map(
         tuple((
             ws(tag("range")),
-            //tuple((ws(parse_symbol), ws(parse_symbol))),
             ws(parse_hs),
             opt(parse_if_expression_attribute),
         )),

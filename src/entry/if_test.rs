@@ -11,7 +11,7 @@ use crate::{
 
 #[test]
 fn test_parse_if_entry() {
-    let input = "if NET_VENDOR_AMD source \"/hello/world\" endif";
+    let input = "if NET_VENDOR_AMD source \"$(VAR)/Kconfig\" endif";
     assert_parsing_eq!(
         parse_if,
         input,
@@ -22,7 +22,7 @@ fn test_parse_if_entry() {
                     "NET_VENDOR_AMD".to_string()
                 ))),
                 entries: vec!(Entry::Source(Source {
-                    file: "/hello/world".to_string(),
+                    file: "$(VAR)/Kconfig".to_string(),
                     ..Default::default()
                 }))
             }

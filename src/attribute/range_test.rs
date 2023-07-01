@@ -1,9 +1,8 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        expression::{Expression, Term},
         range::{parse_range, Range},
-    },
+    }, symbol::Symbol,
 };
 
 #[test]
@@ -15,8 +14,8 @@ fn test_parse_range() {
         Ok((
             "",
             Range {
-                lhs: Expression::Term(Term::Number(1)),
-                rhs: Expression::Term(Term::Number(5)),
+                lhs: Symbol::Constant("1".to_string()),
+                rhs: Symbol::Constant("5".to_string()),
                 r#if: None
             }
         ))
