@@ -39,11 +39,11 @@ pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
         ),
         map(
             delimited(ws(char('"')), take_until("\""), char('"')),
-            |c: KconfigInput| Symbol::NonConstant(c.to_string()),
+            |c: KconfigInput| Symbol::NonConstant(format!("\"{}\"", c.to_string())),
         ),
         map(
             delimited(ws(char('\'')), take_until("'"), char('\'')),
-            |c: KconfigInput| Symbol::NonConstant(c.to_string()),
+            |c: KconfigInput| Symbol::NonConstant(format!("'{}'", c.to_string())),
         ),
     ))(input)
 }
