@@ -21,3 +21,18 @@ fn test_parse_depends_on() {
         ))
     )
 }
+
+
+#[test]
+fn test_parse_depends_on_optimization() {
+    assert_parsing_eq!(
+        parse_depends_on,
+        "depends on ALPHA_MIATA || ALPHA_LX164 || ALPHA_SX164 && (HELLO = world)",
+        Ok((
+            "",
+            Attribute::DependsOn(Expression::Term(Term::Symbol(Symbol::Constant(
+                "PCI".to_string()
+            ))))
+        ))
+    )
+}

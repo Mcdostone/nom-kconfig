@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take},
+    bytes::complete::{tag},
     character::complete::{char, digit1, space1},
     combinator::{map, map_res, opt, recognize, value, peek},
-    multi::many1,
+    multi::{many1, separated_list1},
     sequence::{delimited, pair, tuple},
     IResult,
 };
@@ -21,38 +21,6 @@ use super::function::{parse_function_call, FunctionCall};
 
 // (GFS2_FS!=n) && NET && INET && (IPV6 || IPV6=n) && CONFIGFS_FS && SYSFS && (DLM=y || DLM=GFS2_FS)
 
-/* 
-{
-    "DependsOn": {
-      "operation": {
-        operator: "||",
-        terms: [
-            {
-                "Symbol": {
-                "Constant": "ARCH_MXC"
-            },
-            {
-                "Symbol": {
-                  "Constant": "COMPILE_TEST"
-                }
-            }
-        ]
-        ]
-        
-        [
-          {
-            "Compare": [
-              "Or",
-              
-            ]
-          }
-        ]
-      ]
-    }
-  },
-*/
-
-
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Operator {
     GreaterThan,
@@ -61,15 +29,18 @@ pub enum Operator {
     LowerOrEqual,
     Equal,
     NotEqual,
-    And,
-    Or,
 }
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Expression {
     Term(Term),
-    //MultiTermExpression(Term, Vec<Compare>),
-    Operation(Operator, Vec<Expression>),
+    Operation(Operation),
+}
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub struct Operation {
+    pub operator: Operator,
+    pub operands: Vec<Expression>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Clone)]
@@ -97,12 +68,6 @@ impl Default for Term {
     }
 }
 
-pub fn parse_right_operand(input: KconfigInput) -> IResult<KconfigInput, Compare> {
-    map(pair(ws(parse_operator), ws(parse_term)), |(o, t)| {
-        Compare(o, t)
-    })(input)
-}
-
 impl Operator {
     fn tt(&self) -> &str {
         return match self {
@@ -117,6 +82,12 @@ impl Operator {
         }
     }
 }
+
+enum BooleanOperator {
+    And, 
+    Or
+}
+pub struct BooleanExpression(BooleanOperator, Expression, Expression);
 
 
 pub fn parse_operator(input: KconfigInput) -> IResult<KconfigInput, Operator> {
@@ -155,20 +126,65 @@ pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression
     ))(input)
 }
 
+pub fn dd(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    println!("{}", input.fragment());
+    map(pair(
+        ws(tag("||")),
+        ws(parse_expression)
+    ), |(_, d)| d)(input)
+}
 
 pub fn parse_operation(input: KconfigInput) -> IResult<KconfigInput, Expression> {
     let (input, left) = parse_term(input)?;
     let (input, operator) = peek(ws(parse_operator))(input)?;
     let parse_tt = ws(tag(operator.tt()));
-    let (input, operands) = many1(map(pair(
-        parse_tt,
-        parse_expression
-    ), |(_, d)| d))(input)?;
+    let (input, operands) = many1(map(pair(parse_tt, ws(parse_expression)), |(_, d)| d))(input)?;
     let mut r = vec!(Expression::Term(left));
     r.extend(operands);
-    return Ok((input, Expression::Operation(Operator::And, r)))
+    Ok((input, Expression::Operation(Operation { operator: operator, operands: r})))
+    //let o = Operation { operator: operator, operands: r};
+    //return Ok((input, optimise(o)))
+}
+
+
+impl Operation {
+    pub fn optimise(&self) -> Self {
+        println!("oo");
+        let mut new_operation = Operation { operator: self.operator.clone(), operands: vec!() };
+        for operator in self.operands.iter() {
+            match operator {
+                Expression::Term(t) => {
+                    new_operation.operands.push(operator.clone())
+                },
+                Expression::Operation(op) => {
+                    let rrop: Operation = op.optimise();
+                    if rrop.operator == new_operation.operator {
+                        new_operation.operands.extend(rrop.operands);
+                    } else {
+                        new_operation.operands.push(Expression::Operation(op.clone()));
+                    }
+                },
+            }
+        }
+        return new_operation
+    }
 
 }
+
+impl Expression {
+
+    pub fn optimise(self) -> Self {
+        if let Self::Operation(o) = self {
+            return Self::Operation(o.optimise())
+        }
+        return self
+    }
+
+}
+
+
+
+
 
 
 

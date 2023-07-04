@@ -1,7 +1,7 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        expression::{Expression, Operator, RightOperand, Term},
+        expression::{Expression, Term, Operation, Operator},
         visible::Visible,
     },
     entry::menu::{parse_menu, Menu},
@@ -58,13 +58,13 @@ fn test_parse_menu_depends_on() {
             "",
             Menu {
                 prompt: "BPF subsystem".to_string(),
-                depends_on: vec!(Expression::MultiTermExpression(
-                    Term::Symbol(Symbol::Constant("ARC_HAS_ICACHE".to_string())),
-                    vec!(RightOperand::Compare(
-                        Operator::Or,
-                        Term::Symbol(Symbol::Constant("ARC_HAS_DCACHE".to_string()))
-                    ))
-                )),
+                depends_on: vec!(Expression::Operation(Operation {
+                    operator: Operator::Or,
+                    operands: vec!(
+                        Expression::Term(Term::Symbol(Symbol::Constant("ARC_HAS_ICACHE".to_string()))),
+                        Expression::Term(Term::Symbol(Symbol::Constant("ARC_HAS_DCACHE".to_string())))
+                    )})
+            ),
                 blocks: vec!(),
                 visible: None
             }
