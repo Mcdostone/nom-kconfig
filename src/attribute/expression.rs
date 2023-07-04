@@ -2,9 +2,9 @@ use std::str::FromStr;
 
 use nom::{
     branch::alt,
-    bytes::complete::tag,
+    bytes::complete::{tag, take},
     character::complete::{char, digit1, space1},
-    combinator::{map, map_res, opt, recognize, value},
+    combinator::{map, map_res, opt, recognize, value, peek},
     multi::many1,
     sequence::{delimited, pair, tuple},
     IResult,
@@ -21,6 +21,38 @@ use super::function::{parse_function_call, FunctionCall};
 
 // (GFS2_FS!=n) && NET && INET && (IPV6 || IPV6=n) && CONFIGFS_FS && SYSFS && (DLM=y || DLM=GFS2_FS)
 
+/* 
+{
+    "DependsOn": {
+      "operation": {
+        operator: "||",
+        terms: [
+            {
+                "Symbol": {
+                "Constant": "ARCH_MXC"
+            },
+            {
+                "Symbol": {
+                  "Constant": "COMPILE_TEST"
+                }
+            }
+        ]
+        ]
+        
+        [
+          {
+            "Compare": [
+              "Or",
+              
+            ]
+          }
+        ]
+      ]
+    }
+  },
+*/
+
+
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Operator {
     GreaterThan,
@@ -36,13 +68,13 @@ pub enum Operator {
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Expression {
     Term(Term),
-    MultiTermExpression(Term, Vec<RightOperand>),
+    //MultiTermExpression(Term, Vec<Compare>),
+    Operation(Operator, Vec<Expression>),
 }
 
 #[derive(Debug, PartialEq, Serialize, Clone)]
-pub enum RightOperand {
-    Compare(Operator, Term),
-}
+pub struct Compare(Operator, Term);
+
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Term {
@@ -65,11 +97,27 @@ impl Default for Term {
     }
 }
 
-pub fn parse_right_operand(input: KconfigInput) -> IResult<KconfigInput, RightOperand> {
+pub fn parse_right_operand(input: KconfigInput) -> IResult<KconfigInput, Compare> {
     map(pair(ws(parse_operator), ws(parse_term)), |(o, t)| {
-        RightOperand::Compare(o, t)
+        Compare(o, t)
     })(input)
 }
+
+impl Operator {
+    fn tt(&self) -> &str {
+        return match self {
+            Operator::GreaterOrEqual => ">=",
+            Operator::LowerOrEqual => "<=",
+            Operator::GreaterThan => ">",
+            Operator::LowerThan => "<",
+            Operator::Equal => "=",
+            Operator::NotEqual => "!=",
+            Operator::And => "&&",
+            Operator::Or => "||"
+        }
+    }
+}
+
 
 pub fn parse_operator(input: KconfigInput) -> IResult<KconfigInput, Operator> {
     alt((
@@ -83,6 +131,7 @@ pub fn parse_operator(input: KconfigInput) -> IResult<KconfigInput, Operator> {
         value(Operator::Or, tag("||")),
     ))(input)
 }
+
 
 pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
     alt((
@@ -101,13 +150,28 @@ pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
 
 pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
     alt((
-        map(
-            pair(ws(parse_term), many1(parse_right_operand)),
-            |(l, o)| Expression::MultiTermExpression(l, o),
-        ),
+        parse_operation,
         map(ws(parse_term), Expression::Term),
     ))(input)
 }
+
+
+pub fn parse_operation(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    let (input, left) = parse_term(input)?;
+    let (input, operator) = peek(ws(parse_operator))(input)?;
+    let parse_tt = ws(tag(operator.tt()));
+    let (input, operands) = many1(map(pair(
+        parse_tt,
+        parse_expression
+    ), |(_, d)| d))(input)?;
+    let mut r = vec!(Expression::Term(left));
+    r.extend(operands);
+    return Ok((input, Expression::Operation(Operator::And, r)))
+
+}
+
+
+
 
 pub fn parse_if_expression_attribute(input: KconfigInput) -> IResult<KconfigInput, Expression> {
     map(
