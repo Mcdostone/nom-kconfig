@@ -20,7 +20,7 @@ pub fn parse_if(input: KconfigInput) -> IResult<KconfigInput, If> {
     )(input)
 }
 
-#[derive(Debug, Default, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct If {
     pub condition: Expression,
     pub entries: Vec<Entry>,

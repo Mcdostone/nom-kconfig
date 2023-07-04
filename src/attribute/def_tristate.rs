@@ -10,7 +10,7 @@ use crate::{util::ws, KconfigInput};
 
 use super::expression::{parse_expression, parse_if_expression_attribute, Expression};
 
-#[derive(Debug, Default, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct DefTristate {
     pub expression: Expression,
     #[serde(skip_serializing_if = "Option::is_none")]

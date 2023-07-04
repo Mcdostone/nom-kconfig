@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::expression::{parse_expression, Expression, Term},
+    attribute::expression::{parse_expression, Expression, Term, Operator, RightOperand},
     symbol::Symbol,
 };
 
@@ -42,6 +42,21 @@ fn test_parse_and_expression() {
         ))
 }
 */
+
+
+#[test]
+fn test_parse_depends_on_and() {
+    assert_parsing_eq!(
+        parse_expression,
+        "ALPHA_MIATA && ALPHA_LX164",
+        Ok((
+            "",
+            Expression::Boolean(Term::Symbol(Symbol::Constant("ALPHA_MIATA".to_string())), vec!(RightOperand::Compare(Operator::And, Term::Symbol(Symbol::Constant(
+                "ALPHA_LX164".to_string()
+            )))))
+        ))
+    )
+}
 
 #[test]
 fn test_parse_depends_on_ambigus() {

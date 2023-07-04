@@ -1,0 +1,256 @@
+use std::{str::FromStr};
+
+use nom::{
+    branch::alt,
+    bytes::complete::{tag},
+    character::complete::{char, digit1, space1},
+    combinator::{map, map_res, opt, recognize, value},
+    sequence::{delimited, pair, tuple},
+    IResult,
+};
+use serde::Serialize;
+
+use crate::{
+    symbol::{parse_symbol, Symbol},
+    util::ws,
+    KconfigInput,
+};
+
+use super::function::{parse_function_call, FunctionCall};
+
+// (GFS2_FS!=n) && NET && INET && (IPV6 || IPV6=n) && CONFIGFS_FS && SYSFS && (DLM=y || DLM=GFS2_FS)
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Operator {
+    GreaterThan,
+    GreaterOrEqual,
+    LowerThan,
+    LowerOrEqual,
+    Equal,
+    NotEqual,
+}
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Expression {
+    Or(Term, Term),
+    Term(Term),
+}
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Term {
+    And(Factor, Factor),
+    Factor(Factor),
+    Compare(Unary, Operator, Unary),
+}
+    
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Factor {
+    Unary(Unary),
+    Function(FunctionCall),
+    Parenthesis(Box<Expression>),
+    Not(Box<Expression>),
+    
+    //Expression(Box<Expression>)
+}
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Unary {
+    Symbol(Symbol),
+    Number(i64),
+}
+
+pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+//    println!("####{:?}", input);
+    alt((
+        map(tuple((ws(parse_term), ws(tag("||")), ws(parse_term))), |(l, _, r)| Expression::Or(l, r)),
+        map(ws(parse_term), Expression::Term),
+    ))(input)
+}
+
+pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
+    alt((
+        map(tuple((ws(parse_factor), ws(tag("&&")), ws(parse_factor))), |(l, _, r)| Term::And(l, r)),
+        map(ws(parse_factor), Term::Factor),
+    ))(input)
+}
+
+
+pub fn parse_unary(input: KconfigInput) -> IResult<KconfigInput, Unary> {
+    alt((
+        map(parse_symbol, Unary::Symbol),
+        map(parse_number, Unary::Number)
+    ))(input)
+}
+
+
+pub fn parse_factor(input: KconfigInput) -> IResult<KconfigInput, Factor> {
+    alt((
+        map(tuple((ws(parse_unary), ws(parse_operator), ws(parse_unary))), |f| Factor::Compare(f.0, f.1, f.2)),
+        map(parse_function_call, Factor::Function),
+        map(pair(ws(tag("!")), parse_expression), |(_, o)| {
+            Factor::Not(Box::new(o))
+        }),
+        map(
+            delimited(ws(tag("(")), parse_expression, ws(tag(")"))),
+            |expr| Factor::Parenthesis(Box::new(expr)),
+        ),
+        map(ws(parse_unary), Factor::Unary),
+    ))(input)
+}
+
+
+pub fn parse_operator(input: KconfigInput) -> IResult<KconfigInput, Operator> {
+    alt((
+        value(Operator::GreaterOrEqual, tag(">=")),
+        value(Operator::LowerOrEqual, tag("<=")),
+        value(Operator::GreaterThan, tag(">")),
+        value(Operator::LowerThan, tag("<")),
+        value(Operator::Equal, tag("=")),
+        value(Operator::NotEqual, tag("!=")),
+    ))(input)
+}
+
+
+/* 
+impl Default for Expression {
+    fn default() -> Self {
+        Expression::Term(Default::default())
+    }
+}
+
+impl Default for Term {
+    fn default() -> Self {
+        Self::Symbol(Default::default())
+    }
+}*/
+/*
+impl Operator {
+    fn tt(&self) -> &str {
+        return match self {
+            Operator::GreaterOrEqual => ">=",
+            Operator::LowerOrEqual => "<=",
+            Operator::GreaterThan => ">",
+            Operator::LowerThan => "<",
+            Operator::Equal => "=",
+            Operator::NotEqual => "!=",
+            Operator::And => "&&",
+            Operator::Or => "||"
+        }
+    }
+}
+
+enum BooleanOperator {
+    And, 
+    Or
+}
+
+
+pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
+    alt((
+        map(pair(ws(tag("!")), parse_expression), |(_, o)| {
+            Term::NotSymbol(Box::new(o))
+        }),
+        map(parse_function_call, Term::Function),
+        map(
+            delimited(ws(tag("(")), parse_expression, ws(tag(")"))),
+            |expr| Term::Parenthesis(Box::new(expr)),
+        ),
+        map(parse_symbol, Term::Symbol),
+        map(parse_number, Term::Number),
+    ))(input)
+}
+
+pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    alt((
+        parse_operation,
+        map(ws(parse_term), Expression::Term),
+    ))(input)
+}
+
+pub fn dd(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    println!("{}", input.fragment());
+    map(pair(
+        ws(tag("||")),
+        ws(parse_expression)
+    ), |(_, d)| d)(input)
+}
+
+pub fn parse_operation(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    let (input, left) = parse_term(input)?;
+    let (input, operator) = peek(ws(parse_operator))(input)?;
+    let parse_tt = ws(tag(operator.tt()));
+    let (input, operands) = many1(map(pair(parse_tt, ws(parse_expression)), |(_, d)| d))(input)?;
+    let mut r = vec!(Expression::Term(left));
+    r.extend(operands);
+    Ok((input, Expression::Operation(Operation { operator: operator, operands: r})))
+    //let o = Operation { operator: operator, operands: r};
+    //return Ok((input, optimise(o)))
+}
+
+
+impl Operation {
+    pub fn optimise(&self) -> Self {
+        println!("oo");
+        let mut new_operation = Operation { operator: self.operator.clone(), operands: vec!() };
+        for operator in self.operands.iter() {
+            match operator {
+                Expression::Term(t) => {
+                    new_operation.operands.push(operator.clone())
+                },
+                Expression::Operation(op) => {
+                    let rrop: Operation = op.optimise();
+                    if rrop.operator == new_operation.operator {
+                        new_operation.operands.extend(rrop.operands);
+                    } else {
+                        new_operation.operands.push(Expression::Operation(op.clone()));
+                    }
+                },
+            }
+        }
+        return new_operation
+    }
+
+}
+
+impl Expression {
+
+    pub fn optimise(self) -> Self {
+        if let Self::Operation(o) = self {
+            return Self::Operation(o.optimise())
+        }
+        return self
+    }
+
+}
+*/
+
+
+
+
+
+
+
+pub fn parse_if_expression_attribute(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    map(
+        tuple((space1, tag("if"), ws(parse_expression))),
+        |(_, _, e)| e,
+    )(input)
+}
+
+pub fn parse_hex_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
+    map_res(
+        recognize(pair(opt(char('-')), digit1)),
+        |d: KconfigInput| FromStr::from_str(d.fragment()),
+    )(input)
+}
+
+pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
+    map_res(
+        recognize(pair(opt(char('-')), digit1)),
+        |d: KconfigInput| FromStr::from_str(d.fragment()),
+    )(input)
+}
+
+pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    map(pair(ws(tag("if")), ws(parse_expression)), |(_, e)| e)(input)
+}
