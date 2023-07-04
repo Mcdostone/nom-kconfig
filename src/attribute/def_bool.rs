@@ -10,17 +10,11 @@ use crate::{util::ws, KconfigInput};
 
 use super::expression::{parse_expression, parse_if_expression_attribute, Expression};
 
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, PartialEq, Default)]
 pub struct DefBool {
     pub expression: Expression,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#if: Option<Expression>,
-}
-
-impl Default for DefBool {
-    fn default() -> Self {
-        Self { expression: Default::default(), r#if:None }
-    }
 }
 
 pub fn parse_def_bool(input: KconfigInput) -> IResult<KconfigInput, DefBool> {

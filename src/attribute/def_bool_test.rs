@@ -2,7 +2,7 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         def_bool::{parse_def_bool, DefBool},
-        expression::{Expression, Term},
+        expression::{AndExpression, Atom, Expression, OrExpression, Term},
     },
     symbol::Symbol,
 };
@@ -16,8 +16,8 @@ fn test_parse_def_bool() {
         Ok((
             " ",
             DefBool {
-                expression: Expression::Term(Term::NotSymbol(Box::new(Expression::Term(
-                    Term::Symbol(Symbol::Constant("PCI".to_string()))
+                expression: Expression(OrExpression::Term(AndExpression::Term(Term::Not(
+                    Atom::Symbol(Symbol::Constant("PCI".to_string()))
                 )))),
                 r#if: None
             }

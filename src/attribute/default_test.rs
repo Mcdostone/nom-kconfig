@@ -2,7 +2,7 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         default::{parse_default, DefaultAttribute},
-        expression::{Expression, Term},
+        expression::{AndExpression, Atom, Expression, OrExpression, Term},
     },
     symbol::Symbol,
 };
@@ -15,7 +15,9 @@ fn test_parse_default() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression::Term(Term::Symbol(Symbol::Constant("0x1".to_string()))),
+                expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::Constant("0x1".to_string()))
+                )))),
                 r#if: None
             }
         ))

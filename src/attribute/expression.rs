@@ -5,8 +5,8 @@ use nom::{
     bytes::complete::tag,
     character::complete::{char, digit1, space1},
     combinator::{map, map_res, opt, recognize, value},
-    multi::{many0},
-    sequence::{delimited, pair, tuple, preceded},
+    multi::many0,
+    sequence::{delimited, pair, preceded, tuple},
     IResult,
 };
 use serde::Serialize;
@@ -26,15 +26,6 @@ pub enum Operator {
     And,
     Or,
 }
-impl Operator {
-    fn to_string(&self) -> &str {
-        match self {
-            Operator::And => "&&",
-            Operator::Or => "||",
-        }
-    }
-}
-
 
 #[derive(Debug, PartialEq, Serialize, Clone)]
 pub enum CompareOperator {
@@ -46,8 +37,8 @@ pub enum CompareOperator {
     NotEqual,
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
-pub struct Expression(OrExpression);
+#[derive(Debug, Serialize, PartialEq, Clone, Default)]
+pub struct Expression(pub OrExpression);
 //#[derive(Debug, Serialize, PartialEq, Clone)]
 //pub struct OrExpression(BooleanExpression<AndExpression>);
 //#[derive(Debug, Serialize, PartialEq, Clone)]
@@ -55,48 +46,51 @@ pub struct Expression(OrExpression);
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum AndExpression {
     Term(Term),
-    Expression(BooleanExpression<Term>)
+    Expression(Vec<Term>),
 }
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum OrExpression {
     Term(AndExpression),
-    Expression(BooleanExpression<AndExpression>)
-}
-
-#[derive(Debug, Serialize, PartialEq, Clone)]
-pub struct BooleanExpression<T> {
-    operator: Operator,
-    operands: Vec<T>
+    Expression(Vec<AndExpression>),
 }
 
 pub fn parse_or_expression(input: KconfigInput) -> IResult<KconfigInput, OrExpression> {
-    map(tuple((ws(parse_and_expression), many0(preceded(ws(tag("||")), ws(parse_and_expression))))), |(l, ee)| {
-        if ee.is_empty() {
-            OrExpression::Term(l)
-        } else {
-            let mut ll = vec!(l);
-            ll.extend(ee);
-            OrExpression::Expression(BooleanExpression { operator: Operator::Or, operands: ll })
-    
-        }
-    })(input)
+    map(
+        tuple((
+            ws(parse_and_expression),
+            many0(preceded(ws(tag("||")), ws(parse_and_expression))),
+        )),
+        |(l, ee)| {
+            if ee.is_empty() {
+                OrExpression::Term(l)
+            } else {
+                let mut ll = vec![l];
+                ll.extend(ee);
+                OrExpression::Expression(ll)
+            }
+        },
+    )(input)
 }
 
 pub fn parse_and_expression(input: KconfigInput) -> IResult<KconfigInput, AndExpression> {
-    map(tuple((ws(parse_term), many0(preceded(ws(tag("&&")), ws(parse_term))))), |(l, ee)|
-    {
-        if ee.is_empty() {
-            AndExpression::Term(l)
-        } else {
-            let mut ll = vec!(l);
-            ll.extend(ee);
-            AndExpression::Expression(BooleanExpression { operator: Operator::And, operands: ll })
-        }
-    } )(input)
+    map(
+        tuple((
+            ws(parse_term),
+            many0(preceded(ws(tag("&&")), ws(parse_term))),
+        )),
+        |(l, ee)| {
+            if ee.is_empty() {
+                AndExpression::Term(l)
+            } else {
+                let mut ll = vec![l];
+                ll.extend(ee);
+                AndExpression::Expression(ll)
+            }
+        },
+    )(input)
 }
 
-    
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub struct Compare {
     pub operator: Operator,
@@ -110,28 +104,17 @@ pub enum LeftOperand {
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Term {
+    Not(Atom),
+    Atom(Atom),
+}
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Atom {
     Symbol(Symbol),
     Number(i64),
     Compare(Symbol, CompareOperator, Symbol),
-    Not(Box<Expression>),
-    NotSymbol(Symbol),
     Function(FunctionCall),
     Parenthesis(Box<Expression>),
-}
-
-impl Default for Expression {
-    fn default() -> Self {
-        Expression(Default::default())
-    }
-}
-
-impl<T> Default for BooleanExpression<T> {
-    fn default() -> Self {
-        Self {
-            operator: Operator::And,
-            operands: vec!(),
-        }
-    }
 }
 
 impl Default for OrExpression {
@@ -146,8 +129,12 @@ impl Default for AndExpression {
     }
 }
 
-
 impl Default for Term {
+    fn default() -> Self {
+        Self::Atom(Default::default())
+    }
+}
+impl Default for Atom {
     fn default() -> Self {
         Self::Symbol(Default::default())
     }
@@ -155,27 +142,27 @@ impl Default for Term {
 
 pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
     alt((
+        map(preceded(ws(tag("!")), parse_atom), |a| Term::Not(a)),
+        map(parse_atom, Term::Atom),
+    ))(input)
+}
+
+pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
+    alt((
         ws(parse_compare),
-        
-        map(pair(ws(tag("!")), parse_expression), |(_, o)| {
-            Term::Not(Box::new(o))
-        }),
-        map(pair(ws(tag("!")), parse_symbol), |(_, o)| {
-            Term::NotSymbol(o)
-        }),
-        map(parse_function_call, Term::Function),
+        map(parse_function_call, Atom::Function),
+        map(parse_symbol, Atom::Symbol),
         map(
             delimited(ws(tag("(")), parse_expression, ws(tag(")"))),
-            |expr| Term::Parenthesis(Box::new(expr)),
+            |expr| Atom::Parenthesis(Box::new(expr)),
         ),
-        
-        map(parse_symbol, Term::Symbol),
-        map(parse_number, Term::Number),
+        map(parse_symbol, Atom::Symbol),
+        map(parse_number, Atom::Number),
     ))(input)
 }
 
 pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    map(parse_or_expression, |d| Expression(d))(input)
+    map(parse_or_expression, Expression)(input)
 }
 
 pub fn parse_compare_operator(input: KconfigInput) -> IResult<KconfigInput, CompareOperator> {
@@ -189,10 +176,16 @@ pub fn parse_compare_operator(input: KconfigInput) -> IResult<KconfigInput, Comp
     ))(input)
 }
 
-pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Term> {
-    map(tuple((ws(parse_symbol), ws(parse_compare_operator), ws(parse_symbol))), |(l, o, r)| Term::Compare(l, o, r))(input)
+pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
+    map(
+        tuple((
+            ws(parse_symbol),
+            ws(parse_compare_operator),
+            ws(parse_symbol),
+        )),
+        |(l, o, r)| Atom::Compare(l, o, r),
+    )(input)
 }
-
 
 pub fn parse_if_expression_attribute(input: KconfigInput) -> IResult<KconfigInput, Expression> {
     map(
