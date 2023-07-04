@@ -9,6 +9,6 @@ fn test_parse_symbol() {
     assert_parsing_eq!(
         parse_symbol,
         input,
-        Ok(("", Symbol::NonConstant("hello".to_string())))
+        Ok(("", Symbol::NonConstant("\"hello\"".to_string())))
     )
 }
