@@ -34,8 +34,8 @@ impl Default for Symbol {
 pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
     alt((
         map(
-            recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_"))))))),
-            |c: KconfigInput| Symbol::Constant(c.trim().to_string()),
+            parse_constant_symbol,
+            |c: &str| Symbol::Constant(c.to_string()),
         ),
         map(
             delimited(ws(char('"')), take_until("\""), char('"')),
@@ -46,4 +46,11 @@ pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
             |c: KconfigInput| Symbol::NonConstant(format!("'{}'", c)),
         ),
     ))(input)
+}
+
+
+pub fn parse_constant_symbol(input: KconfigInput) -> IResult<KconfigInput, &str> {
+        map(
+            recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_"))))))),
+            |c: KconfigInput| c.trim())(input)
 }

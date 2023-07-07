@@ -46,12 +46,14 @@ pub struct Expression(pub OrExpression);
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum AndExpression {
     Term(Term),
+    #[serde(rename = "And")]
     Expression(Vec<Term>),
 }
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum OrExpression {
     Term(AndExpression),
+    #[serde(rename = "Or")]
     Expression(Vec<AndExpression>),
 }
 
