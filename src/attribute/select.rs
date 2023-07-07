@@ -6,11 +6,7 @@ use nom::{
 };
 use serde::Serialize;
 
-use crate::{
-    symbol::{parse_constant_symbol},
-    util::ws,
-    KconfigInput,
-};
+use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
 use super::expression::{parse_if_expression_attribute, Expression};
 
@@ -28,6 +24,9 @@ pub fn parse_select(input: KconfigInput) -> IResult<KconfigInput, Select> {
             ws(parse_constant_symbol),
             opt(parse_if_expression_attribute),
         )),
-        |(_, s, i)| Select { symbol: s.to_string(), r#if: i },
+        |(_, s, i)| Select {
+            symbol: s.to_string(),
+            r#if: i,
+        },
     )(input)
 }

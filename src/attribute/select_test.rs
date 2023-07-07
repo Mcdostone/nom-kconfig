@@ -14,7 +14,7 @@ fn test_parse_select() {
             "",
             Select {
                 r#if: None,
-                symbol: Symbol::Constant("MTK_INFRACFG".to_string())
+                symbol: "MTK_INFRACFG".to_string()
             }
         ))
     )

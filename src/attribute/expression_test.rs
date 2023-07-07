@@ -1,7 +1,10 @@
 use crate::{
     assert_parsing_eq,
-    attribute::expression::{
-        parse_expression, AndExpression, Atom, CompareOperator, Expression, OrExpression, Term,
+    attribute::{
+        expression::{
+            parse_expression, AndExpression, Atom, CompareOperator, Expression, OrExpression, Term,
+        },
+        function::{ExpressionToken, FunctionCall, Parameter},
     },
     symbol::Symbol,
 };
@@ -33,22 +36,6 @@ fn test_parse_term() {
         ))
     )
 }
-/*
-#[test]
-fn test_parse_and_expression() {
-    assert_parsing_eq!(
-        parse_expression,
-        "KVM && INET",
-        Ok((
-            "",
-            Expression::Operation(
-                "&&".to_string(),
-                vec!(Expression::Term(Term::Symbol(Symbol::Constant("KVM".to_string()))),
-                    Expression::Term(Term::Symbol(Symbol::Constant("INET".to_string())))
-                )))
-        ))
-}
-*/
 
 #[test]
 fn test_parse_depends_on_and() {
@@ -104,5 +91,42 @@ fn test_parse_depends_on_optimization() {
                 )
             )
         )))))
+    )
+}
+
+#[test]
+fn test_parse_expression_function() {
+    assert_parsing_eq!(
+        parse_expression,
+        "$(success,$(OBJCOPY) --version | head -n1 | grep -qv llvm)",
+        Ok((
+            "",
+            Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
+                Atom::Function(FunctionCall {
+                    name: "success".to_string(),
+                    parameters: vec!(Parameter {
+                        tokens: vec!(
+                            ExpressionToken::Variable("OBJCOPY".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("--version".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("|".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("head".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("-n1".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("|".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("grep".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("-qv".to_string()),
+                            ExpressionToken::Space,
+                            ExpressionToken::Literal("llvm".to_string())
+                        )
+                    })
+                })
+            ))))
+        ))
     )
 }
