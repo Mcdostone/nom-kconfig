@@ -1,7 +1,6 @@
 use crate::{
     assert_parsing_eq,
     attribute::select::{parse_select, Select},
-    symbol::Symbol,
 };
 
 #[test]

@@ -58,7 +58,6 @@ pub enum OrExpression {
     Expression(Vec<AndExpression>),
 }
 
-
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Term {
     Not(Atom),
@@ -105,7 +104,6 @@ impl Default for Atom {
     }
 }
 
-
 pub fn parse_or_expression(input: KconfigInput) -> IResult<KconfigInput, OrExpression> {
     map(
         tuple((
@@ -144,7 +142,7 @@ pub fn parse_and_expression(input: KconfigInput) -> IResult<KconfigInput, AndExp
 
 pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
     alt((
-        map(preceded(ws(tag("!")), parse_atom), |a| Term::Not(a)),
+        map(preceded(ws(tag("!")), parse_atom), Term::Not),
         map(parse_atom, Term::Atom),
     ))(input)
 }
@@ -185,7 +183,13 @@ pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
             ws(parse_compare_operator),
             ws(parse_symbol),
         )),
-        |(l, o, r)| Atom::Compare(CompareExpression { left: l, operator: o, right: r }),
+        |(l, o, r)| {
+            Atom::Compare(CompareExpression {
+                left: l,
+                operator: o,
+                right: r,
+            })
+        },
     )(input)
 }
 

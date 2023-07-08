@@ -2,7 +2,8 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         expression::{
-            parse_expression, AndExpression, Atom, CompareOperator, Expression, OrExpression, Term,
+            parse_expression, AndExpression, Atom, CompareExpression, CompareOperator, Expression,
+            OrExpression, Term,
         },
         function::{ExpressionToken, FunctionCall, Parameter},
     },
@@ -83,15 +84,14 @@ fn test_parse_depends_on_optimization() {
                 AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Compare(Symbol::Constant("HELLO".to_string()), CompareOperator::Equal, Symbol::Constant("world".to_string())))))))),
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string()) }))))))),
                 ))),
                 AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Compare(Symbol::Constant("HELLO".to_string()), CompareOperator::Equal, Symbol::Constant("world".to_string())))))))))
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string())}))))))))
                 )
             )
-        )))))
-    )
+        ))))))
 }
 
 #[test]
