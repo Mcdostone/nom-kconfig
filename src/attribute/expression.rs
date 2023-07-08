@@ -37,25 +37,74 @@ pub enum CompareOperator {
     NotEqual,
 }
 
+// https://stackoverflow.com/questions/9509048/antlr-parser-for-and-or-logic-how-to-get-expressions-between-logic-operators
+
 #[derive(Debug, Serialize, PartialEq, Clone, Default)]
 pub struct Expression(pub OrExpression);
-//#[derive(Debug, Serialize, PartialEq, Clone)]
-//pub struct OrExpression(BooleanExpression<AndExpression>);
-//#[derive(Debug, Serialize, PartialEq, Clone)]
-//pub struct AndExpression(BooleanExpression<Term>);
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum AndExpression {
+    #[serde(rename = "AndTerm")]
     Term(Term),
+
     #[serde(rename = "And")]
     Expression(Vec<Term>),
 }
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum OrExpression {
+    #[serde(rename = "OrTerm")]
     Term(AndExpression),
     #[serde(rename = "Or")]
     Expression(Vec<AndExpression>),
 }
+
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Term {
+    Not(Atom),
+    Atom(Atom),
+}
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+#[serde(rename = "Compare")]
+pub struct CompareExpression {
+    pub left: Symbol,
+    pub operator: CompareOperator,
+    pub right: Symbol,
+}
+
+#[derive(Debug, Serialize, PartialEq, Clone)]
+pub enum Atom {
+    Symbol(Symbol),
+    Number(i64),
+    Compare(CompareExpression),
+    Function(FunctionCall),
+    Parenthesis(Box<Expression>),
+}
+
+impl Default for OrExpression {
+    fn default() -> Self {
+        Self::Term(Default::default())
+    }
+}
+
+impl Default for AndExpression {
+    fn default() -> Self {
+        Self::Term(Default::default())
+    }
+}
+
+impl Default for Term {
+    fn default() -> Self {
+        Self::Atom(Default::default())
+    }
+}
+impl Default for Atom {
+    fn default() -> Self {
+        Self::Symbol(Default::default())
+    }
+}
+
 
 pub fn parse_or_expression(input: KconfigInput) -> IResult<KconfigInput, OrExpression> {
     map(
@@ -91,55 +140,6 @@ pub fn parse_and_expression(input: KconfigInput) -> IResult<KconfigInput, AndExp
             }
         },
     )(input)
-}
-
-#[derive(Debug, Serialize, PartialEq, Clone)]
-pub struct Compare {
-    pub operator: Operator,
-    pub term: Term,
-}
-
-#[derive(Debug, PartialEq, Serialize, Clone)]
-pub enum LeftOperand {
-    Compare(Term, Operator),
-}
-
-#[derive(Debug, Serialize, PartialEq, Clone)]
-pub enum Term {
-    Not(Atom),
-    Atom(Atom),
-}
-
-#[derive(Debug, Serialize, PartialEq, Clone)]
-pub enum Atom {
-    Symbol(Symbol),
-    Number(i64),
-    Compare(Symbol, CompareOperator, Symbol),
-    Function(FunctionCall),
-    Parenthesis(Box<Expression>),
-}
-
-impl Default for OrExpression {
-    fn default() -> Self {
-        Self::Term(Default::default())
-    }
-}
-
-impl Default for AndExpression {
-    fn default() -> Self {
-        Self::Term(Default::default())
-    }
-}
-
-impl Default for Term {
-    fn default() -> Self {
-        Self::Atom(Default::default())
-    }
-}
-impl Default for Atom {
-    fn default() -> Self {
-        Self::Symbol(Default::default())
-    }
 }
 
 pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
@@ -185,7 +185,7 @@ pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
             ws(parse_compare_operator),
             ws(parse_symbol),
         )),
-        |(l, o, r)| Atom::Compare(l, o, r),
+        |(l, o, r)| Atom::Compare(CompareExpression { left: l, operator: o, right: r }),
     )(input)
 }
 
