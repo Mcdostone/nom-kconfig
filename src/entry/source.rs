@@ -25,7 +25,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
         map(
             ws(recognize(ws(many1(alt((
                 alphanumeric1,
-                recognize(one_of("/.")),
+                recognize(one_of("-_/.")),
             )))))),
             |c: KconfigInput| c.fragment().to_owned(),
         ),
@@ -52,10 +52,19 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             ))),
         };
     }
-    Err(nom::Err::Error(nom::error::Error::new(
-        KconfigInput::new_extra("", source_kconfig_file),
-        nom::error::ErrorKind::Fail,
-    )))
+
+    if fail_missing_source {
+        return Err(nom::Err::Error(nom::error::Error::new(
+            KconfigInput::new_extra("", source_kconfig_file),
+            nom::error::ErrorKind::Fail,
+        )));
+    } else {
+        return Ok((input, Source {
+            file: file.to_string(),
+            entries: vec!(),
+        }))
+
+    }
 }
 
 fn is_dynamic_source(file: &str) -> bool {

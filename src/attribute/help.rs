@@ -42,7 +42,6 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
         preceded(many0(space1), newline),
     )(input)?;
     //let (input, (tabs, spaces)) = indentation_level(input);
-    println!("here");
     let r = indentation_level(input);
     let spaces: usize;
     match r {
