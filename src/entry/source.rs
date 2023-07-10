@@ -30,7 +30,11 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             |c: KconfigInput| c.fragment().to_owned(),
         ),
     ))(input)?;
-    let source_kconfig_file = KconfigFile::new(input.clone().extra.root_dir, PathBuf::from(file), fail_missing_source);
+    let source_kconfig_file = KconfigFile::new(
+        input.clone().extra.root_dir,
+        PathBuf::from(file),
+        fail_missing_source,
+    );
     if is_dynamic_source(file) {
         return Ok((
             input,
@@ -54,16 +58,18 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     }
 
     if fail_missing_source {
-        return Err(nom::Err::Error(nom::error::Error::new(
+        Err(nom::Err::Error(nom::error::Error::new(
             KconfigInput::new_extra("", source_kconfig_file),
             nom::error::ErrorKind::Fail,
-        )));
+        )))
     } else {
-        return Ok((input, Source {
-            file: file.to_string(),
-            entries: vec!(),
-        }))
-
+        Ok((
+            input,
+            Source {
+                file: file.to_string(),
+                entries: vec![],
+            },
+        ))
     }
 }
 

@@ -37,6 +37,3 @@ fn test_parse_type_with_weird_prompt() {
         ))
     )
 }
-
-
-

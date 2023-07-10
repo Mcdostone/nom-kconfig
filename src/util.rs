@@ -27,7 +27,10 @@ where
         (),
         many0(alt((
             // TODO 3.0.19/drivers/staging/iio/light/Kconfig, backslash??
-            preceded(alt((tag("#"), tag("\\#"))), terminated(not_line_ending, line_ending)),
+            preceded(
+                alt((tag("#"), tag("\\#"))),
+                terminated(not_line_ending, line_ending),
+            ),
             multispace1,
             // TODO linux v3.2, in file /drivers/dma/Kconfig
             tag(" "),
