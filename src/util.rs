@@ -28,6 +28,8 @@ where
         many0(alt((
             preceded(tag("#"), terminated(not_line_ending, line_ending)),
             multispace1,
+            // TODO linux v3.2, in file /drivers/dma/Kconfig
+            tag(" "),
         ))),
     )(input)
 }

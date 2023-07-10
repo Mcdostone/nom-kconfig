@@ -7,6 +7,7 @@ pub mod function;
 pub mod help;
 pub mod imply;
 pub mod modules;
+pub mod option;
 pub mod optional;
 pub mod prompt;
 pub mod range;
@@ -28,6 +29,7 @@ use self::{
     help::parse_help,
     imply::{parse_imply, Imply},
     modules::parse_modules,
+    option::{parse_option, OptionValues},
     prompt::{parse_prompt, Prompt},
     r#type::{parse_type, EntryType},
     range::{parse_range, Range},
@@ -53,6 +55,7 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_range), Attribute::Range),
         map(ws(parse_imply), Attribute::Imply),
         map(ws(parse_visible), Attribute::Visible),
+        map(ws(parse_option), Attribute::Option),
     ))(input)
 }
 #[derive(Debug, Serialize, Clone, PartialEq)]
@@ -70,6 +73,7 @@ pub enum Attribute {
     DefBool(DefBool),
     DefTristate(DefTristate),
     Imply(Imply),
+    Option(OptionValues),
 }
 
 #[cfg(test)]
@@ -90,6 +94,8 @@ mod help_test;
 mod imply_test;
 #[cfg(test)]
 mod modules_test;
+#[cfg(test)]
+mod option_test;
 #[cfg(test)]
 mod optional_test;
 #[cfg(test)]

@@ -1,6 +1,13 @@
 use std::path::PathBuf;
 
-use nom::{bytes::complete::tag, IResult};
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::{alphanumeric1, one_of},
+    combinator::{map, recognize},
+    multi::many1,
+    IResult,
+};
 use regex::Regex;
 
 use crate::{
@@ -12,7 +19,16 @@ use crate::{
 
 pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     let (input, _) = ws(tag("source"))(input)?;
-    let (input, file) = ws(parse_prompt_option)(input)?;
+    let (input, file) = alt((
+        ws(parse_prompt_option),
+        map(
+            ws(recognize(ws(many1(alt((
+                alphanumeric1,
+                recognize(one_of("/.")),
+            )))))),
+            |c: KconfigInput| c.fragment().to_owned(),
+        ),
+    ))(input)?;
     let source_kconfig_file = KconfigFile::new(input.clone().extra.root_dir, PathBuf::from(file));
     if is_dynamic_source(file) {
         return Ok((

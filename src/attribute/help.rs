@@ -4,23 +4,52 @@ use nom::{
     character::complete::{line_ending, newline, not_line_ending, space1, tab},
     combinator::{eof, map, peek},
     multi::{count, many0, many1},
-    sequence::{pair, terminated},
+    sequence::{delimited, pair, preceded, terminated},
     IResult,
 };
 
-use crate::KconfigInput;
+use crate::{util::ws, KconfigInput};
 
 fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, (usize, usize)> {
     let (input, _) = many0(newline)(input)?;
     // TODO: something is wrong here with the indentation level calculation
     // println!("{:?}", input.chars().next().unwrap());
-    let (input, (tabs, spaces)) = peek(pair(many0(tab), many0(space1)))(input)?;
-    Ok(((input), (tabs.len(), spaces.len())))
+    map(peek(pair(many0(tab), many0(space1))), |(t, s)| {
+        (t.len(), s.len())
+    })(input)
 }
 
 pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
-    let (input, _) = pair(tag("help"), newline)(input)?;
-    let (input, (_tabs, spaces)) = indentation_level(input)?;
+    let (mut input, _) = pair(
+        alt((
+            ws(tag("help")),
+            // TODO linux v-3.2, in file /drivers/net/ethernet/stmicro/stmmac/Kconfig
+            preceded(ws(tag("--")), ws(tag("help"))),
+            // TODO linux v-3.2, in file /net/caif/Kconfig
+            delimited(tag("---"), ws(tag("help")), ws(tag("---"))), // unit test test_parse_help_space
+        )),
+        preceded(many0(space1), newline),
+    )(input)?;
+    //let (input, (tabs, spaces)) = indentation_level(input);
+    let r = indentation_level(input);
+    let spaces: usize;
+    match r {
+        Ok((i, (_, s))) => {
+            input = i;
+            spaces = s;
+        }
+        Err(e) => {
+            println!("{:?}", e);
+            return match e {
+                nom::Err::Error(i) => Ok((i.input, "".to_string())),
+                nom::Err::Failure(i) => Ok((i.input, "".to_string())),
+                _ => return Err(e),
+            };
+        }
+    }
+    if spaces == 0 {
+        return Ok((input, "".to_string()));
+    }
     // TODO see function indentation_level
     //println!("{} {}", _tabs, spaces);
     let indent = count(space1::<KconfigInput, _>, spaces);

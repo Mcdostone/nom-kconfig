@@ -18,6 +18,7 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, EntryType> {
     map(
         tuple((
             alt((
+                map(ws(tag("boolean")), |_| Type::Bool),
                 map(ws(tag("bool")), |_| Type::Bool),
                 map(ws(tag("hex")), |_| Type::Hex),
                 map(ws(tag("int")), |_| Type::Int),

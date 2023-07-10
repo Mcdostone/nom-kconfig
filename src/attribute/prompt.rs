@@ -2,10 +2,10 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::char,
-    character::complete::{alphanumeric1, multispace1, one_of},
-    combinator::{map, opt, recognize},
+    character::complete::{alphanumeric1, line_ending, multispace1, not_line_ending, one_of},
+    combinator::{eof, map, opt, recognize},
     multi::many1,
-    sequence::{delimited, tuple},
+    sequence::{delimited, terminated, tuple},
     IResult,
 };
 use serde::Serialize;
@@ -42,6 +42,8 @@ pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
                 char('"'),
             ),
             delimited(ws(char('\'')), take_until("'"), char('\'')),
+            // TODO linux v-3.2, in file /arch/arm/plat-tcc/Kconfig
+            terminated(not_line_ending, alt((line_ending, eof))),
         )),
         |d: KconfigInput| d.fragment().to_owned(),
     )(input)

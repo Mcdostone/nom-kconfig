@@ -17,3 +17,16 @@ fn test_parse_source() {
         }))
     )
 }
+
+#[test]
+fn test_parse_source_no_quote() {
+    let input = "source /path/Kconfig";
+    assert_parsing_eq!(
+        parse_source,
+        input,
+        Err(Error(error::Error {
+            input: KconfigInput::new_extra("", Default::default()),
+            code: ErrorKind::Fail,
+        }))
+    )
+}

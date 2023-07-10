@@ -5,3 +5,9 @@ fn test_parse_help() {
     let input = "help\n hello world";
     assert_parsing_eq!(parse_help, input, Ok(("", "hello world".to_string())))
 }
+
+#[test]
+fn test_parse_help_space() {
+    let input = "help   \n hello world";
+    assert_parsing_eq!(parse_help, input, Ok(("", "hello world".to_string())))
+}
