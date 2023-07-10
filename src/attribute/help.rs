@@ -2,7 +2,7 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{line_ending, newline, not_line_ending, space1, tab},
-    combinator::{eof, map, peek},
+    combinator::{eof, map, peek, opt},
     multi::{count, many0, many1},
     sequence::{delimited, pair, preceded, terminated},
     IResult,
@@ -19,18 +19,30 @@ fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, (usize, usize
     })(input)
 }
 
+
+pub fn weirdo_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
+    // TODO linux v-3.2, in file /drivers/net/ethernet/stmicro/stmmac/Kconfig
+    // TODO 3.4.110/drivers/net/ethernet/sfc/Kconfig
+    map(delimited(ws(opt(many0(tag("-")))), ws(tag("help")), opt(many0(alt((
+        tag("-"),
+        space1
+    ))))), |d| d)(input)
+}
+
 pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
     let (mut input, _) = pair(
         alt((
             ws(tag("help")),
             // TODO linux v-3.2, in file /drivers/net/ethernet/stmicro/stmmac/Kconfig
-            preceded(ws(tag("--")), ws(tag("help"))),
+            weirdo_help
+            //preceded(ws(tag("--")), ws(tag("help"))),
             // TODO linux v-3.2, in file /net/caif/Kconfig
-            delimited(tag("---"), ws(tag("help")), ws(tag("---"))), // unit test test_parse_help_space
+            //delimited(tag("---"), ws(tag("help")), ws(tag("---"))), // unit test test_parse_help_space
         )),
         preceded(many0(space1), newline),
     )(input)?;
     //let (input, (tabs, spaces)) = indentation_level(input);
+    println!("here");
     let r = indentation_level(input);
     let spaces: usize;
     match r {

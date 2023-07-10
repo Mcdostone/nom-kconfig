@@ -19,11 +19,13 @@ pub type KconfigInput<'a> = LocatedSpan<&'a str, KconfigFile>;
 pub struct KconfigFile {
     pub root_dir: PathBuf,
     pub file: PathBuf,
+    pub fail_on_missing_source: bool
 }
 
 impl KconfigFile {
-    pub fn new(root_dir: PathBuf, file: PathBuf) -> Self {
-        Self { root_dir, file }
+
+    pub fn new(root_dir: PathBuf, file: PathBuf, fail_on_missing_source: bool) -> Self {
+        Self { root_dir, file, fail_on_missing_source }
     }
 
     pub fn full_path(&self) -> PathBuf {

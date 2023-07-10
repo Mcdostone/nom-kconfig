@@ -18,6 +18,7 @@ use crate::{
 };
 
 pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
+    let fail_missing_source = input.extra.fail_on_missing_source;
     let (input, _) = ws(tag("source"))(input)?;
     let (input, file) = alt((
         ws(parse_prompt_option),
@@ -29,7 +30,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             |c: KconfigInput| c.fragment().to_owned(),
         ),
     ))(input)?;
-    let source_kconfig_file = KconfigFile::new(input.clone().extra.root_dir, PathBuf::from(file));
+    let source_kconfig_file = KconfigFile::new(input.clone().extra.root_dir, PathBuf::from(file), fail_missing_source);
     if is_dynamic_source(file) {
         return Ok((
             input,

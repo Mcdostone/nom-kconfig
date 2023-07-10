@@ -2,9 +2,9 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::char,
-    character::complete::{alphanumeric1, line_ending, multispace1, not_line_ending, one_of},
+    character::{complete::{alphanumeric1, line_ending, multispace1, not_line_ending, one_of, newline}, is_newline},
     combinator::{eof, map, opt, recognize},
-    multi::many1,
+    multi::{many1, many_till},
     sequence::{delimited, terminated, tuple},
     IResult,
 };
@@ -43,7 +43,8 @@ pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
             ),
             delimited(ws(char('\'')), take_until("'"), char('\'')),
             // TODO linux v-3.2, in file /arch/arm/plat-tcc/Kconfig
-            terminated(not_line_ending, alt((line_ending, eof))),
+            map(recognize(many_till(alphanumeric1, newline)) ,|d: KconfigInput| d) 
+            //terminated(not_line_ending, alt((line_ending, eof))),
         )),
         |d: KconfigInput| d.fragment().to_owned(),
     )(input)
