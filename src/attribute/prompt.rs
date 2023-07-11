@@ -2,8 +2,8 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::char,
-    character::complete::{alphanumeric1, anychar, multispace1, one_of, space1},
-    combinator::{eof, map, opt, recognize},
+    character::complete::{alphanumeric1, line_ending, multispace1, not_line_ending, one_of},
+    combinator::{eof, map, opt, recognize, verify},
     multi::many1,
     sequence::{delimited, terminated, tuple},
     IResult,
@@ -45,30 +45,12 @@ pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
             ),
             delimited(ws(char('\'')), take_until("'"), char('\'')),
             // TODO linux v-3.2, in file /arch/arm/plat-tcc/Kconfig
-            ntm, //map(take_until(newline), |d: KconfigInput| d)
-                 //ws(many_till(anychar, end_of_line)),
-                 //recognize(terminated(many1(alphanumeric1), not(alphanumeric1)))
-
-                 //map(recognize(many_till(alphanumeric1), not(alphanumeric1))) ,|d: KconfigInput| d)
-                 //terminated(not_line_ending, alt((line_ending, eof))),
+            verify(
+                terminated(not_line_ending, alt((line_ending, eof))),
+                |d: &KconfigInput| !d.is_empty(),
+            ),
         )),
         |d: KconfigInput| d.fragment().to_owned().trim(),
-    )(input)
-}
-
-pub fn ntm(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
-    terminated(
-        map(
-            recognize(ws(many1(alt((
-                alphanumeric1,
-                space1,
-                tag("\\\""),
-                recognize(anychar),
-                //recognize(one_of("&#*|!É{}^<>%[]()+'=,:;μ-?._$/")),
-            ))))),
-            |d: KconfigInput| d,
-        ),
-        eof,
     )(input)
 }
 

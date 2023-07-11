@@ -37,3 +37,21 @@ fn test_parse_type_with_weird_prompt() {
         ))
     )
 }
+
+// 3.0.18/arch/powerpc/kvm/Kconfig
+#[test]
+fn test_parse_type_bool() {
+    let input = "bool";
+    assert_parsing_eq!(
+        parse_type,
+        input,
+        Ok((
+            "",
+            EntryType {
+                r#type: Type::Bool,
+                prompt: None,
+                r#if: None
+            },
+        ))
+    )
+}

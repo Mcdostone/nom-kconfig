@@ -26,3 +26,23 @@ fn test_parse_config() {
         ))
     )
 }
+
+#[test]
+fn test_parse_config_bool() {
+    let input = "config KVM\n    bool";
+    assert_parsing_eq!(
+        parse_config,
+        input,
+        Ok((
+            "",
+            Config {
+                symbol: "KVM".to_string(),
+                attributes: vec!(Attribute::Type(EntryType {
+                    r#type: Type::Bool,
+                    prompt: None,
+                    r#if: None
+                }))
+            }
+        ))
+    )
+}

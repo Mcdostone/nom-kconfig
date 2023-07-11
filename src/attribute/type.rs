@@ -25,7 +25,7 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, EntryType> {
                 map(ws(tag("string")), |_| Type::String),
                 map(ws(tag("tristate")), |_| Type::Tristate),
             )),
-            opt(map(ws(parse_prompt_option), |o| o.to_string())),
+            opt(map(parse_prompt_option, |o| o.to_string())),
             opt(parse_if_expression_attribute),
         )),
         |(he, wo, e)| EntryType {

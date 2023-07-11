@@ -10,14 +10,17 @@ use crate::{
 use super::{parse_entry, Entry};
 
 pub fn parse_if(input: KconfigInput) -> IResult<KconfigInput, If> {
-    map(
+    let ok = map(
         tuple((
             ws(parse_if_expression),
             many0(parse_entry),
             ws(tag("endif")),
         )),
         |(condition, entries, _)| If { condition, entries },
-    )(input)
+    )(input);
+    println!("{:?}", ok);
+
+    ok
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
