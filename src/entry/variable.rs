@@ -11,7 +11,7 @@ use serde::Serialize;
 
 use crate::{
     attribute::function::{parse_expression_token_variable_parameter, ExpressionToken},
-    util::ws,
+    util::{ws, parse_until_eol},
     KconfigInput,
 };
 
@@ -35,29 +35,30 @@ pub enum Value {
 }
 
 pub fn parse_value(input: KconfigInput) -> IResult<KconfigInput, Value> {
-    alt((
-        map(
-            delimited(
+    //alt((
+         /*map(
+            recognize(delimited(
                 tag("$("),
-                recognize(many1(alt((alphanumeric1, recognize(one_of("_")))))),
+                many1(alt((alphanumeric1, recognize(one_of("_"))))),
                 tag(")"),
-            ),
+            )),
             |c: KconfigInput| Value::ExpandedVariable(c.to_string()),
-        ),
-        map(
+        ),*/
+        /*map(
             ws(recognize(many1(alt((
                 alphanumeric1,
                 recognize(one_of("_")),
             ))))),
             |s: KconfigInput| Value::Literal(s.to_string()),
-        ),
-    ))(input)
+        ),*/
+        map(parse_until_eol, |d| Value::Literal(d.fragment().trim().to_string()))
+    (input)
 }
 
 pub fn parse_variable_identifier(input: KconfigInput) -> IResult<KconfigInput, VariableIdentifier> {
     alt((
         map(
-            recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_"))))))),
+            recognize(ws(many1(alt((alphanumeric1, recognize(one_of("-_"))))))),
             |l: KconfigInput| VariableIdentifier::Identifier(l.trim().to_string()),
         ),
         map(many1(parse_expression_token_variable_parameter), |v| {

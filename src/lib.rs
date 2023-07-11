@@ -51,3 +51,5 @@ pub mod kconfig_test;
 pub mod lib_test;
 #[cfg(test)]
 pub mod symbol_test;
+#[cfg(test)]
+pub mod util_test;
