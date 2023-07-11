@@ -74,10 +74,7 @@ pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
         map(ws(parse_menu_config), Entry::MenuConfig),
         map(ws(parse_function), Entry::Function),
         map(ws(parse_main_menu), Entry::MainMenu),
-        map(ws(parse_if), |e| {
-            println!("{:?}", &e);
-            Entry::If(e)
-        }),
+        map(ws(parse_if), Entry::If),
         map(ws(parse_menu), Entry::Menu),
         map(ws(parse_comment), Entry::Comment),
         map(ws(parse_source), Entry::Source),

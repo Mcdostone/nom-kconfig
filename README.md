@@ -30,7 +30,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let kconfig_file = KconfigFile::new(PathBuf::from("/path/to/kernel-dir"), PathBuf::from("Kconfig"));
     let input = kconfig_file.read_to_string().unwrap();
     let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
-    println!("{:?}", kconfig);
     Ok(())
 }
 ```

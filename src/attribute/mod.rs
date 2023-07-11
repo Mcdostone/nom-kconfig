@@ -38,7 +38,6 @@ use self::{
 };
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
-    println!("{}", input.fragment());
     ws(many0(parse_attribute))(input)
 }
 

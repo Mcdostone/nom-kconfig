@@ -47,7 +47,6 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     if let Ok(ff) = source_kconfig_file.read_to_string() {
         return match parse_kconfig(KconfigInput::new_extra(&ff, source_kconfig_file.clone())) {
             Ok((_, kconfig)) => {
-                //      println!("{:?}", kconfig);
                 Ok((input, kconfig))
             }
             Err(_err) => Err(nom::Err::Error(nom::error::Error::new(

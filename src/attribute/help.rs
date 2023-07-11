@@ -52,7 +52,6 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
             spaces = s;
         }
         Err(e) => {
-            println!("{:?}", e);
             return match e {
                 nom::Err::Error(i) => Ok((i.input, "".to_string())),
                 nom::Err::Failure(i) => Ok((i.input, "".to_string())),
