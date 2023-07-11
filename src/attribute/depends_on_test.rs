@@ -21,3 +21,18 @@ fn test_parse_depends_on() {
         ))
     )
 }
+
+// 5.19.7/arch/powerpc/Kconfig
+#[test]
+fn test_parse_depends_on_weird_tab() {
+    assert_parsing_eq!(
+        parse_depends_on,
+        "depends 	on LIVEPATCH",
+        Ok((
+            "",
+            Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Term(
+                Term::Atom(Atom::Symbol(Symbol::Constant("LIVEPATCH".to_string())))
+            ))))
+        ))
+    )
+}

@@ -46,6 +46,8 @@ impl KconfigFile {
 }
 
 #[cfg(test)]
+pub mod kconfig_test;
+#[cfg(test)]
 pub mod lib_test;
 #[cfg(test)]
 pub mod symbol_test;

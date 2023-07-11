@@ -4,7 +4,7 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{line_ending, multispace1, not_line_ending},
-    combinator::value,
+    combinator::{eof, value},
     error::ParseError,
     multi::many0,
     sequence::{preceded, terminated},
@@ -29,7 +29,7 @@ where
             // TODO 3.0.19/drivers/staging/iio/light/Kconfig, backslash??
             preceded(
                 alt((tag("#"), tag("\\#"))),
-                terminated(not_line_ending, line_ending),
+                terminated(not_line_ending, alt((line_ending, eof))),
             ),
             multispace1,
             // TODO linux v3.2, in file /drivers/dma/Kconfig
