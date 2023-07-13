@@ -1,7 +1,7 @@
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, char, one_of, space1, anychar},
+    character::complete::{alphanumeric1, char, one_of, space1},
     combinator::{map, opt, recognize},
     multi::{many1, separated_list0},
     sequence::{delimited, preceded, terminated, tuple},
@@ -57,7 +57,8 @@ fn parse_expression_token_parameter(input: KconfigInput) -> IResult<KconfigInput
         ),
         map(
             delimited(tag("`"), take_until("`"), tag("`")),
-            |d: KconfigInput| ExpressionToken::Backtick(d.to_string())),
+            |d: KconfigInput| ExpressionToken::Backtick(d.to_string()),
+        ),
         map(
             delimited(
                 ws(char::<KconfigInput, _>('\'')),

@@ -1,6 +1,12 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{select::{parse_select, Select}, requires::{parse_requires, Requires}, expression::{Expression, OrExpression, AndExpression, Term, Atom, CompareExpression, CompareOperator}}, symbol::Symbol,
+    attribute::{
+        expression::{
+            AndExpression, Atom, CompareExpression, CompareOperator, Expression, OrExpression, Term,
+        },
+        requires::{parse_requires, Requires},
+    },
+    symbol::Symbol,
 };
 
 // 2.5.55/drivers/char/Kconfig
@@ -14,7 +20,11 @@ fn test_parse_requires() {
             "",
             Requires {
                 symbol: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Compare(CompareExpression { left: Symbol::Constant("MTK_INFRACFG".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("y".to_string())})
+                    Atom::Compare(CompareExpression {
+                        left: Symbol::Constant("MTK_INFRACFG".to_string()),
+                        operator: CompareOperator::Equal,
+                        right: Symbol::Constant("y".to_string())
+                    })
                 ))))
             }
         ))

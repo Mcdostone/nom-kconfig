@@ -10,8 +10,8 @@ pub mod modules;
 pub mod option;
 pub mod optional;
 pub mod prompt;
-pub mod requires;
 pub mod range;
+pub mod requires;
 pub mod select;
 pub mod r#type;
 pub mod visible;
@@ -34,8 +34,9 @@ use self::{
     prompt::{parse_prompt, Prompt},
     r#type::{parse_type, EntryType},
     range::{parse_range, Range},
+    requires::{parse_requires, Requires},
     select::{parse_select, Select},
-    visible::{parse_visible, Visible}, requires::{Requires, parse_requires},
+    visible::{parse_visible, Visible},
 };
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
@@ -106,10 +107,10 @@ mod prompt_test;
 #[cfg(test)]
 mod range_test;
 #[cfg(test)]
+mod requires_test;
+#[cfg(test)]
 mod select_test;
 #[cfg(test)]
 mod type_test;
 #[cfg(test)]
 mod visible_test;
-#[cfg(test)]
-mod requires_test;

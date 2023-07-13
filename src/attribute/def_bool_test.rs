@@ -37,20 +37,21 @@ fn test_parse_def_bool_function() {
             "",
             DefBool {
                 expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Function(
-                        FunctionCall {
-                            name: "as-instr".to_string(),
-                            parameters: vec!(Parameter {
-                                tokens: vec!(
-                                    ExpressionToken::Literal("vpmovm2b".to_string()),
-                                    ExpressionToken::Space,
-                                    ExpressionToken::Literal("%k1".to_string()),
-                                    ExpressionToken::Function(Box::new(FunctionCall{name: "comma".to_string(), parameters: vec!() })),
-                                    ExpressionToken::Literal("%zmm5".to_string())
-                                )
-                            })
-                        }
-                    )
+                    Atom::Function(FunctionCall {
+                        name: "as-instr".to_string(),
+                        parameters: vec!(Parameter {
+                            tokens: vec!(
+                                ExpressionToken::Literal("vpmovm2b".to_string()),
+                                ExpressionToken::Space,
+                                ExpressionToken::Literal("%k1".to_string()),
+                                ExpressionToken::Function(Box::new(FunctionCall {
+                                    name: "comma".to_string(),
+                                    parameters: vec!()
+                                })),
+                                ExpressionToken::Literal("%zmm5".to_string())
+                            )
+                        })
+                    })
                 )))),
                 r#if: None
             }

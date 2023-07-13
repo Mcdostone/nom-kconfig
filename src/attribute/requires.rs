@@ -1,14 +1,9 @@
-use nom::{
-    bytes::complete::tag,
-    combinator::{map, opt},
-    sequence::tuple,
-    IResult,
-};
+use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 use serde::Serialize;
 
-use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
+use crate::{util::ws, KconfigInput};
 
-use super::expression::{parse_if_expression_attribute, Expression, parse_expression};
+use super::expression::{parse_expression, Expression};
 
 #[derive(Debug, Default, Serialize, Clone, PartialEq)]
 pub struct Requires {
@@ -17,12 +12,7 @@ pub struct Requires {
 
 pub fn parse_requires(input: KconfigInput) -> IResult<KconfigInput, Requires> {
     map(
-        tuple((
-            ws(tag("requires")),
-            ws(parse_expression),
-        )),
-        |(_, s)| Requires {
-            symbol: s
-        },
+        tuple((ws(tag("requires")), ws(parse_expression))),
+        |(_, s)| Requires { symbol: s },
     )(input)
 }

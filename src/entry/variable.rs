@@ -4,14 +4,14 @@ use nom::{
     character::complete::{alphanumeric1, one_of},
     combinator::{map, recognize},
     multi::many1,
-    sequence::{delimited, tuple},
+    sequence::tuple,
     IResult,
 };
 use serde::Serialize;
 
 use crate::{
     attribute::function::{parse_expression_token_variable_parameter, ExpressionToken},
-    util::{ws, parse_until_eol},
+    util::{parse_until_eol, ws},
     KconfigInput,
 };
 
@@ -36,23 +36,24 @@ pub enum Value {
 
 pub fn parse_value(input: KconfigInput) -> IResult<KconfigInput, Value> {
     //alt((
-         /*map(
-            recognize(delimited(
-                tag("$("),
-                many1(alt((alphanumeric1, recognize(one_of("_"))))),
-                tag(")"),
-            )),
-            |c: KconfigInput| Value::ExpandedVariable(c.to_string()),
-        ),*/
-        /*map(
-            ws(recognize(many1(alt((
-                alphanumeric1,
-                recognize(one_of("_")),
-            ))))),
-            |s: KconfigInput| Value::Literal(s.to_string()),
-        ),*/
-        map(parse_until_eol, |d| Value::Literal(d.fragment().trim().to_string()))
-    (input)
+    /*map(
+        recognize(delimited(
+            tag("$("),
+            many1(alt((alphanumeric1, recognize(one_of("_"))))),
+            tag(")"),
+        )),
+        |c: KconfigInput| Value::ExpandedVariable(c.to_string()),
+    ),*/
+    /*map(
+        ws(recognize(many1(alt((
+            alphanumeric1,
+            recognize(one_of("_")),
+        ))))),
+        |s: KconfigInput| Value::Literal(s.to_string()),
+    ),*/
+    map(parse_until_eol, |d| {
+        Value::Literal(d.fragment().trim().to_string())
+    })(input)
 }
 
 pub fn parse_variable_identifier(input: KconfigInput) -> IResult<KconfigInput, VariableIdentifier> {

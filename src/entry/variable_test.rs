@@ -76,7 +76,6 @@ fn test_parse_variable_space() {
     )
 }
 
-
 #[test]
 fn test_parse_variable_if_success() {
     let input = r#"if-success = $(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")"#;
@@ -88,11 +87,11 @@ fn test_parse_variable_if_success() {
             VariableAssignment {
                 identifier: VariableIdentifier::Identifier("if-success".to_string()),
                 operator: "=".to_string(),
-                right: Value::Literal(r#"$(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")"#.to_string())
+                right: Value::Literal(
+                    r#"$(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")"#
+                        .to_string()
+                )
             }
         ))
     )
 }
-
-
-

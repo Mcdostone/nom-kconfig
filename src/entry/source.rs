@@ -4,7 +4,7 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{alphanumeric1, one_of},
-    combinator::{map, recognize, cut},
+    combinator::{cut, map, recognize},
     multi::many1,
     IResult,
 };
