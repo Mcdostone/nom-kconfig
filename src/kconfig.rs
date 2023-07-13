@@ -26,9 +26,7 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
             entries: d,
         }
     })(input)?;
-    
     let (input, _) = ws(eof)(input)?;
-    println!("{:?} {:?}", input.extra.file, input.fragment());
     // TODO
     Ok((input, result))
 }

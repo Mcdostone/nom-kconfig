@@ -10,6 +10,7 @@ pub mod modules;
 pub mod option;
 pub mod optional;
 pub mod prompt;
+pub mod requires;
 pub mod range;
 pub mod select;
 pub mod r#type;
@@ -34,7 +35,7 @@ use self::{
     r#type::{parse_type, EntryType},
     range::{parse_range, Range},
     select::{parse_select, Select},
-    visible::{parse_visible, Visible},
+    visible::{parse_visible, Visible}, requires::{Requires, parse_requires},
 };
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
@@ -50,6 +51,7 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         ws(parse_depends_on),
         map(ws(parse_select), Attribute::Select),
         map(ws(parse_default), Attribute::Default),
+        map(ws(parse_requires), Attribute::Requires),
         map(ws(parse_def_tristate), Attribute::DefTristate),
         map(ws(parse_modules), |_| Attribute::Modules),
         map(ws(parse_range), Attribute::Range),
@@ -73,6 +75,7 @@ pub enum Attribute {
     DefBool(DefBool),
     DefTristate(DefTristate),
     Imply(Imply),
+    Requires(Requires),
     Option(OptionValues),
 }
 
@@ -108,3 +111,5 @@ mod select_test;
 mod type_test;
 #[cfg(test)]
 mod visible_test;
+#[cfg(test)]
+mod requires_test;

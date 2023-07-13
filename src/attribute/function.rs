@@ -1,7 +1,7 @@
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, char, one_of, space1},
+    character::complete::{alphanumeric1, char, one_of, space1, anychar},
     combinator::{map, opt, recognize},
     multi::{many1, separated_list0},
     sequence::{delimited, preceded, terminated, tuple},
@@ -28,6 +28,7 @@ pub enum ExpressionToken {
     Variable(String),
     DoubleQuotes(Vec<ExpressionToken>),
     SingleQuotes(String),
+    Backtick(String),
     Function(Box<FunctionCall>),
     Space,
 }
@@ -54,6 +55,9 @@ fn parse_expression_token_parameter(input: KconfigInput) -> IResult<KconfigInput
             delimited(tag("\""), parse_expression_parameter, tag("\"")),
             ExpressionToken::DoubleQuotes,
         ),
+        map(
+            delimited(tag("`"), take_until("`"), tag("`")),
+            |d: KconfigInput| ExpressionToken::Backtick(d.to_string())),
         map(
             delimited(
                 ws(char::<KconfigInput, _>('\'')),
@@ -96,7 +100,7 @@ fn parse_literal_parameter(input: KconfigInput) -> IResult<KconfigInput, Express
             recognize(ws(many1(alt((
                 alphanumeric1,
                 tag("\\$"),
-                recognize(one_of("+(<>&\\[]_|'.-:\n\\/")),
+                recognize(one_of("+(<>%&\\[]_|'.-:\n\\/")),
             ))))),
             |d: KconfigInput| ExpressionToken::Literal(d.fragment().to_string()),
         ),

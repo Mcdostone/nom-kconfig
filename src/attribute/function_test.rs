@@ -163,3 +163,31 @@ fn test_parse_function_call_special_chars() {
         ))
     )
 }
+
+
+
+#[test]
+fn test_parse_function_call_special_backtik() {
+    let input = r#"$(success, test `$(PAHOLE) --version | sed -E 's/v([0-9]+)\.([0-9]+)/\1\2/'` -ge "119")"#;
+    assert_parsing_eq!(
+        parse_function_call,
+        input,
+        Ok((
+            "",
+            FunctionCall {
+                name: "success".to_string(),
+                parameters: vec!(Parameter {
+                    tokens: vec!(
+                        ExpressionToken::Literal("test".to_string()),
+                        ExpressionToken::Space,
+                        ExpressionToken::Backtick("$(PAHOLE) --version | sed -E 's/v([0-9]+)\\.([0-9]+)/\\1\\2/'".to_string()),
+                        ExpressionToken::Space,
+                        ExpressionToken::Literal("-ge".to_string()),
+                        ExpressionToken::Space,
+                        ExpressionToken::DoubleQuotes(vec!(ExpressionToken::Literal("119".to_string())))
+                    )
+                })
+            }
+        ))
+    )
+}
