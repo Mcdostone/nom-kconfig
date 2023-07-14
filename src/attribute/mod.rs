@@ -15,6 +15,7 @@ pub mod requires;
 pub mod select;
 pub mod r#type;
 pub mod visible;
+pub mod enable;
 
 use nom::{branch::alt, combinator::map, multi::many0, IResult};
 use serde::Serialize;
@@ -36,7 +37,7 @@ use self::{
     range::{parse_range, Range},
     requires::{parse_requires, Requires},
     select::{parse_select, Select},
-    visible::{parse_visible, Visible},
+    visible::{parse_visible, Visible}, enable::{parse_enable, Enable},
 };
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
@@ -59,6 +60,7 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_imply), Attribute::Imply),
         map(ws(parse_visible), Attribute::Visible),
         map(ws(parse_option), Attribute::Option),
+        map(ws(parse_enable), Attribute::Enable),
     ))(input)
 }
 #[derive(Debug, Serialize, Clone, PartialEq)]
@@ -73,6 +75,7 @@ pub enum Attribute {
     Range(Range),
     Visible(Visible),
     Default(DefaultAttribute),
+    Enable(Enable),
     DefBool(DefBool),
     DefTristate(DefTristate),
     Imply(Imply),
@@ -114,3 +117,5 @@ mod select_test;
 mod type_test;
 #[cfg(test)]
 mod visible_test;
+#[cfg(test)]
+mod enable_test;

@@ -47,10 +47,20 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     if let Ok(ff) = source_kconfig_file.read_to_string() {
         return match cut(parse_kconfig)(KconfigInput::new_extra(&ff, source_kconfig_file.clone())) {
             Ok((_, kconfig)) => Ok((input, kconfig)),
-            Err(_err) => Err(nom::Err::Error(nom::error::Error::new(
-                KconfigInput::new_extra("", source_kconfig_file),
-                nom::error::ErrorKind::Fail,
-            ))),
+            Err(_err) => match _err {
+                nom::Err::Incomplete(_d) => Err(nom::Err::Error(nom::error::Error::new(
+                    KconfigInput::new_extra("", source_kconfig_file),
+                    nom::error::ErrorKind::Fail,
+                ))),
+                nom::Err::Error(i) => Err(nom::Err::Error(nom::error::Error::new(
+                    KconfigInput::new_extra(&input, source_kconfig_file),
+                    i.code,
+                ))),
+                nom::Err::Failure(i) => Err(nom::Err::Error(nom::error::Error::new(
+                    KconfigInput::new_extra("", source_kconfig_file),
+                    i.code,
+                ))),
+            },
         };
     }
 
