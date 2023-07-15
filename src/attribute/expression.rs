@@ -79,6 +79,7 @@ pub enum Atom {
     Compare(CompareExpression),
     Function(FunctionCall),
     Parenthesis(Box<Expression>),
+    String(Box<Atom>),
 }
 
 impl Default for OrExpression {
@@ -151,6 +152,7 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     alt((
         ws(parse_compare),
         map(parse_function_call, Atom::Function),
+        map(delimited(tag("\""), parse_atom, tag("\"")), |d| Atom::String(Box::new(d))),
         map(parse_symbol, Atom::Symbol),
         map(
             delimited(ws(tag("(")), parse_expression, ws(tag(")"))),
@@ -158,6 +160,7 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
         ),
         map(parse_symbol, Atom::Symbol),
         map(parse_number, Atom::Number),
+        
     ))(input)
 }
 
