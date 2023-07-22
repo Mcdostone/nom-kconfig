@@ -6,10 +6,7 @@ use nom::{
 };
 use serde::Serialize;
 
-use crate::{
-    util::{wsi},
-    KconfigInput,
-};
+use crate::{util::wsi, KconfigInput};
 
 use super::expression::{parse_expression, parse_if_expression_attribute, Expression};
 
@@ -24,7 +21,7 @@ pub struct DefTristate {
 /// Parses a `def_tristate` attribute.
 ///
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::{

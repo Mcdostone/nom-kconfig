@@ -21,7 +21,7 @@ pub struct DefaultAttribute {
 /// Parses a `default` attribute.
 ///
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::{

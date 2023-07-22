@@ -21,7 +21,7 @@ pub struct DefBool {
 /// Parses a `def_bool` attribute.
 ///
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::{

@@ -165,7 +165,7 @@ fn test_parse_function_call_special_chars() {
 }
 
 #[test]
-fn test_parse_function_call_special_backtik() {
+fn test_parse_function_call_special_backtick() {
     let input = r#"$(success, test `$(PAHOLE) --version | sed -E 's/v([0-9]+)\.([0-9]+)/\1\2/'` -ge "119")"#;
     assert_parsing_eq!(
         parse_function_call,

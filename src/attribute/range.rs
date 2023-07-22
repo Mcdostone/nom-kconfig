@@ -39,7 +39,7 @@ fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
 
 /// Parses a `range` attribute.
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::range::{parse_range, Range},

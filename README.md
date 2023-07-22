@@ -22,7 +22,7 @@ Parsing relies on the [nom library](https://github.com/rust-bakery/nom).
 cargo add nom-kconfig
 ```
 
-```rust
+```
 use std::path::PathBuf;
 use nom_kconfig::{kconfig::{parse_kconfig}, KconfigInput, KconfigFile};
 

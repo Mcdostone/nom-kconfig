@@ -19,7 +19,7 @@ pub struct Visible {
 
 /// Parses a `visible` attribute.
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 /// assert_parsing_eq,
 /// attribute::visible::{parse_visible, Visible},

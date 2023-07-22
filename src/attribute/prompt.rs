@@ -30,7 +30,7 @@ pub fn parse_prompt(input: KconfigInput) -> IResult<KconfigInput, Prompt> {
 
 /// Parses a `prompt` attribute.
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{assert_parsing_eq, attribute::prompt::parse_prompt_option};
 ///
 /// assert_parsing_eq!(parse_prompt_option, "scripts/Kconfig.include", Ok(("", "scripts/Kconfig.include")))

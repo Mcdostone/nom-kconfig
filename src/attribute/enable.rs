@@ -11,7 +11,7 @@ pub struct Enable {
 /// Parses a `enable` attribute. It looks like this attribute is deprecated....
 ///
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::enable::{parse_enable, Enable},

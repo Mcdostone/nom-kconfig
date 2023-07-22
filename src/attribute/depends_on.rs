@@ -13,7 +13,7 @@ use super::{expression::parse_expression, Attribute};
 /// If multiple dependencies are defined, they are connected with '&&'. Dependencies are applied to all other options within this menu entry (which also accept an "if" expression), so these two examples are equivalent:
 ///
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::{

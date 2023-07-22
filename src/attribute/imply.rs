@@ -25,7 +25,7 @@ pub struct Imply {
 /// This parses a `imply` attribute.
 ///
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     symbol::Symbol,

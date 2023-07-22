@@ -20,7 +20,7 @@ pub struct Select {
 
 /// Parses a `select` attribute.
 /// # Example
-/// ```rust
+/// ```
 /// use nom_kconfig::{
 /// assert_parsing_eq,
 /// attribute::select::{parse_select, Select},

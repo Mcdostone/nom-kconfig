@@ -8,7 +8,8 @@ use serde::Serialize;
 
 use crate::{
     entry::{parse_entry, Entry},
-    util::{ws, ws_comment}, KconfigInput,
+    util::{ws, ws_comment},
+    KconfigInput,
 };
 
 /// A Kconfig file.
