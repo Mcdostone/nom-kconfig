@@ -13,7 +13,7 @@ use serde::Serialize;
 
 use crate::{
     symbol::{parse_symbol, Symbol},
-    util::{wsi},
+    util::wsi,
     KconfigInput,
 };
 
