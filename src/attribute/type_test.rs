@@ -1,6 +1,10 @@
 use crate::{
     assert_parsing_eq,
-    attribute::r#type::{parse_type, EntryType, Type},
+    attribute::{
+        expression::{AndExpression, Atom, Expression, OrExpression, Term},
+        r#type::{parse_type, EntryType, Type},
+    },
+    symbol::Symbol,
 };
 
 #[test]
@@ -51,6 +55,32 @@ fn test_parse_type_bool() {
                 r#type: Type::Bool,
                 prompt: None,
                 r#if: None
+            },
+        ))
+    )
+}
+
+// 2.6.25/kernel/power/Kconfig
+#[test]
+fn test_parse_type_backslash() {
+    let input = r#"bool "Enable freezer for suspend to RAM/standby" \
+    if ARCH_WANTS_FREEZER_CONTROL || BROKEN"#;
+    assert_parsing_eq!(
+        parse_type,
+        input,
+        Ok((
+            "",
+            EntryType {
+                r#type: Type::Bool,
+                prompt: Some("Enable freezer for suspend to RAM/standby".to_string()),
+                r#if: Some(Expression(OrExpression::Expression(vec!(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                        "ARCH_WANTS_FREEZER_CONTROL".to_string()
+                    )))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                        "BROKEN".to_string()
+                    )))),
+                ))))
             },
         ))
     )

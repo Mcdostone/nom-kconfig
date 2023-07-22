@@ -1,5 +1,5 @@
 use nom_locate::LocatedSpan;
-use regex::Regex;
+
 use std::path::PathBuf;
 use std::{fs, io};
 
@@ -37,10 +37,10 @@ impl KconfigFile {
 
     pub fn read_to_string(&self) -> io::Result<String> {
         let input = fs::read_to_string(self.full_path())?;
-        let re = Regex::new("\\\\\n").unwrap();
+        /*let re = Regex::new("\\\\\n").unwrap();
         let input = re.replace_all(&input, "");
         let re = Regex::new("\t").unwrap();
-        let input = re.replace_all(&input, "    ");
+        let input = re.replace_all(&input, "    ");*/
         Ok(input.to_string())
     }
 }

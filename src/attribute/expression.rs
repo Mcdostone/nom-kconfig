@@ -3,7 +3,7 @@ use std::str::FromStr;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{char, digit1, space1},
+    character::complete::{char, digit1},
     combinator::{map, map_res, opt, recognize, value},
     multi::many0,
     sequence::{delimited, pair, preceded, tuple},
@@ -13,7 +13,7 @@ use serde::Serialize;
 
 use crate::{
     symbol::{parse_symbol, Symbol},
-    util::ws,
+    util::{wsi},
     KconfigInput,
 };
 
@@ -108,8 +108,8 @@ impl Default for Atom {
 pub fn parse_or_expression(input: KconfigInput) -> IResult<KconfigInput, OrExpression> {
     map(
         tuple((
-            ws(parse_and_expression),
-            many0(preceded(ws(tag("||")), ws(parse_and_expression))),
+            wsi(parse_and_expression),
+            many0(preceded(wsi(tag("||")), wsi(parse_and_expression))),
         )),
         |(l, ee)| {
             if ee.is_empty() {
@@ -126,8 +126,8 @@ pub fn parse_or_expression(input: KconfigInput) -> IResult<KconfigInput, OrExpre
 pub fn parse_and_expression(input: KconfigInput) -> IResult<KconfigInput, AndExpression> {
     map(
         tuple((
-            ws(parse_term),
-            many0(preceded(ws(tag("&&")), ws(parse_term))),
+            wsi(parse_term),
+            many0(preceded(wsi(tag("&&")), wsi(parse_term))),
         )),
         |(l, ee)| {
             if ee.is_empty() {
@@ -143,24 +143,25 @@ pub fn parse_and_expression(input: KconfigInput) -> IResult<KconfigInput, AndExp
 
 pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
     alt((
-        map(preceded(ws(tag("!")), parse_atom), Term::Not),
+        map(preceded(wsi(tag("!")), parse_atom), Term::Not),
         map(parse_atom, Term::Atom),
     ))(input)
 }
 
 pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     alt((
-        ws(parse_compare),
+        wsi(parse_compare),
         map(parse_function_call, Atom::Function),
-        map(delimited(tag("\""), parse_atom, tag("\"")), |d| Atom::String(Box::new(d))),
+        map(delimited(tag("\""), parse_atom, tag("\"")), |d| {
+            Atom::String(Box::new(d))
+        }),
         map(parse_symbol, Atom::Symbol),
         map(
-            delimited(ws(tag("(")), parse_expression, ws(tag(")"))),
+            delimited(wsi(tag("(")), parse_expression, wsi(tag(")"))),
             |expr| Atom::Parenthesis(Box::new(expr)),
         ),
         map(parse_symbol, Atom::Symbol),
         map(parse_number, Atom::Number),
-        
     ))(input)
 }
 
@@ -182,9 +183,9 @@ pub fn parse_compare_operator(input: KconfigInput) -> IResult<KconfigInput, Comp
 pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     map(
         tuple((
-            ws(parse_symbol),
-            ws(parse_compare_operator),
-            ws(parse_symbol),
+            wsi(parse_symbol),
+            wsi(parse_compare_operator),
+            wsi(parse_symbol),
         )),
         |(l, o, r)| {
             Atom::Compare(CompareExpression {
@@ -197,10 +198,7 @@ pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
 }
 
 pub fn parse_if_expression_attribute(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    map(
-        tuple((space1, tag("if"), ws(parse_expression))),
-        |(_, _, e)| e,
-    )(input)
+    map(tuple((wsi(tag("if")), wsi(parse_expression))), |(_, e)| e)(input)
 }
 
 pub fn parse_hex_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
@@ -218,5 +216,5 @@ pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
 }
 
 pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    map(pair(ws(tag("if")), ws(parse_expression)), |(_, e)| e)(input)
+    map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e)(input)
 }

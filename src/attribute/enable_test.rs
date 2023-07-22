@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{enable::{Enable, parse_enable}},
+    attribute::enable::{parse_enable, Enable},
 };
 
 #[test]

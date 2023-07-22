@@ -3,19 +3,19 @@ use nom::{
     bytes::complete::tag,
     character::complete::{line_ending, newline, not_line_ending, space1, tab},
     combinator::{eof, map, opt, peek},
-    multi::{count, many0, many1},
+    multi::{many0, many1},
     sequence::{delimited, pair, preceded, terminated},
     IResult,
 };
 
 use crate::{util::ws, KconfigInput};
 
-fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, (usize, usize)> {
+fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, (usize, usize, usize)> {
     let (input, _) = many0(newline)(input)?;
     // TODO: something is wrong here with the indentation level calculation
     // println!("{:?}", input.chars().next().unwrap());
     map(peek(pair(many0(tab), many0(space1))), |(t, s)| {
-        (t.len(), s.len())
+        (t.len(), s.len(), s.len() + t.len())
     })(input)
 }
 
@@ -37,19 +37,17 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
         alt((
             ws(tag("help")),
             // TODO linux v-3.2, in file /drivers/net/ethernet/stmicro/stmmac/Kconfig
-            weirdo_help, //preceded(ws(tag("--")), ws(tag("help"))),
-                         // TODO linux v-3.2, in file /net/caif/Kconfig
-                         //delimited(tag("---"), ws(tag("help")), ws(tag("---"))), // unit test test_parse_help_space
+            weirdo_help,
         )),
         preceded(many0(space1), newline),
     )(input)?;
     //let (input, (tabs, spaces)) = indentation_level(input);
     let r = indentation_level(input);
-    let spaces: usize;
+    let indent: usize;
     match r {
-        Ok((i, (_, s))) => {
+        Ok((i, (_, _, tt))) => {
             input = i;
-            spaces = s;
+            indent = tt;
         }
         Err(e) => {
             return match e {
@@ -59,17 +57,17 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
             };
         }
     }
-    if spaces == 0 {
+    if indent == 0 {
         return Ok((input, "".to_string()));
     }
     // TODO see function indentation_level
-    //println!("{} {}", _tabs, spaces);
-    let indent = count(space1::<KconfigInput, _>, spaces);
-    let content_line = terminated(not_line_ending, alt((line_ending, eof)));
+    //let indent = count(space1::<KconfigInput, _>, indent);
+    let indent = space1;
+
     map(
         many1(alt((
             map(newline, |_| ""),
-            map(pair(indent, content_line), |(_, line)| {
+            map(pair(indent, parse_line_help), |(_, line)| {
                 line.fragment().to_owned()
             }),
         ))),
@@ -81,4 +79,8 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
                 .join("\n")
         },
     )(input)
+}
+
+pub fn parse_line_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
+    terminated(not_line_ending, alt((line_ending, eof)))(input)
 }

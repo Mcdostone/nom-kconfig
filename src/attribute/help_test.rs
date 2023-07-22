@@ -33,3 +33,38 @@ fn test_parse_help_encoding() {
         ))
     )
 }
+
+#[test]
+fn test_parse_help_indent() {
+    let input = "	---help---
+	This driver supports all of Adaptec's Fast through Ultra 160 PCI
+	based SCSI controllers as well as the aic7770 based EISA and VLB
+	SCSI controllers (the 274x and 284x series).";
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok((
+            "",
+            "This driver supports all of Adaptec's Fast through Ultra 160 PCI\nbased SCSI controllers as well as the aic7770 based EISA and VLB\nSCSI controllers (the 274x and 284x series).".to_string()
+        ))
+    )
+}
+
+#[test]
+fn test_parse_help_indent_2() {
+    let input = "	help
+    The Alpha is a 64-bit general-purpose processor designed and
+    marketed by the Digital Equipment Corporation of blessed memory, now
+    Compaq.  Alpha Linux dates from 1995-1996 and was the first non-x86
+    port. The Alpha Linux project has a home page at
+    <http://www.alphalinux.org/>.
+";
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok((
+            "",
+            "The Alpha is a 64-bit general-purpose processor designed and\nmarketed by the Digital Equipment Corporation of blessed memory, now\nCompaq.  Alpha Linux dates from 1995-1996 and was the first non-x86\nport. The Alpha Linux project has a home page at\n<http://www.alphalinux.org/>.".to_string()
+        ))
+    )
+}

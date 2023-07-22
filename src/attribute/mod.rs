@@ -2,6 +2,7 @@ pub mod def_bool;
 pub mod def_tristate;
 pub mod default;
 pub mod depends_on;
+pub mod enable;
 pub mod expression;
 pub mod function;
 pub mod help;
@@ -15,7 +16,6 @@ pub mod requires;
 pub mod select;
 pub mod r#type;
 pub mod visible;
-pub mod enable;
 
 use nom::{branch::alt, combinator::map, multi::many0, IResult};
 use serde::Serialize;
@@ -27,6 +27,7 @@ use self::{
     def_tristate::{parse_def_tristate, DefTristate},
     default::{parse_default, DefaultAttribute},
     depends_on::parse_depends_on,
+    enable::{parse_enable, Enable},
     expression::Expression,
     help::parse_help,
     imply::{parse_imply, Imply},
@@ -37,7 +38,7 @@ use self::{
     range::{parse_range, Range},
     requires::{parse_requires, Requires},
     select::{parse_select, Select},
-    visible::{parse_visible, Visible}, enable::{parse_enable, Enable},
+    visible::{parse_visible, Visible},
 };
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
@@ -92,6 +93,8 @@ mod default_test;
 #[cfg(test)]
 mod depends_on_test;
 #[cfg(test)]
+mod enable_test;
+#[cfg(test)]
 mod expression_test;
 #[cfg(test)]
 mod function_test;
@@ -117,5 +120,3 @@ mod select_test;
 mod type_test;
 #[cfg(test)]
 mod visible_test;
-#[cfg(test)]
-mod enable_test;
