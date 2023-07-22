@@ -25,6 +25,24 @@ fn test_parse_default() {
     )
 }
 
+// v3.5.0/arch/microblaze/platform/generic/Kconfig.auto
+#[test]
+fn test_parse_default_constant_symbol_with_numbers() {
+    assert_parsing_eq!(
+        parse_default,
+        "default 7.10.d",
+        Ok((
+            "",
+            DefaultAttribute {
+                expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::Constant("7.10.d".to_string()))
+                )))),
+                r#if: None
+            }
+        ))
+    )
+}
+
 // 5.0/scripts/gcc-plugins/Kconfig
 #[test]
 fn test_parse_default_ambigus() {

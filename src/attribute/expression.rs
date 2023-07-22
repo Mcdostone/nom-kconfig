@@ -155,13 +155,12 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
         map(delimited(tag("\""), parse_atom, tag("\"")), |d| {
             Atom::String(Box::new(d))
         }),
-        map(parse_symbol, Atom::Symbol),
         map(
             delimited(wsi(tag("(")), parse_expression, wsi(tag(")"))),
             |expr| Atom::Parenthesis(Box::new(expr)),
         ),
-        map(parse_symbol, Atom::Symbol),
         map(parse_number, Atom::Number),
+        map(parse_symbol, Atom::Symbol),
     ))(input)
 }
 
