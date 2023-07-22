@@ -17,7 +17,7 @@ fn test_parse() {
     let input_file = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("tests")
         .join("Kconfig");
-    let kconfig_file = KconfigFile::new(
+    let kconfig_file: KconfigFile = KconfigFile::new(
         input_file.parent().unwrap().to_path_buf(),
         input_file.clone(),
         false,
