@@ -7,6 +7,7 @@ use crate::{
     KconfigInput,
 };
 
+/// This defines a comment which is displayed to the user during the configuration process and is also echoed to the output files. The only possible options are dependencies.
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct Comment {
     pub prompt: String,

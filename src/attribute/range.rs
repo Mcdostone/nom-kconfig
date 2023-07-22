@@ -15,6 +15,7 @@ use crate::{
 
 use super::expression::{parse_if_expression_attribute, parse_number, Expression};
 
+/// This allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
 #[derive(Debug, Default, Clone, Serialize, PartialEq)]
 pub struct Range {
     pub lhs: Symbol,
@@ -23,7 +24,7 @@ pub struct Range {
     pub r#if: Option<Expression>,
 }
 
-pub fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
+fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
     // TODO semantic controls: lhs < rhs
     alt((
         map(tuple((ws(parse_number), ws(parse_number))), |(l, r)| {
@@ -36,6 +37,28 @@ pub fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> 
     ))(input)
 }
 
+/// Parses a `range` attribute.
+/// # Example
+/// ```rust
+/// use nom_kconfig::{
+///     assert_parsing_eq,
+///     attribute::range::{parse_range, Range},
+///     symbol::Symbol,
+/// };
+///
+/// assert_parsing_eq!(
+///     parse_range,
+///     "range 1 5",
+///     Ok((
+///         "",
+///         Range {
+///             lhs: Symbol::Constant("1".to_string()),
+///             rhs: Symbol::Constant("5".to_string()),
+///             r#if: None
+///         }
+///     ))
+/// )
+/// ```
 pub fn parse_range(input: KconfigInput) -> IResult<KconfigInput, Range> {
     map(
         tuple((

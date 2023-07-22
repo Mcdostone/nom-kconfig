@@ -12,6 +12,7 @@ pub fn parse_main_menu(input: KconfigInput) -> IResult<KconfigInput, MainMenu> {
     )(input)
 }
 
+/// This sets the config program's title bar if the config program chooses to use it. It should be placed at the top of the configuration, before any other statement.
 #[derive(Debug, Default, Clone, Serialize, PartialEq)]
 pub struct MainMenu {
     pub prompt: String,

@@ -6,10 +6,9 @@ use crate::{
 
 #[test]
 fn test_parse_range() {
-    let input = "range 1 5";
     assert_parsing_eq!(
         parse_range,
-        input,
+        "range 1 5",
         Ok((
             "",
             Range {

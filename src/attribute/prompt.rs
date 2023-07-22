@@ -28,6 +28,13 @@ pub fn parse_prompt(input: KconfigInput) -> IResult<KconfigInput, Prompt> {
     )(input)
 }
 
+/// Parses a `prompt` attribute.
+/// # Example
+/// ```rust
+/// use nom_kconfig::{assert_parsing_eq, attribute::prompt::parse_prompt_option};
+///
+/// assert_parsing_eq!(parse_prompt_option, "scripts/Kconfig.include", Ok(("", "scripts/Kconfig.include")))
+/// ```
 pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
     map(
         alt((
@@ -54,6 +61,7 @@ pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
     )(input)
 }
 
+/// Every menu entry can have at most one prompt, which is used to display to the user. Optionally dependencies only for this prompt can be added with "if".
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct Prompt {
     pub prompt: String,

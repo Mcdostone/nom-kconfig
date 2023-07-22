@@ -32,6 +32,17 @@ pub fn weirdo_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
     )(input)
 }
 
+/// This parses a help text. The end of the help text is determined by the indentation level, this means it ends at the first line which has a smaller indentation than the first line of the help text.
+///
+/// # Example
+/// ```rust
+/// use nom_kconfig::{
+///     assert_parsing_eq,
+///     attribute::help::parse_help,
+/// };
+///
+/// assert_parsing_eq!(parse_help, "help\n   hello world", Ok(("", "hello world".to_string())))
+/// ```
 pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
     let (mut input, _) = pair(
         alt((

@@ -6,10 +6,9 @@ use crate::{
 
 #[test]
 fn test_parse_imply() {
-    let input = "imply PCI";
     assert_parsing_eq!(
         parse_imply,
-        input,
+        "imply PCI",
         Ok((
             "",
             Imply {

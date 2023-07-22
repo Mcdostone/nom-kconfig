@@ -6,10 +6,14 @@ use nom::{
 };
 use serde::Serialize;
 
-use crate::{util::ws, KconfigInput};
+use crate::{
+    util::{wsi},
+    KconfigInput,
+};
 
 use super::expression::{parse_expression, parse_if_expression_attribute, Expression};
 
+/// This is a shorthand notation for a tristate type definition plus a value.
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct DefTristate {
     pub expression: Expression,
@@ -17,11 +21,32 @@ pub struct DefTristate {
     pub r#if: Option<Expression>,
 }
 
+/// Parses a `def_tristate` attribute.
+///
+/// # Example
+/// ```rust
+/// use nom_kconfig::{
+///     assert_parsing_eq,
+///     attribute::{
+///         def_tristate::{parse_def_tristate, DefTristate},
+///         expression::{Expression, AndExpression, Atom, OrExpression, Term},
+///         function::{ExpressionToken, FunctionCall, Parameter},
+///     },
+///     symbol::Symbol,
+/// };
+///
+/// assert_parsing_eq!(parse_def_tristate, "def_tristate PCI",  Ok(("", DefTristate {
+///     expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
+///         Atom::Symbol(Symbol::Constant("PCI".to_string()))
+///     )))),
+///     r#if: None
+/// })));
+/// ```
 pub fn parse_def_tristate(input: KconfigInput) -> IResult<KconfigInput, DefTristate> {
     map(
         tuple((
-            ws(tag("def_tristate")),
-            ws(parse_expression),
+            wsi(tag("def_tristate")),
+            wsi(parse_expression),
             opt(parse_if_expression_attribute),
         )),
         |(_, e, i)| DefTristate {

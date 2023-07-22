@@ -46,6 +46,7 @@ pub enum Type {
     Int,
 }
 
+/// Every config option must have a type. There are only two basic types: tristate and string; the other types are based on these two. The type definition optionally accepts an input prompt.
 #[derive(Debug, Serialize, Clone, PartialEq)]
 pub struct EntryType {
     pub r#type: Type,

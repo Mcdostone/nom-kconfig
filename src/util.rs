@@ -39,7 +39,7 @@ where
         ))),
     )(input)
 }
-
+/// Gets rid of comments, spaces, tabs and newlines.
 pub fn ws<I, F, O, E: ParseError<I>>(inner: F) -> impl FnMut(I) -> IResult<I, O, E>
 where
     I: Clone + InputLength + InputTake,
@@ -62,6 +62,8 @@ pub fn parse_until_eol(input: KconfigInput) -> IResult<KconfigInput, KconfigInpu
     terminated(not_line_ending, alt((line_ending, eof)))(input)
 }
 
+/// Gets rid of spaces tabs and backslash + newline.
+/// Parses a `def_tristate` attribute.
 pub fn wsi<I, F, O, E: ParseError<I>>(inner: F) -> impl FnMut(I) -> IResult<I, O, E>
 where
     I: Clone + InputLength + InputTake,
@@ -78,14 +80,7 @@ where
     F: FnMut(I) -> IResult<I, O, E>,
 {
     preceded(
-        value(
-            (),
-            many0(alt((
-                // TODO 3.0.19/drivers/staging/iio/light/Kconfig, backslash??
-                preceded(tag("\\"), line_ending),
-                space1,
-            ))),
-        ),
+        value((), many0(alt((preceded(tag("\\"), line_ending), space1)))),
         inner,
     )
 }

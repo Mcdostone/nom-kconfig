@@ -85,4 +85,5 @@ fn is_dynamic_source(file: &str) -> bool {
     re.is_match(file)
 }
 
+/// Entry that reads the specified configuration file. This file is always parsed.
 pub type Source = Kconfig;

@@ -8,10 +8,10 @@ use serde::Serialize;
 
 use crate::{
     entry::{parse_entry, Entry},
-    util::{ws, ws_comment},
-    KconfigInput,
+    util::{ws, ws_comment}, KconfigInput,
 };
 
+/// A Kconfig file.
 #[derive(Debug, Serialize, Clone, PartialEq, Default)]
 pub struct Kconfig {
     pub file: String,
@@ -19,7 +19,7 @@ pub struct Kconfig {
 }
 
 pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
-    let file = input.extra.file.clone();
+    let file: std::path::PathBuf = input.extra.file.clone();
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws_comment), |d| {
         Kconfig {
             file: file.display().to_string(),

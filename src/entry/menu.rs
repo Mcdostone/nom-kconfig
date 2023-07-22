@@ -22,6 +22,16 @@ use crate::{
 
 use super::{parse_entry, Entry};
 
+/// This defines a menu block, see ["Menu structure"](https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html#menu-structure) for more information. The only possible options are dependencies and "visible" attributes.
+#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+pub struct Menu {
+    pub prompt: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visible: Option<Visible>,
+    pub depends_on: Vec<Expression>,
+    pub blocks: Vec<Entry>,
+}
+
 fn parse_menu_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
     many0(alt((
         ws(parse_depends_on),
@@ -48,13 +58,4 @@ pub fn parse_menu(input: KconfigInput) -> IResult<KconfigInput, Menu> {
         }
     }
     Ok((input, menu))
-}
-
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
-pub struct Menu {
-    pub prompt: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub visible: Option<Visible>,
-    pub depends_on: Vec<Expression>,
-    pub blocks: Vec<Entry>,
 }

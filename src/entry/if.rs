@@ -9,6 +9,13 @@ use crate::{
 
 use super::{parse_entry, Entry};
 
+/// This defines an if block. The dependency expression [expr]((crate::attribute::expression)) is appended to all enclosed menu entries.
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct If {
+    pub condition: Expression,
+    pub entries: Vec<Entry>,
+}
+
 pub fn parse_if(input: KconfigInput) -> IResult<KconfigInput, If> {
     map(
         tuple((
@@ -18,10 +25,4 @@ pub fn parse_if(input: KconfigInput) -> IResult<KconfigInput, If> {
         )),
         |(condition, entries, _)| If { condition, entries },
     )(input)
-}
-
-#[derive(Debug, Clone, Serialize, PartialEq)]
-pub struct If {
-    pub condition: Expression,
-    pub entries: Vec<Entry>,
 }

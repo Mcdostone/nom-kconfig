@@ -9,7 +9,8 @@ use super::expression::{parse_expression, Expression};
 pub struct Requires {
     pub symbol: Expression,
 }
-
+/// Parses a `require` attribute.
+/// TODO: I think this attribute is deprecated.
 pub fn parse_requires(input: KconfigInput) -> IResult<KconfigInput, Requires> {
     map(
         tuple((ws(tag("requires")), ws(parse_expression))),
