@@ -1,11 +1,7 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        def_bool::DefBool,
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        Attribute,
-    },
-    entry::menuconfig::{parse_menu_config, MenuConfig},
+    attribute::{AndExpression, Atom, Attribute, DefBool, Expression, OrExpression, Term},
+    entry::{parse_menu_config, MenuConfig},
     symbol::Symbol,
 };
 

@@ -1,4 +1,4 @@
-use crate::{assert_parsing_eq, attribute::prompt::parse_prompt_option};
+use crate::{assert_parsing_eq, attribute::parse_prompt_option};
 
 #[test]
 fn test_parse_prompt() {

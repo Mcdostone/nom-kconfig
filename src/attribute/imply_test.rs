@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::imply::{parse_imply, Imply},
+    attribute::{parse_imply, Imply},
     symbol::Symbol,
 };
 

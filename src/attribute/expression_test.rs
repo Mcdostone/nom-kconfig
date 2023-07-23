@@ -130,3 +130,34 @@ fn test_parse_expression_function() {
         ))
     )
 }
+
+// v3.6-rc4/drivers/mtd/maps/Kconfig
+#[test]
+fn test_parse_expression_start_like_number_but_symbol() {
+    assert_parsing_eq!(
+        parse_expression,
+        r#"8xx && MTD_CFI"#,
+        Ok((
+            "",
+            Expression(OrExpression::Term(AndExpression::Expression(vec!(
+                Term::Atom(Atom::Symbol(Symbol::Constant("8xx".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
+            ))))
+        ))
+    )
+}
+
+#[test]
+fn test_parse_expression_number_and() {
+    assert_parsing_eq!(
+        parse_expression,
+        r#"8500 && MTD_CFI"#,
+        Ok((
+            "",
+            Expression(OrExpression::Term(AndExpression::Expression(vec!(
+                Term::Atom(Atom::Number(8500)),
+                Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
+            ))))
+        ))
+    )
+}

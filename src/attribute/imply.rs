@@ -14,7 +14,7 @@ use crate::{
 
 use super::expression::{parse_if_expression, Expression};
 
-/// This is similar to "select" as it enforces a lower limit on another symbol except that the "implied" symbol's value may still be set to n from a direct dependency or with a visible prompt.
+/// Imply` is similar "select" as it enforces a lower limit on another symbol except that the "implied" symbol's value may still be set to n from a direct dependency or with a visible prompt.
 #[derive(Debug, Default, Clone, Serialize, PartialEq)]
 pub struct Imply {
     pub symbol: Symbol,
@@ -29,7 +29,7 @@ pub struct Imply {
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     symbol::Symbol,
-///     attribute::imply::{parse_imply, Imply}
+///     attribute::{parse_imply, Imply}
 /// };
 ///
 /// assert_parsing_eq!(

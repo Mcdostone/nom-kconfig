@@ -4,8 +4,7 @@ use crate::util::{ws, wsi};
 
 #[test]
 fn test_ws() {
-    let input = "";
-    assert_eq!(ws(eof::<&str, ()>)(input), Ok(("", "")))
+    assert_eq!(ws(eof::<&str, ()>)("# a comment\n"), Ok(("", "")))
 }
 
 #[test]

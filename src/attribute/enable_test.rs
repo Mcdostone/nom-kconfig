@@ -1,14 +1,13 @@
 use crate::{
     assert_parsing_eq,
-    attribute::enable::{parse_enable, Enable},
+    attribute::{parse_enable, Enable},
 };
 
 #[test]
 fn test_parse_enable() {
-    let input = "enable MTK_INFRACFG";
     assert_parsing_eq!(
         parse_enable,
-        input,
+        "enable MTK_INFRACFG",
         Ok((
             "",
             Enable {

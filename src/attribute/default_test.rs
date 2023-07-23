@@ -1,9 +1,8 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        default::{parse_default, DefaultAttribute},
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        function::{ExpressionToken, FunctionCall, Parameter},
+        parse_default, AndExpression, Atom, DefaultAttribute, Expression, ExpressionToken,
+        FunctionCall, OrExpression, Parameter, Term,
     },
     symbol::Symbol,
 };

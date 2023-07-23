@@ -5,36 +5,36 @@ use nom::{
     bytes::complete::tag,
     character::complete::{alphanumeric1, one_of},
     combinator::{cut, map, recognize},
+    error::ErrorKind,
     multi::many1,
+    sequence::delimited,
     IResult,
 };
 use regex::Regex;
 
 use crate::{
-    attribute::prompt::parse_prompt_option,
     kconfig::{parse_kconfig, Kconfig},
-    util::ws,
+    util::{ws, wsi},
     KconfigFile, KconfigInput,
 };
 
+pub fn parse_filepath(input: KconfigInput) -> IResult<KconfigInput, &str> {
+    map(
+        recognize(ws(many1(alt((
+            alphanumeric1::<KconfigInput, _>,
+            recognize(one_of(".$()-_$/")),
+        ))))),
+        |d| d.fragment().to_owned(),
+    )(input)
+}
+
 pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
-    let fail_missing_source = input.extra.fail_on_missing_source;
     let (input, _) = ws(tag("source"))(input)?;
-    let (input, file) = alt((
-        ws(parse_prompt_option),
-        map(
-            ws(recognize(ws(many1(alt((
-                alphanumeric1,
-                recognize(one_of("-_/.")),
-            )))))),
-            |c: KconfigInput| c.fragment().to_owned(),
-        ),
-    ))(input)?;
-    let source_kconfig_file = KconfigFile::new(
-        input.clone().extra.root_dir,
-        PathBuf::from(file),
-        fail_missing_source,
-    );
+    let (input, file) = wsi(alt((
+        delimited(tag("\""), parse_filepath, tag("\"")),
+        parse_filepath,
+    )))(input)?;
+    let source_kconfig_file = KconfigFile::new(input.clone().extra.root_dir, PathBuf::from(file));
     if is_dynamic_source(file) {
         return Ok((
             input,
@@ -45,39 +45,23 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
         ));
     }
     if let Ok(ff) = source_kconfig_file.read_to_string() {
-        return match cut(parse_kconfig)(KconfigInput::new_extra(&ff, source_kconfig_file.clone())) {
+        return match cut(parse_kconfig)(KconfigInput::new_extra(
+            ff.as_str(),
+            source_kconfig_file.clone(),
+        )) {
             Ok((_, kconfig)) => Ok((input, kconfig)),
-            Err(_err) => match _err {
-                nom::Err::Incomplete(_d) => Err(nom::Err::Error(nom::error::Error::new(
+            Err(_err) => {
+                return Err(nom::Err::Error(nom::error::Error::new(
                     KconfigInput::new_extra("", source_kconfig_file),
-                    nom::error::ErrorKind::Fail,
-                ))),
-                nom::Err::Error(i) => Err(nom::Err::Error(nom::error::Error::new(
-                    KconfigInput::new_extra(&input, source_kconfig_file),
-                    i.code,
-                ))),
-                nom::Err::Failure(i) => Err(nom::Err::Error(nom::error::Error::new(
-                    KconfigInput::new_extra("", source_kconfig_file),
-                    i.code,
-                ))),
-            },
+                    ErrorKind::Fail,
+                )))
+            }
         };
     }
-
-    if fail_missing_source {
-        Err(nom::Err::Error(nom::error::Error::new(
-            KconfigInput::new_extra("", source_kconfig_file),
-            nom::error::ErrorKind::Fail,
-        )))
-    } else {
-        Ok((
-            input,
-            Source {
-                file: file.to_string(),
-                entries: vec![],
-            },
-        ))
-    }
+    Err(nom::Err::Error(nom::error::Error::new(
+        KconfigInput::new_extra("", source_kconfig_file),
+        ErrorKind::Fail,
+    )))
 }
 
 fn is_dynamic_source(file: &str) -> bool {

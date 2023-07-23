@@ -42,7 +42,7 @@ fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
 /// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
-///     attribute::range::{parse_range, Range},
+///     attribute::{parse_range, Range},
 ///     symbol::Symbol,
 /// };
 ///

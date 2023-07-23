@@ -1,8 +1,7 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        def_tristate::{parse_def_tristate, DefTristate},
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
+        parse_def_tristate, AndExpression, Atom, DefTristate, Expression, OrExpression, Term,
     },
     symbol::Symbol,
 };

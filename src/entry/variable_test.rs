@@ -1,7 +1,7 @@
 use crate::{
     assert_parsing_eq,
-    attribute::function::ExpressionToken,
-    entry::variable::{parse_variable_assignment, Value, VariableAssignment, VariableIdentifier},
+    attribute::ExpressionToken,
+    entry::{parse_variable_assignment, Value, VariableAssignment, VariableIdentifier},
 };
 
 #[test]

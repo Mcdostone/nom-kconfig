@@ -20,7 +20,6 @@ fn test_parse() {
     let kconfig_file: KconfigFile = KconfigFile::new(
         input_file.parent().unwrap().to_path_buf(),
         input_file.clone(),
-        false,
     );
 
     let content = kconfig_file.read_to_string().unwrap();

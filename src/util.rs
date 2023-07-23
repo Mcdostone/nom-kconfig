@@ -13,6 +13,18 @@ use nom::{
 
 use crate::KconfigInput;
 
+/// ignores comments
+///
+/// # Example
+/// ```
+/// use nom::combinator::eof;
+/// use nom::bytes::complete::tag;
+/// use nom_kconfig::util::ws_comment;
+/// let input = r#"# a comment#   \
+///
+/// hello"#;
+/// assert_eq!(ws_comment::<&str, ()>(input), Ok(("hello", ())))
+/// ```
 pub fn ws_comment<I, E: ParseError<I>>(input: I) -> IResult<I, (), E>
 where
     I: Clone + InputLength + InputTake,
@@ -40,6 +52,16 @@ where
     )(input)
 }
 /// Gets rid of comments, spaces, tabs and newlines.
+///
+/// # Example
+/// ```
+/// use nom::bytes::complete::tag;
+/// use nom_kconfig::util::ws;
+/// let input = r#"# a comment#   \
+///
+/// hello"#;
+/// assert_eq!(ws(tag::<&str, &str, ()>("hello"))(input), Ok(("", "hello")))
+/// ```
 pub fn ws<I, F, O, E: ParseError<I>>(inner: F) -> impl FnMut(I) -> IResult<I, O, E>
 where
     I: Clone + InputLength + InputTake,
@@ -62,8 +84,16 @@ pub fn parse_until_eol(input: KconfigInput) -> IResult<KconfigInput, KconfigInpu
     terminated(not_line_ending, alt((line_ending, eof)))(input)
 }
 
-/// Gets rid of spaces tabs and backslash + newline.
-/// Parses a `def_tristate` attribute.
+/// Gets rid of spaces, tabs and backslash + newline.
+/// `wsi` for *whitespaces inline*
+/// # Example
+/// ```
+/// use nom::bytes::complete::tag;
+/// use nom_kconfig::util::wsi;
+/// let input = r#"   \
+/// hello"#;
+/// assert_eq!(wsi(tag::<&str, &str, ()>("hello"))(input), Ok(("", "hello")))
+/// ```
 pub fn wsi<I, F, O, E: ParseError<I>>(inner: F) -> impl FnMut(I) -> IResult<I, O, E>
 where
     I: Clone + InputLength + InputTake,

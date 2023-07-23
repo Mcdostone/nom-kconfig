@@ -7,7 +7,7 @@ use crate::{
     KconfigInput,
 };
 
-use self::{
+pub use self::{
     choice::{parse_choice, Choice},
     comment::{parse_comment, Comment},
     config::{parse_config, Config},
@@ -17,7 +17,7 @@ use self::{
     menuconfig::{parse_menu_config, MenuConfig},
     r#if::{parse_if, If},
     source::{parse_source, Source},
-    variable::{parse_variable_assignment, VariableAssignment},
+    variable::{parse_variable_assignment, Value, VariableAssignment, VariableIdentifier},
 };
 
 pub mod choice;
@@ -30,27 +30,6 @@ pub mod menu;
 pub mod menuconfig;
 pub mod source;
 pub mod variable;
-
-#[cfg(test)]
-pub mod choice_test;
-#[cfg(test)]
-mod comment_test;
-#[cfg(test)]
-mod config_test;
-#[cfg(test)]
-mod function_test;
-#[cfg(test)]
-pub mod if_test;
-#[cfg(test)]
-mod main_menu_test;
-#[cfg(test)]
-mod menu_test;
-#[cfg(test)]
-mod menuconfig_test;
-#[cfg(test)]
-mod source_test;
-#[cfg(test)]
-mod variable_test;
 
 #[derive(Debug, Serialize, Clone, PartialEq)]
 pub enum Entry {
@@ -86,3 +65,24 @@ pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
 pub fn parse_entries(input: KconfigInput) -> IResult<KconfigInput, Vec<Entry>> {
     delimited(ws_comment, many0(parse_entry), ws_comment)(input)
 }
+
+#[cfg(test)]
+pub mod choice_test;
+#[cfg(test)]
+mod comment_test;
+#[cfg(test)]
+mod config_test;
+#[cfg(test)]
+mod function_test;
+#[cfg(test)]
+pub mod if_test;
+#[cfg(test)]
+mod main_menu_test;
+#[cfg(test)]
+mod menu_test;
+#[cfg(test)]
+mod menuconfig_test;
+#[cfg(test)]
+mod source_test;
+#[cfg(test)]
+mod variable_test;

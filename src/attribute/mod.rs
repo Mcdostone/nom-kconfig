@@ -22,7 +22,7 @@ use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
-use self::{
+pub use self::{
     def_bool::{parse_def_bool, DefBool},
     def_tristate::{parse_def_tristate, DefTristate},
     default::{parse_default, DefaultAttribute},
@@ -33,13 +33,20 @@ use self::{
     imply::{parse_imply, Imply},
     modules::parse_modules,
     option::{parse_option, OptionValues},
-    prompt::{parse_prompt, Prompt},
-    r#type::{parse_type, EntryType},
+    prompt::{parse_prompt, parse_prompt_option, Prompt},
+    r#type::{parse_type, EntryType, Type},
     range::{parse_range, Range},
     requires::{parse_requires, Requires},
     select::{parse_select, Select},
     visible::{parse_visible, Visible},
 };
+
+pub use self::expression::{
+    parse_expression, parse_if_expression_attribute, AndExpression, Atom, CompareExpression,
+    CompareOperator, OrExpression, Term,
+};
+pub use self::function::{parse_function_call, ExpressionToken, FunctionCall, Parameter};
+pub use self::optional::parse_optional;
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
     ws(many0(parse_attribute))(input)
@@ -61,7 +68,7 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_imply), Attribute::Imply),
         map(ws(parse_visible), Attribute::Visible),
         map(ws(parse_option), Attribute::Option),
-        map(ws(parse_enable), Attribute::Enable),
+        //map(ws(parse_enable), Attribute::Enable),
     ))(input)
 }
 #[derive(Debug, Serialize, Clone, PartialEq)]
@@ -102,6 +109,8 @@ mod function_test;
 mod help_test;
 #[cfg(test)]
 mod imply_test;
+#[cfg(test)]
+mod mod_test;
 #[cfg(test)]
 mod modules_test;
 #[cfg(test)]

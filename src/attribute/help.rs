@@ -38,7 +38,7 @@ pub fn weirdo_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
 /// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
-///     attribute::help::parse_help,
+///     attribute::parse_help,
 /// };
 ///
 /// assert_parsing_eq!(parse_help, "help\n   hello world", Ok(("", "hello world".to_string())))

@@ -1,3 +1,7 @@
+//! # nom-kconfig
+//!
+//! A parser for kconfig files. The parsing is done with [nom](https://github.com/rust-bakery/nom).
+
 use nom_locate::LocatedSpan;
 
 use std::path::PathBuf;
@@ -15,20 +19,18 @@ pub use self::kconfig::Kconfig;
 
 pub type KconfigInput<'a> = LocatedSpan<&'a str, KconfigFile>;
 
+/// Represents a Kconfig file.
+/// - [root_dir] is the absolute path of the kernel root directory.
+/// - [file] is the path the the Kconfig you want to parse
 #[derive(Debug, Clone, Default)]
 pub struct KconfigFile {
     pub root_dir: PathBuf,
     pub file: PathBuf,
-    pub fail_on_missing_source: bool,
 }
 
 impl KconfigFile {
-    pub fn new(root_dir: PathBuf, file: PathBuf, fail_on_missing_source: bool) -> Self {
-        Self {
-            root_dir,
-            file,
-            fail_on_missing_source,
-        }
+    pub fn new(root_dir: PathBuf, file: PathBuf) -> Self {
+        Self { root_dir, file }
     }
 
     pub fn full_path(&self) -> PathBuf {

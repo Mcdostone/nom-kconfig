@@ -1,19 +1,17 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        def_bool::{parse_def_bool, DefBool},
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        function::{ExpressionToken, FunctionCall, Parameter},
+        parse_def_bool, AndExpression, Atom, DefBool, Expression, ExpressionToken, FunctionCall,
+        OrExpression, Parameter, Term,
     },
     symbol::Symbol,
 };
 
 #[test]
 fn test_parse_def_bool() {
-    let input = "def_bool     !PCI ";
     assert_parsing_eq!(
         parse_def_bool,
-        input,
+        "def_bool     !PCI ",
         Ok((
             " ",
             DefBool {
@@ -29,10 +27,9 @@ fn test_parse_def_bool() {
 // 5.19.7/arch/x86/Kconfig.assembler
 #[test]
 fn test_parse_def_bool_function() {
-    let input = "def_bool $(as-instr,vpmovm2b %k1$(comma)%zmm5)";
     assert_parsing_eq!(
         parse_def_bool,
-        input,
+        "def_bool $(as-instr,vpmovm2b %k1$(comma)%zmm5)",
         Ok((
             "",
             DefBool {

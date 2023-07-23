@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::function::{parse_function_call, ExpressionToken, FunctionCall, Parameter},
+    attribute::{parse_function_call, ExpressionToken, FunctionCall, Parameter},
 };
 
 #[test]
@@ -20,10 +20,9 @@ fn test_parse_function_call() {
 
 #[test]
 fn test_parse_function_call_with_parameters() {
-    let input = "$(greeting,Hello,John)";
     assert_parsing_eq!(
         parse_function_call,
-        input,
+        "$(greeting,Hello,John)",
         Ok((
             "",
             FunctionCall {
@@ -43,10 +42,9 @@ fn test_parse_function_call_with_parameters() {
 
 #[test]
 fn test_parse_function_call_expression() {
-    let input = "$(warning,SIMPLE = basic)";
     assert_parsing_eq!(
         parse_function_call,
-        input,
+        "$(warning,SIMPLE = basic)",
         Ok((
             "",
             FunctionCall {

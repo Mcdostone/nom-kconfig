@@ -5,7 +5,7 @@ use nom::{
     IResult,
 };
 
-use crate::{util::ws, KconfigInput};
+use crate::{util::wsi, KconfigInput};
 
 use super::{expression::parse_expression, Attribute};
 
@@ -37,7 +37,7 @@ use super::{expression::parse_expression, Attribute};
 /// ```
 pub fn parse_depends_on(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     map(
-        tuple((tag("depends"), ws(opt(tag("on"))), ws(parse_expression))),
+        tuple((tag("depends"), wsi(opt(tag("on"))), wsi(parse_expression))),
         |(_, _, e)| Attribute::DependsOn(e),
     )(input)
 }

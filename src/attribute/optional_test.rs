@@ -1,4 +1,4 @@
-use crate::{assert_parsing_eq, attribute::optional::parse_optional};
+use crate::{assert_parsing_eq, attribute::parse_optional};
 
 #[test]
 fn test_parse_optional() {

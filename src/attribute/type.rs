@@ -9,10 +9,7 @@ use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
-use super::{
-    expression::{parse_if_expression_attribute, Expression},
-    prompt::parse_prompt_option,
-};
+use super::{parse_if_expression_attribute, parse_prompt_option, Expression};
 
 pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, EntryType> {
     map(

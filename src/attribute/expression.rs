@@ -4,7 +4,7 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{char, digit1},
-    combinator::{map, map_res, opt, recognize, value},
+    combinator::{all_consuming, map, map_res, opt, recognize, value},
     multi::many0,
     sequence::{delimited, pair, preceded, tuple},
     IResult,
@@ -157,10 +157,10 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
         }),
         map(
             delimited(wsi(tag("(")), parse_expression, wsi(tag(")"))),
-            |expr| Atom::Parenthesis(Box::new(expr)),
+            |expr: Expression| Atom::Parenthesis(Box::new(expr)),
         ),
+        parse_number_or_symbol,
         map(parse_number, Atom::Number),
-        map(parse_symbol, Atom::Symbol),
     ))(input)
 }
 
@@ -207,13 +207,30 @@ pub fn parse_hex_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     )(input)
 }
 
+pub fn parse_number_or_symbol(input: KconfigInput) -> IResult<KconfigInput, Atom> {
+    let (input, sym) = parse_symbol(input)?;
+    match sym.clone() {
+        Symbol::Constant(s) => match string_to_number(s.as_str()) {
+            Ok((_, i)) => Ok((input, Atom::Number(i))),
+            Err(_) => Ok((input, Atom::Symbol(sym))),
+        },
+        Symbol::NonConstant(_) => Ok((input, Atom::Symbol(sym))),
+    }
+}
+
+pub fn string_to_number(input: &str) -> IResult<&str, i64> {
+    all_consuming(map_res(recognize(pair(opt(char('-')), digit1)), |d| {
+        FromStr::from_str(d)
+    }))(input)
+}
+
+pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e)(input)
+}
+
 pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     map_res(
         recognize(pair(opt(char('-')), digit1)),
         |d: KconfigInput| FromStr::from_str(d.fragment()),
     )(input)
-}
-
-pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e)(input)
 }

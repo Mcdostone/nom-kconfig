@@ -1,10 +1,7 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        visible::Visible,
-    },
-    entry::menu::{parse_menu, Menu},
+    attribute::{AndExpression, Atom, Expression, OrExpression, Term, Visible},
+    entry::{parse_menu, Menu},
     symbol::Symbol,
 };
 
@@ -19,8 +16,7 @@ fn test_parse_menu() {
             Menu {
                 prompt: "BPF subsystem".to_string(),
                 visible: None,
-                depends_on: vec!(),
-                blocks: vec!()
+                ..Default::default()
             }
         ))
     )
@@ -41,34 +37,8 @@ fn test_parse_menu_visible() {
                         Term::Atom(Atom::Symbol(Symbol::Constant("EXPERT".to_string())))
                     )))),
                 }),
-                depends_on: vec!(),
-                blocks: vec!()
+                ..Default::default()
             }
         ))
     )
 }
-/*
-#[test]
-fn test_parse_menu_depends_on() {
-    let input = "menu \"BPF subsystem\" depends on ARC_HAS_ICACHE || ARC_HAS_DCACHE endmenu";
-    assert_parsing_eq!(
-        parse_menu,
-        input,
-        Ok((
-            "",
-            Menu {
-                prompt: "BPF subsystem".to_string(),
-                depends_on: vec!(Expression::Operation(Operation {
-                    operator: Operator::Or,
-                    operands: vec!(
-                        Expression::Term(Term::Symbol(Symbol::Constant("ARC_HAS_ICACHE".to_string()))),
-                        Expression::Term(Term::Symbol(Symbol::Constant("ARC_HAS_DCACHE".to_string())))
-                    )})
-            ),
-                blocks: vec!(),
-                visible: None
-            }
-        ))
-    )
-}
-*/

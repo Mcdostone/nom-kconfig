@@ -1,4 +1,10 @@
-use nom::{bytes::complete::tag, combinator::map, multi::many0, sequence::tuple, IResult};
+use nom::{
+    bytes::complete::tag,
+    combinator::{cut, map},
+    multi::many0,
+    sequence::{pair, terminated},
+    IResult,
+};
 use serde::Serialize;
 
 use crate::{
@@ -18,11 +24,10 @@ pub struct If {
 
 pub fn parse_if(input: KconfigInput) -> IResult<KconfigInput, If> {
     map(
-        tuple((
+        pair(
             ws(parse_if_expression),
-            many0(parse_entry),
-            ws(tag("endif")),
-        )),
-        |(condition, entries, _)| If { condition, entries },
+            cut(terminated(many0(parse_entry), ws(tag("endif")))),
+        ),
+        |(condition, entries)| If { condition, entries },
     )(input)
 }

@@ -1,9 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        r#type::{parse_type, EntryType, Type},
-    },
+    attribute::{parse_type, AndExpression, Atom, EntryType, Expression, OrExpression, Term, Type},
     symbol::Symbol,
 };
 

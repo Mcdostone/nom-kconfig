@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::range::{parse_range, Range},
+    attribute::{parse_range, Range},
     symbol::Symbol,
 };
 

@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::option::{parse_option, OptionValues},
+    attribute::{parse_option, OptionValues},
 };
 
 #[test]
@@ -17,10 +17,9 @@ fn test_parse_option_modules() {
 
 #[test]
 fn test_parse_option_env() {
-    let input = "option env =\"SHELL\"";
     assert_parsing_eq!(
         parse_option,
-        input,
+        r#"option env ="SHELL""#,
         Ok(("", OptionValues::Env("SHELL".to_string())))
     )
 }

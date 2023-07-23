@@ -1,10 +1,7 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        r#type::{EntryType, Type},
-        Attribute,
-    },
-    entry::config::{parse_config, Config},
+    attribute::{Attribute, EntryType, Type},
+    entry::{parse_config, Config},
 };
 
 #[test]

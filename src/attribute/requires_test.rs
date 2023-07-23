@@ -1,10 +1,8 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        expression::{
-            AndExpression, Atom, CompareExpression, CompareOperator, Expression, OrExpression, Term,
-        },
         requires::{parse_requires, Requires},
+        AndExpression, Atom, CompareExpression, CompareOperator, Expression, OrExpression, Term,
     },
     symbol::Symbol,
 };
@@ -25,6 +23,19 @@ fn test_parse_requires() {
                         operator: CompareOperator::Equal,
                         right: Symbol::Constant("y".to_string())
                     })
+                ))))
+            }
+        ))
+    );
+
+    assert_parsing_eq!(
+        parse_requires,
+        " requires  KVM",
+        Ok((
+            "",
+            Requires {
+                symbol: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::Constant("KVM".to_string()))
                 ))))
             }
         ))

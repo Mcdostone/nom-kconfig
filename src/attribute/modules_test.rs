@@ -1,4 +1,4 @@
-use crate::{assert_parsing_eq, attribute::modules::parse_modules};
+use crate::{assert_parsing_eq, attribute::parse_modules};
 
 #[test]
 fn test_parse_modules() {

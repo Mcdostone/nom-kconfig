@@ -1,4 +1,4 @@
-use crate::{assert_parsing_eq, attribute::help::parse_help};
+use crate::{assert_parsing_eq, attribute::parse_help};
 
 #[test]
 fn test_parse_help() {

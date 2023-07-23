@@ -1,15 +1,11 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
         r#type::{EntryType, Type},
         select::Select,
+        AndExpression, Atom, Expression, OrExpression, Term,
     },
-    entry::{
-        config::Config,
-        r#if::{parse_if, If},
-        source::Source,
-    },
+    entry::{parse_if, Config, If, Source},
     symbol::Symbol,
     Attribute, Entry,
 };

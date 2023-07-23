@@ -1,19 +1,15 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        Attribute,
-    },
-    entry::comment::{parse_comment, Comment},
+    attribute::{AndExpression, Atom, Attribute, Expression, OrExpression, Term},
+    entry::{parse_comment, Comment},
     symbol::Symbol,
 };
 
 #[test]
 fn test_parse_comment() {
-    let input = "comment \"Default contiguous memory area size:\"";
     assert_parsing_eq!(
         parse_comment,
-        input,
+        r#"comment "Default contiguous memory area size:""#,
         Ok((
             "",
             Comment {

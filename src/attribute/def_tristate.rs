@@ -8,9 +8,12 @@ use serde::Serialize;
 
 use crate::{util::wsi, KconfigInput};
 
-use super::expression::{parse_expression, parse_if_expression_attribute, Expression};
+use super::{
+    expression::{parse_expression, parse_if_expression_attribute},
+    Expression,
+};
 
-/// This is a shorthand notation for a tristate type definition plus a value.
+/// `def_tristate` is a shorthand notation for a tristate type definition plus a value.
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct DefTristate {
     pub expression: Expression,

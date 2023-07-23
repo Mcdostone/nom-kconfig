@@ -12,12 +12,11 @@ use crate::{
 
 #[macro_export]
 macro_rules! assert_parsing_source_eq {
-    ($fn:ident, $input:expr, $silent_fail: expr,  $expected:expr) => {{
+    ($fn:ident, $input:expr, $expected:expr) => {{
         use $crate::KconfigInput;
         let res = $fn(KconfigInput::new_extra(
             $input,
             KconfigFile {
-                fail_on_missing_source: $silent_fail,
                 ..Default::default()
             },
         ))

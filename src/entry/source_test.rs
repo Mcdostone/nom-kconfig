@@ -1,39 +1,52 @@
+use std::path::PathBuf;
+
+use nom_locate::LocatedSpan;
+
 use crate::{
-    assert_parsing_source_eq,
-    entry::source::{parse_source, Source},
-    KconfigFile,
+    entry::{parse_source, Source},
+    Kconfig, KconfigFile, KconfigInput,
 };
 
 #[test]
 fn test_parse_source() {
-    let input = "source \"/path/Kconfig\"";
-    assert_parsing_source_eq!(
-        parse_source,
-        input,
-        false,
+    assert_parsing_source_eq(
+        r#"source "empty""#,
         Ok((
             "",
             Source {
-                file: "/path/Kconfig".to_string(),
-                entries: vec!()
-            }
-        ))
+                file: "empty".to_string(),
+                entries: vec![],
+            },
+        )),
     )
 }
 
+// v2.6.24/arch/cris/arch/drivers/Kconfig
 #[test]
 fn test_parse_source_no_quote() {
-    let input = "source /path/Kconfig";
-    assert_parsing_source_eq!(
-        parse_source,
-        input,
-        false,
+    assert_parsing_source_eq(
+        "source empty",
         Ok((
             "",
             Source {
-                file: "/path/Kconfig".to_string(),
-                entries: vec!()
-            }
-        ))
+                file: "empty".to_string(),
+                entries: vec![],
+            },
+        )),
     )
+}
+
+fn assert_parsing_source_eq(
+    input: &str,
+    expected: Result<(&str, Kconfig), nom::Err<nom::error::Error<LocatedSpan<&str, KconfigFile>>>>,
+) {
+    let res = parse_source(KconfigInput::new_extra(
+        input,
+        KconfigFile {
+            root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests"),
+            ..Default::default()
+        },
+    ))
+    .map(|r| (r.0.fragment().to_owned(), r.1));
+    assert_eq!(res, expected)
 }

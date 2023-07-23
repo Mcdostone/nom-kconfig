@@ -1,15 +1,14 @@
 use crate::{
     assert_parsing_eq,
-    attribute::Attribute,
-    entry::choice::{parse_choice, Choice},
+    entry::{parse_choice, Choice},
+    Attribute,
 };
 
 #[test]
 fn test_parse_choice_optional() {
-    let input = "choice optional endchoice";
     assert_parsing_eq!(
         parse_choice,
-        input,
+        "choice optional endchoice",
         Ok((
             "",
             Choice {

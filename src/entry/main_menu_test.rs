@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    entry::main_menu::{parse_main_menu, MainMenu},
+    entry::{parse_main_menu, MainMenu},
 };
 
 #[test]
