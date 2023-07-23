@@ -1,5 +1,3 @@
-
-
 use crate::{
     assert_parsing_eq,
     attribute::r#type::{EntryType, Type},

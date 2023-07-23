@@ -9,7 +9,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         .join("Kconfig");
     let kconfig_file: KconfigFile = KconfigFile::new(
         input_file.parent().unwrap().to_path_buf(),
-        input_file.clone()
+        input_file.clone(),
     );
 
     let content = kconfig_file.read_to_string().unwrap();
