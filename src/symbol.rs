@@ -53,3 +53,12 @@ pub fn parse_constant_symbol(input: KconfigInput) -> IResult<KconfigInput, &str>
         |c: KconfigInput| c.trim(),
     )(input)
 }
+
+impl ToString for Symbol {
+    fn to_string(&self) -> String {
+        match self {
+            Symbol::Constant(c) => c.to_string(),
+            Symbol::NonConstant(c) => c.to_string(),
+        }
+    }
+}

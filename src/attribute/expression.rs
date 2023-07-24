@@ -37,6 +37,19 @@ pub enum CompareOperator {
     NotEqual,
 }
 
+impl ToString for CompareOperator {
+    fn to_string(&self) -> String {
+        match self {
+            CompareOperator::GreaterThan => ">".to_string(),
+            CompareOperator::GreaterOrEqual => ">=".to_string(),
+            CompareOperator::LowerThan => "<".to_string(),
+            CompareOperator::LowerOrEqual => ">=".to_string(),
+            CompareOperator::Equal => "=".to_string(),
+            CompareOperator::NotEqual => "!=".to_string(),
+        }
+    }
+}
+
 // https://stackoverflow.com/questions/9509048/antlr-parser-for-and-or-logic-how-to-get-expressions-between-logic-operators
 
 #[derive(Debug, Serialize, PartialEq, Clone, Default)]
@@ -48,6 +61,12 @@ pub enum AndExpression {
 
     #[serde(rename = "And")]
     Expression(Vec<Term>),
+}
+
+impl ToString for Expression {
+    fn to_string(&self) -> String {
+        self.0.to_string()
+    }
 }
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
@@ -72,6 +91,17 @@ pub struct CompareExpression {
     pub right: Symbol,
 }
 
+impl ToString for CompareExpression {
+    fn to_string(&self) -> String {
+        format!(
+            "{} {} {}",
+            self.left.to_string(),
+            self.operator.to_string(),
+            self.right.to_string()
+        )
+    }
+}
+
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum Atom {
     Symbol(Symbol),
@@ -80,6 +110,54 @@ pub enum Atom {
     Function(FunctionCall),
     Parenthesis(Box<Expression>),
     String(Box<Atom>),
+}
+
+impl ToString for AndExpression {
+    fn to_string(&self) -> String {
+        match self {
+            AndExpression::Term(t) => t.to_string(),
+            AndExpression::Expression(t) => t
+                .iter()
+                .map(|a| a.to_string())
+                .collect::<Vec<_>>()
+                .join(" && "),
+        }
+    }
+}
+
+impl ToString for OrExpression {
+    fn to_string(&self) -> String {
+        match self {
+            OrExpression::Term(t) => t.to_string(),
+            OrExpression::Expression(t) => t
+                .iter()
+                .map(|a| a.to_string())
+                .collect::<Vec<_>>()
+                .join(" || "),
+        }
+    }
+}
+
+impl ToString for Term {
+    fn to_string(&self) -> String {
+        match self {
+            Term::Not(t) => format!("!{}", t.to_string()),
+            Term::Atom(t) => t.to_string(),
+        }
+    }
+}
+
+impl ToString for Atom {
+    fn to_string(&self) -> String {
+        match self {
+            Atom::Symbol(s) => s.to_string(),
+            Atom::Number(d) => d.to_string(),
+            Atom::Compare(c) => c.to_string(),
+            Atom::Function(f) => f.to_string(),
+            Atom::Parenthesis(d) => d.to_string(),
+            Atom::String(s) => s.to_string(),
+        }
+    }
 }
 
 impl Default for OrExpression {

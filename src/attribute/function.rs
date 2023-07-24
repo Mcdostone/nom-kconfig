@@ -17,6 +17,47 @@ pub struct FunctionCall {
     pub parameters: Vec<Parameter>,
 }
 
+impl ToString for Parameter {
+    fn to_string(&self) -> String {
+        self.tokens
+            .iter()
+            .map(|d: &ExpressionToken| d.to_string())
+            .collect::<Vec<_>>()
+            .join("")
+    }
+}
+
+impl ToString for ExpressionToken {
+    fn to_string(&self) -> String {
+        match self {
+            ExpressionToken::Literal(s) => s.to_string(),
+            ExpressionToken::Variable(v) => format!("${}", v),
+            ExpressionToken::DoubleQuotes(s) => format!(
+                r#""${}""#,
+                s.iter().map(|d| d.to_string()).collect::<Vec<_>>().join("")
+            ),
+            ExpressionToken::SingleQuotes(s) => format!("'{}'", s),
+            ExpressionToken::Backtick(c) => format!("`{}`", c),
+            ExpressionToken::Function(f) => f.to_string(),
+            ExpressionToken::Space => " ".to_string(),
+        }
+    }
+}
+
+impl ToString for FunctionCall {
+    fn to_string(&self) -> String {
+        format!(
+            "{}({})",
+            self.name,
+            self.parameters
+                .iter()
+                .map(|d| d.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
 #[derive(Debug, Serialize, PartialEq, Clone, Default)]
 pub struct Parameter {
     pub tokens: Vec<ExpressionToken>,

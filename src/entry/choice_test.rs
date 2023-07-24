@@ -1,7 +1,7 @@
 use crate::{
     assert_parsing_eq,
     entry::{parse_choice, Choice},
-    Attribute,
+    Attribute, assert_parsing_fail,
 };
 
 #[test]
@@ -13,8 +13,19 @@ fn test_parse_choice_optional() {
             "",
             Choice {
                 options: vec!(Attribute::Optional),
-                blocks: vec!()
+                configs: vec!()
             }
         ))
+    )
+}
+
+#[test]
+fn test_parse_choice_string_not_allowed() {
+    assert_parsing_fail!(
+        parse_choice,
+        r#"choice 
+        config TESTCHOICE1
+    string "Choice 1"
+        endchoice"#
     )
 }

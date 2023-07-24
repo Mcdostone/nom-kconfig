@@ -68,7 +68,7 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_imply), Attribute::Imply),
         map(ws(parse_visible), Attribute::Visible),
         map(ws(parse_option), Attribute::Option),
-        //map(ws(parse_enable), Attribute::Enable),
+        map(ws(parse_enable), Attribute::Enable),
     ))(input)
 }
 #[derive(Debug, Serialize, Clone, PartialEq)]

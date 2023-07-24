@@ -38,7 +38,7 @@ fn test_parse_source_no_quote() {
 
 fn assert_parsing_source_eq(
     input: &str,
-    expected: Result<(&str, Kconfig), nom::Err<nom::error::Error<LocatedSpan<&str, KconfigFile>>>>,
+    expected: Result<(&str, Kconfig), nom::Err<nom::error::Error<KconfigInput>>>,
 ) {
     let res = parse_source(KconfigInput::new_extra(
         input,

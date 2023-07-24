@@ -52,3 +52,15 @@ pub struct EntryType {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#if: Option<Expression>,
 }
+
+impl ToString for Type {
+    fn to_string(&self) -> String {
+        match self {
+            Type::Bool => "bool".to_string(),
+            Type::Tristate => "tristate".to_string(),
+            Type::String => "string".to_string(),
+            Type::Hex => "hex".to_string(),
+            Type::Int => "int".to_string(),
+        }
+    }
+}

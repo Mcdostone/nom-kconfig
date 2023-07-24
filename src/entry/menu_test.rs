@@ -1,5 +1,7 @@
+
+
 use crate::{
-    assert_parsing_eq,
+    assert_parsing_eq, assert_parsing_fail,
     attribute::{AndExpression, Atom, Expression, OrExpression, Term, Visible},
     entry::{parse_menu, Menu},
     symbol::Symbol,
@@ -41,4 +43,10 @@ fn test_parse_menu_visible() {
             }
         ))
     )
+}
+
+#[test]
+fn test_parse_menu_forbidden_attribute() {
+    let input = "menu \"BPF subsystem\" select EXPERT endmenu";
+    assert_parsing_fail!(parse_menu, input)
 }

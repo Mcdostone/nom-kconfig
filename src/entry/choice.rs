@@ -24,7 +24,7 @@ use super::{parse_entry, Entry};
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct Choice {
     pub options: Vec<Attribute>,
-    pub blocks: Vec<Entry>,
+    pub configs: Vec<Entry>,
 }
 
 fn parse_choice_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
@@ -41,6 +41,6 @@ pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
             pair(parse_choice_attributes, many0(ws(parse_entry))),
             ws(tag("endchoice")),
         ),
-        |(options, blocks)| Choice { options, blocks },
+        |(options, configs)| Choice { options, configs },
     )(input)
 }

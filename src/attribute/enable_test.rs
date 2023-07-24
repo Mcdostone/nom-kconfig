@@ -3,6 +3,7 @@ use crate::{
     attribute::{parse_enable, Enable},
 };
 
+// v2.6.1/drivers/net/wireless/Kconfig
 #[test]
 fn test_parse_enable() {
     assert_parsing_eq!(
