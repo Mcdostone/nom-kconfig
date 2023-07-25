@@ -26,7 +26,7 @@ pub struct Kconfig {
 /// use std::path::PathBuf;
 /// use nom_kconfig::{KconfigInput, KconfigFile, Entry, kconfig::parse_kconfig, Kconfig};
 ///
-/// let kconfig_file = KconfigFile::new(PathBuf::from("path/to/root/dir"), PathBuf::from("Kconfig"), false);
+/// let kconfig_file = KconfigFile::new(PathBuf::from("path/to/root/dir"), PathBuf::from("Kconfig"));
 /// let content = "";
 /// let input = KconfigInput::new_extra(content, kconfig_file);
 /// assert_eq!(parse_kconfig(input).unwrap().1, Kconfig {file: "Kconfig".to_string(), entries: vec!() })

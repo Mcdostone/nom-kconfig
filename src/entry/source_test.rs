@@ -1,7 +1,5 @@
 use std::path::PathBuf;
 
-use nom_locate::LocatedSpan;
-
 use crate::{
     entry::{parse_source, Source},
     Kconfig, KconfigFile, KconfigInput,

@@ -14,7 +14,9 @@ use crate::{
     KconfigInput,
 };
 
-use super::{parse_entry, Entry};
+use super::{
+    config::{parse_bool_config, parse_tristate_config}, Config,
+};
 
 /// This defines a choice group and accepts any of the above attributes as options. A choice can only be of type bool or tristate. If no type is specified for a choice, its type will be determined by the type of the first choice element in the group or remain unknown if none of the choice elements have a type specified, as well.
 ///
@@ -24,7 +26,7 @@ use super::{parse_entry, Entry};
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct Choice {
     pub options: Vec<Attribute>,
-    pub configs: Vec<Entry>,
+    pub configs: Vec<Config>,
 }
 
 fn parse_choice_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
@@ -38,7 +40,10 @@ pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
     let (input, _) = tag("choice")(input)?;
     map(
         terminated(
-            pair(parse_choice_attributes, many0(ws(parse_entry))),
+            pair(
+                parse_choice_attributes,
+                many0(alt((parse_bool_config, parse_tristate_config))),
+            ),
             ws(tag("endchoice")),
         ),
         |(options, configs)| Choice { options, configs },

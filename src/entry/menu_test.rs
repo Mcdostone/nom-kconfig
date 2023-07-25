@@ -1,5 +1,3 @@
-
-
 use crate::{
     assert_parsing_eq, assert_parsing_fail,
     attribute::{AndExpression, Atom, Expression, OrExpression, Term, Visible},

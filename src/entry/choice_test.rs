@@ -1,7 +1,7 @@
 use crate::{
-    assert_parsing_eq,
+    assert_parsing_eq, assert_parsing_fail,
     entry::{parse_choice, Choice},
-    Attribute, assert_parsing_fail,
+    Attribute,
 };
 
 #[test]

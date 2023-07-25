@@ -33,6 +33,39 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, EntryType> {
     )(input)
 }
 
+pub fn parse_bool_type(input: KconfigInput) -> IResult<KconfigInput, EntryType> {
+    map(
+        tuple((
+            alt((
+                map(ws(tag("boolean")), |_| Type::Bool),
+                map(ws(tag("bool")), |_| Type::Bool),
+            )),
+            opt(map(parse_prompt_option, |o| o.to_string())),
+            opt(parse_if_expression_attribute),
+        )),
+        |(he, wo, e)| EntryType {
+            r#type: he,
+            prompt: wo,
+            r#if: e,
+        },
+    )(input)
+}
+
+pub fn parse_tristate_type(input: KconfigInput) -> IResult<KconfigInput, EntryType> {
+    map(
+        tuple((
+            map(ws(tag("tristate")), |_| Type::Tristate),
+            opt(map(parse_prompt_option, |o| o.to_string())),
+            opt(parse_if_expression_attribute),
+        )),
+        |(he, wo, e)| EntryType {
+            r#type: he,
+            prompt: wo,
+            r#if: e,
+        },
+    )(input)
+}
+
 #[derive(Debug, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum Type {
