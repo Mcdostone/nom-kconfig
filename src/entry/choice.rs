@@ -15,7 +15,8 @@ use crate::{
 };
 
 use super::{
-    config::{parse_bool_config, parse_tristate_config}, Config,
+    config::{parse_bool_config, parse_tristate_config},
+    Config,
 };
 
 /// This defines a choice group and accepts any of the above attributes as options. A choice can only be of type bool or tristate. If no type is specified for a choice, its type will be determined by the type of the first choice element in the group or remain unknown if none of the choice elements have a type specified, as well.

@@ -17,11 +17,7 @@ pub mod select;
 pub mod r#type;
 pub mod visible;
 
-
-
-use nom::{
-    branch::alt, combinator::map, multi::many0, IResult,
-};
+use nom::{branch::alt, combinator::map, multi::many0, IResult};
 use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};

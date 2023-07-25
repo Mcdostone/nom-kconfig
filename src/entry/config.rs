@@ -10,10 +10,7 @@ use nom::{
 use serde::Serialize;
 
 use crate::{
-    attribute::{
-        parse_attribute, parse_bool_attribute, parse_tristate_attribute,
-        Attribute,
-    },
+    attribute::{parse_attribute, parse_bool_attribute, parse_tristate_attribute, Attribute},
     util::ws,
     KconfigInput,
 };
