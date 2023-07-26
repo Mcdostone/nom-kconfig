@@ -2,7 +2,7 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         r#type::{ConfigType, Type},
-        AndExpression, Atom, Expression, OrExpression, Term,
+        AndExpression, Atom, Expression, Term,
     },
     entry::{parse_menu_config, MenuConfig},
     symbol::Symbol,
@@ -19,8 +19,8 @@ fn test_parse_menuconfig() {
             MenuConfig {
                 symbol: "VIRTUALIZATION".to_string(),
                 r#type: ConfigType {
-                    r#type: Type::DefBool(Expression(OrExpression::Term(AndExpression::Term(
-                        Term::Atom(Atom::Symbol(Symbol::Constant("y".to_string())))
+                    r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
+                        Atom::Symbol(Symbol::Constant("y".to_string()))
                     )))),
                     prompt: None,
                     r#if: None,

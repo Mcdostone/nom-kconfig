@@ -5,7 +5,7 @@ use crate::{util::ws, KconfigInput};
 
 use super::expression::{parse_expression, Expression};
 
-#[derive(Debug, Default, Serialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Clone, PartialEq)]
 pub struct Requires {
     pub symbol: Expression,
 }
@@ -29,9 +29,9 @@ pub struct Requires {
 ///     Ok((
 ///         "",
 ///         Requires {
-///             symbol: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
+///             symbol: Expression::Term(AndExpression::Term(Term::Atom(
 ///                    Atom::Symbol(Symbol::Constant("KVM".to_string())
-///                )))))
+///                ))))
 ///         }
 ///     ))
 /// )

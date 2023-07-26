@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use nom_kconfig::{
     attribute::{
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
+        expression::{AndExpression, Atom, Expression, Term},
         r#type::{ConfigType, Type},
         select::Select,
     },
@@ -35,11 +35,11 @@ fn test_parse() {
                 r#if: None
             },
             attributes: vec!(
-                Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Expression(vec!(
+                Attribute::DependsOn(Expression::Term(AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("HAVE_KVM".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("HIGH_RES_TIMERS".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("X86_LOCAL_APIC".to_string())))
-                ))))),
+                )))),
                 Attribute::Select(Select { symbol: "PREEMPT_NOTIFIERS".to_string(), r#if: None }),
                 Attribute::Select(Select { symbol: "MMU_NOTIFIER".to_string(), r#if: None }),
                 Attribute::Select(Select { symbol: "HAVE_KVM_IRQCHIP".to_string(), r#if: None }),

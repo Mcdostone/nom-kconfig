@@ -67,6 +67,9 @@ pub fn parse_entries(input: KconfigInput) -> IResult<KconfigInput, Vec<Entry>> {
 }
 
 #[cfg(test)]
+pub mod mod_test;
+
+#[cfg(test)]
 pub mod choice_test;
 #[cfg(test)]
 mod comment_test;

@@ -11,8 +11,12 @@
 <br/>
 <p align="center">
   <a href="https://www.rust-lang.org/">
-    <img src="https://img.shields.io/badge/Rust-1.70.0-green.svg?logo=rust" alt="Rust version"/>
+    <img src="https://img.shields.io/badge/Rust-1.71.0-green.svg?logo=rust" alt="Rust version"/>
   </a>
+<a href="https://codecov.io/gh/Mcdostone/nom-kconfig" > 
+ <img src="https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C" alt="code coverage"/> 
+ </a>
+
 </p>
 
 Parsing relies on the [nom library](https://github.com/rust-bakery/nom).

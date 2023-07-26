@@ -15,7 +15,7 @@ use crate::{
 use super::expression::{parse_if_expression, Expression};
 
 /// Imply` is similar "select" as it enforces a lower limit on another symbol except that the "implied" symbol's value may still be set to n from a direct dependency or with a visible prompt.
-#[derive(Debug, Default, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct Imply {
     pub symbol: Symbol,
     #[serde(skip_serializing_if = "Option::is_none")]

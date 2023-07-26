@@ -6,3 +6,5 @@ Kconfig
 *.json
 *.profraw
 tests/!Kconfig
+tarpaulin-report.html
+cobertura.xml

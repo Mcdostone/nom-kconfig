@@ -1,7 +1,7 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        expression::{AndExpression, Atom, Expression, OrExpression, Term},
+        expression::{AndExpression, Atom, Expression, Term},
         r#type::{ConfigType, Type},
     },
     entry::{config::Config, r#if::If},
@@ -27,7 +27,7 @@ macro_rules! assert_parsing_source_eq {
 
 // 2.6.25/drivers/ide/Kconfig
 #[test]
-fn test_parse_typedddb() {
+fn test_parse_type() {
     let input = r#"config BLK_DEV_IDEDMA_SFF
 	bool
 
@@ -52,8 +52,8 @@ endif"#;
                         attributes: vec!()
                     }),
                     Entry::If(If {
-                        condition: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Symbol(Symbol::Constant("PCI".to_string()))
+                        condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                            Symbol::Constant("PCI".to_string())
                         )))),
                         entries: vec!()
                     })

@@ -19,18 +19,30 @@ jobs:
       - uses: actions/checkout@v3
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-      - run: cargo test --locked --release --all
+      - run: cargo test --all-features --locked --release --all
 
   clippy:
-    name: Run Clippy
+    name: Clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: cargo clippy --all-targets -- --deny warnings
 
   fmt:
-    name: Run cargo fmt
+    name: Cargo fmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: cargo fmt --all -- --check
+
+  code-coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo install tarpaulin
+      - run: cargo tarpaulin --all-features --out Xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

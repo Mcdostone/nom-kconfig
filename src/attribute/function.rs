@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
@@ -17,37 +19,46 @@ pub struct FunctionCall {
     pub parameters: Vec<Parameter>,
 }
 
-impl ToString for Parameter {
-    fn to_string(&self) -> String {
-        self.tokens
-            .iter()
-            .map(|d: &ExpressionToken| d.to_string())
-            .collect::<Vec<_>>()
-            .join("")
+impl Display for Parameter {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.tokens
+                .iter()
+                .map(|d: &ExpressionToken| d.to_string())
+                .collect::<Vec<_>>()
+                .join("")
+        )
     }
 }
 
-impl ToString for ExpressionToken {
-    fn to_string(&self) -> String {
+impl Display for ExpressionToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            ExpressionToken::Literal(s) => s.to_string(),
-            ExpressionToken::Variable(v) => format!("${}", v),
-            ExpressionToken::DoubleQuotes(s) => format!(
-                r#""${}""#,
+            ExpressionToken::Literal(s) => write!(f, "{}", s),
+            ExpressionToken::Variable(v) => write!(f, "${}", v),
+            ExpressionToken::DoubleQuotes(s) => write!(
+                f,
+                r#""{}""#,
                 s.iter().map(|d| d.to_string()).collect::<Vec<_>>().join("")
             ),
-            ExpressionToken::SingleQuotes(s) => format!("'{}'", s),
-            ExpressionToken::Backtick(c) => format!("`{}`", c),
-            ExpressionToken::Function(f) => f.to_string(),
-            ExpressionToken::Space => " ".to_string(),
+            ExpressionToken::SingleQuotes(s) => write!(f, "'{}'", s),
+            ExpressionToken::Backtick(c) => write!(f, "`{}`", c),
+            ExpressionToken::Function(func) => write!(f, "{}", func),
+            ExpressionToken::Space => write!(f, " "),
         }
     }
 }
 
-impl ToString for FunctionCall {
-    fn to_string(&self) -> String {
-        format!(
-            "{}({})",
+impl Display for FunctionCall {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.parameters.is_empty() {
+            return write!(f, "$({})", self.name);
+        }
+        write!(
+            f,
+            "$({}, {})",
             self.name,
             self.parameters
                 .iter()
@@ -156,13 +167,9 @@ pub fn parse_expression_parameter(
 }
 
 pub fn parse_parameter(input: KconfigInput) -> IResult<KconfigInput, Parameter> {
-    map(
-        alt((
-            //map(parse_literal_parameter , |d| Parameter::Literal(d.to_string())),
-            parse_expression_parameter,
-        )),
-        |d| Parameter { tokens: d },
-    )(input)
+    map(alt((parse_expression_parameter,)), |d| Parameter {
+        tokens: d,
+    })(input)
 }
 
 fn parse_function_name(input: KconfigInput) -> IResult<KconfigInput, &str> {

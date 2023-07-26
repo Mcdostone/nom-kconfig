@@ -37,9 +37,9 @@ pub struct DefaultAttribute {
 ///     Ok((
 ///         "",
 ///         DefaultAttribute {
-///             expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
+///             expression: Expression::Term(AndExpression::Term(Term::Atom(
 ///                 Atom::Symbol(Symbol::Constant("0x1".to_string()))
-///             )))),
+///             ))),
 ///             r#if: None
 ///         }
 ///     ))

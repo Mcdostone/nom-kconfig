@@ -2,7 +2,7 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         parse_default, AndExpression, Atom, DefaultAttribute, Expression, ExpressionToken,
-        FunctionCall, OrExpression, Parameter, Term,
+        FunctionCall, Parameter, Term,
     },
     symbol::Symbol,
 };
@@ -15,8 +15,8 @@ fn test_parse_default() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("0x1".to_string()))
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::Constant("0x1".to_string())
                 )))),
                 r#if: None
             }
@@ -33,8 +33,8 @@ fn test_parse_default_constant_symbol_with_numbers() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("7.10.d".to_string()))
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::Constant("7.10.d".to_string())
                 )))),
                 r#if: None
             }
@@ -51,8 +51,8 @@ fn test_parse_default_ambigus() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                    Atom::String(Box::new(Atom::Function(FunctionCall {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
+                    Box::new(Atom::Function(FunctionCall {
                         name: "shell".to_string(),
                         parameters: vec!(Parameter {
                             tokens: vec!(
@@ -78,10 +78,10 @@ fn test_parse_default_ambigus() {
                                 ))),
                             )
                         },)
-                    })))
+                    }))
                 )))),
-                r#if: Some(Expression(OrExpression::Term(AndExpression::Term(
-                    Term::Atom(Atom::Symbol(Symbol::Constant("CC_IS_GCC".to_string())))
+                r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::Constant("CC_IS_GCC".to_string()))
                 ))))
             }
         ))

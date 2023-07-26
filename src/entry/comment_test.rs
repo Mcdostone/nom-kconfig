@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{AndExpression, Atom, Attribute, Expression, OrExpression, Term},
+    attribute::{AndExpression, Atom, Attribute, Expression, Term},
     entry::{parse_comment, Comment},
     symbol::Symbol,
 };
@@ -30,10 +30,8 @@ fn test_parse_comment_with_dependencies() {
             "",
             Comment {
                 prompt: "Default contiguous memory area size:".to_string(),
-                dependencies: vec!(Attribute::DependsOn(Expression(OrExpression::Term(
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "JVM".to_string()
-                    ))))
+                dependencies: vec!(Attribute::DependsOn(Expression::Term(AndExpression::Term(
+                    Term::Atom(Atom::Symbol(Symbol::Constant("JVM".to_string())))
                 ))))
             }
         ))

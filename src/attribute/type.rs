@@ -1,3 +1,7 @@
+use std::fmt::Display;
+
+use crate::parse_config_type;
+use crate::{util::ws, KconfigInput};
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -7,38 +11,26 @@ use nom::{
 };
 use serde::Serialize;
 
-use crate::{util::ws, KconfigInput};
-
 use super::{parse_expression, parse_if_expression_attribute, parse_prompt_option, Expression};
 
 pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, ConfigType> {
-    map(
-        tuple((
-            ws(alt((
-                value(Type::Bool, tag("boolean")),
-                value(Type::Bool, tag("bool")),
-                value(Type::Hex, tag("hex")),
-                value(Type::Int, tag("int")),
-                value(Type::String, tag("string")),
-                value(Type::Tristate, tag("tristate")),
-                map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
-                    Type::DefBool(e)
-                }),
-                map(preceded(tag("def_tristate"), ws(parse_expression)), |e| {
-                    Type::DefTristate(e)
-                }),
-            ))),
-            opt(map(parse_prompt_option, |o| o.to_string())),
-            opt(parse_if_expression_attribute),
-        )),
-        |(he, wo, e)| ConfigType {
-            r#type: he,
-            prompt: wo,
-            r#if: e,
-        },
-    )(input)
+    parse_config_type!(alt((
+        value(Type::Bool, tag("boolean")),
+        value(Type::Bool, tag("bool")),
+        value(Type::Hex, tag("hex")),
+        value(Type::Int, tag("int")),
+        value(Type::String, tag("string")),
+        value(Type::Tristate, tag("tristate")),
+        map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
+            Type::DefBool(e)
+        }),
+        map(preceded(tag("def_tristate"), ws(parse_expression)), |e| {
+            Type::DefTristate(e)
+        })
+    )))(input)
 }
 
+#[macro_export]
 macro_rules! parse_config_type {
     ($fn:expr) => {{
         map(
@@ -89,16 +81,17 @@ pub struct ConfigType {
     pub r#if: Option<Expression>,
 }
 
-impl ToString for Type {
-    fn to_string(&self) -> String {
+#[cfg(feature = "display")]
+impl Display for Type {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Type::Bool => "bool".to_string(),
-            Type::Tristate => "tristate".to_string(),
-            Type::String => "string".to_string(),
-            Type::Hex => "hex".to_string(),
-            Type::Int => "int".to_string(),
-            Type::DefBool(v) => format!("{} {}", "def_bool", v.to_string()),
-            Type::DefTristate(v) => format!("{} {}", "def_tristate", v.to_string()),
+            Type::Bool => write!(f, "bool"),
+            Type::Tristate => write!(f, "tristate"),
+            Type::String => write!(f, "string"),
+            Type::Hex => write!(f, "hex"),
+            Type::Int => write!(f, "int"),
+            Type::DefBool(v) => write!(f, "def_bool {}", v),
+            Type::DefTristate(v) => write!(f, "def_tristate {}", v),
         }
     }
 }

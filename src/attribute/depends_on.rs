@@ -29,9 +29,9 @@ use super::{expression::parse_expression, Attribute};
 ///     "depends on PCI",
 ///     Ok((
 ///         "",
-///         Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Term(
+///         Attribute::DependsOn(Expression::Term(AndExpression::Term(
 ///             Term::Atom(Atom::Symbol(Symbol::Constant("PCI".to_string())))
-///         ))))
+///         )))
 ///     ))
 /// )
 /// ```

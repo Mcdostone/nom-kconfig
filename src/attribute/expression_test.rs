@@ -3,7 +3,7 @@ use crate::{
     attribute::{
         expression::{
             parse_expression, AndExpression, Atom, CompareExpression, CompareOperator, Expression,
-            OrExpression, Term,
+            Term,
         },
         function::{ExpressionToken, FunctionCall, Parameter},
     },
@@ -17,9 +17,7 @@ fn test_parse_expression_number() {
         "-412",
         Ok((
             "",
-            Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                Atom::Number(-412)
-            ))))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(-412))))
         ))
     )
 }
@@ -31,8 +29,8 @@ fn test_parse_term() {
         "!KVM",
         Ok((
             "",
-            Expression(OrExpression::Term(AndExpression::Term(Term::Not(
-                Atom::Symbol(Symbol::Constant("KVM".to_string()))
+            Expression::Term(AndExpression::Term(Term::Not(Atom::Symbol(
+                Symbol::Constant("KVM".to_string())
             ))))
         ))
     )
@@ -45,10 +43,28 @@ fn test_parse_depends_on_and() {
         "ALPHA_MIATA && ALPHA_LX164",
         Ok((
             "",
-            Expression(OrExpression::Term(AndExpression::Expression(vec!(
+            Expression::Term(AndExpression::Expression(vec!(
                 Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_MIATA".to_string()))),
                 Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
-            ))))
+            )))
+        ))
+    )
+}
+
+#[test]
+fn test_parse_number_or_symbol() {
+    assert_parsing_eq!(
+        parse_expression,
+        "64BITS = y",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+                CompareExpression {
+                    left: Symbol::Constant("64BITS".to_string()),
+                    operator: CompareOperator::Equal,
+                    right: Symbol::Constant("y".to_string())
+                }
+            ),)))
         ))
     )
 }
@@ -60,7 +76,7 @@ fn test_parse_depends_on_ambigus() {
         "ALPHA_MIATA || ALPHA_LX164 && ALPHA_SX164",
         Ok((
             "",
-            Expression(OrExpression::Expression(vec!(
+            Expression::Expression(vec!(
                 AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
                     "ALPHA_MIATA".to_string()
                 )))),
@@ -68,7 +84,7 @@ fn test_parse_depends_on_ambigus() {
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
                 ))
-            )))
+            ))
         ))
     )
 }
@@ -78,20 +94,20 @@ fn test_parse_depends_on_optimization() {
     assert_parsing_eq!(
         parse_expression,
         "ALPHA_MIATA || ALPHA_LX164 && ALPHA_SX164 && (HELLO = world) || ALPHA_SX164 && (HELLO = world)",
-        Ok(("", Expression(OrExpression::Expression(
+        Ok(("", Expression::Expression(
             vec!(
                 AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_MIATA".to_string())))),
                 AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string()) }))))))),
-                ))),
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string()) }))))))),
+                )),
                 AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string())}))))))))
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string())})))))))
                 )
             )
-        ))))))
+        )))))
 }
 
 #[test]
@@ -101,8 +117,8 @@ fn test_parse_expression_function() {
         "$(success,$(OBJCOPY) --version | head -n1 | grep -qv llvm)",
         Ok((
             "",
-            Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                Atom::Function(FunctionCall {
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Function(
+                FunctionCall {
                     name: "success".to_string(),
                     parameters: vec!(Parameter {
                         tokens: vec!(
@@ -125,7 +141,7 @@ fn test_parse_expression_function() {
                             ExpressionToken::Literal("llvm".to_string())
                         )
                     })
-                })
+                }
             ))))
         ))
     )
@@ -139,10 +155,10 @@ fn test_parse_expression_start_like_number_but_symbol() {
         r#"8xx && MTD_CFI"#,
         Ok((
             "",
-            Expression(OrExpression::Term(AndExpression::Expression(vec!(
+            Expression::Term(AndExpression::Expression(vec!(
                 Term::Atom(Atom::Symbol(Symbol::Constant("8xx".to_string()))),
                 Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
-            ))))
+            )))
         ))
     )
 }
@@ -154,10 +170,132 @@ fn test_parse_expression_number_and() {
         r#"8500 && MTD_CFI"#,
         Ok((
             "",
-            Expression(OrExpression::Term(AndExpression::Expression(vec!(
+            Expression::Term(AndExpression::Expression(vec!(
                 Term::Atom(Atom::Number(8500)),
                 Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
-            ))))
+            )))
         ))
     )
+}
+
+#[test]
+fn test_expression_to_string() {
+    assert_eq!(
+        "NUMBER_OF_PROCS = 5",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+            CompareExpression {
+                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                operator: CompareOperator::Equal,
+                right: Symbol::Constant("5".to_string())
+            }
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "NUMBER_OF_PROCS != 5",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+            CompareExpression {
+                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                operator: CompareOperator::NotEqual,
+                right: Symbol::Constant("5".to_string())
+            }
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "NUMBER_OF_PROCS < 5",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+            CompareExpression {
+                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                operator: CompareOperator::LowerThan,
+                right: Symbol::Constant("5".to_string())
+            }
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "NUMBER_OF_PROCS <= 5",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+            CompareExpression {
+                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                operator: CompareOperator::LowerOrEqual,
+                right: Symbol::Constant("5".to_string())
+            }
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "NUMBER_OF_PROCS > 5",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+            CompareExpression {
+                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                operator: CompareOperator::GreaterThan,
+                right: Symbol::Constant("5".to_string())
+            }
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "NUMBER_OF_PROCS >= 5",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+            CompareExpression {
+                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                operator: CompareOperator::GreaterOrEqual,
+                right: Symbol::Constant("5".to_string())
+            }
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "KVM && NET",
+        Expression::Term(AndExpression::Expression(vec!(
+            Term::Atom(Atom::Symbol(Symbol::Constant("KVM".to_string()))),
+            Term::Atom(Atom::Symbol(Symbol::Constant("NET".to_string())))
+        )))
+        .to_string()
+    );
+    assert_eq!(
+        "KVM || NET",
+        Expression::Expression(vec!(
+            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                "KVM".to_string()
+            )))),
+            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                "NET".to_string()
+            ))))
+        ))
+        .to_string()
+    );
+    assert_eq!(
+        "!KVM",
+        Expression::Term(AndExpression::Term(Term::Not(Atom::Symbol(
+            Symbol::Constant("KVM".to_string())
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "55",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(55)))).to_string()
+    );
+    assert_eq!(
+        r#"(hello)"#,
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Parenthesis(
+            Box::new(Expression::Term(AndExpression::Term(Term::Atom(
+                Atom::String(Box::new(Atom::Symbol(Symbol::Constant(
+                    "hello".to_string()
+                ))))
+            ))))
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        "$(warning)",
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Function(
+            FunctionCall {
+                name: "warning".to_string(),
+                parameters: vec!()
+            }
+        ))))
+        .to_string()
+    );
 }

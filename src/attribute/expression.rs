@@ -1,3 +1,5 @@
+#[cfg(feature = "display")]
+use std::fmt::Display;
 use std::str::FromStr;
 
 use nom::{
@@ -37,23 +39,22 @@ pub enum CompareOperator {
     NotEqual,
 }
 
-impl ToString for CompareOperator {
-    fn to_string(&self) -> String {
+#[cfg(feature = "display")]
+impl Display for CompareOperator {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            CompareOperator::GreaterThan => ">".to_string(),
-            CompareOperator::GreaterOrEqual => ">=".to_string(),
-            CompareOperator::LowerThan => "<".to_string(),
-            CompareOperator::LowerOrEqual => ">=".to_string(),
-            CompareOperator::Equal => "=".to_string(),
-            CompareOperator::NotEqual => "!=".to_string(),
+            CompareOperator::GreaterThan => write!(f, ">"),
+            CompareOperator::GreaterOrEqual => write!(f, ">="),
+            CompareOperator::LowerThan => write!(f, "<"),
+            CompareOperator::LowerOrEqual => write!(f, "<="),
+            CompareOperator::Equal => write!(f, "="),
+            CompareOperator::NotEqual => write!(f, "!="),
         }
     }
 }
 
 // https://stackoverflow.com/questions/9509048/antlr-parser-for-and-or-logic-how-to-get-expressions-between-logic-operators
-
-#[derive(Debug, Serialize, PartialEq, Clone, Default)]
-pub struct Expression(pub OrExpression);
+pub type Expression = OrExpression;
 #[derive(Debug, Serialize, PartialEq, Clone)]
 pub enum AndExpression {
     #[serde(rename = "AndTerm")]
@@ -61,12 +62,6 @@ pub enum AndExpression {
 
     #[serde(rename = "And")]
     Expression(Vec<Term>),
-}
-
-impl ToString for Expression {
-    fn to_string(&self) -> String {
-        self.0.to_string()
-    }
 }
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
@@ -91,14 +86,10 @@ pub struct CompareExpression {
     pub right: Symbol,
 }
 
-impl ToString for CompareExpression {
-    fn to_string(&self) -> String {
-        format!(
-            "{} {} {}",
-            self.left.to_string(),
-            self.operator.to_string(),
-            self.right.to_string()
-        )
+#[cfg(feature = "display")]
+impl Display for CompareExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{} {} {}", self.left, self.operator, self.right)
     }
 }
 
@@ -112,74 +103,61 @@ pub enum Atom {
     String(Box<Atom>),
 }
 
-impl ToString for AndExpression {
-    fn to_string(&self) -> String {
+#[cfg(feature = "display")]
+impl Display for AndExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            AndExpression::Term(t) => t.to_string(),
-            AndExpression::Expression(t) => t
-                .iter()
-                .map(|a| a.to_string())
-                .collect::<Vec<_>>()
-                .join(" && "),
+            Self::Term(t) => write!(f, "{}", t),
+            Self::Expression(t) => write!(
+                f,
+                "{}",
+                t.iter()
+                    .map(|a| a.to_string())
+                    .collect::<Vec<_>>()
+                    .join(" && ")
+            ),
         }
     }
 }
 
-impl ToString for OrExpression {
-    fn to_string(&self) -> String {
+#[cfg(feature = "display")]
+impl Display for OrExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            OrExpression::Term(t) => t.to_string(),
-            OrExpression::Expression(t) => t
-                .iter()
-                .map(|a| a.to_string())
-                .collect::<Vec<_>>()
-                .join(" || "),
+            Self::Term(t) => write!(f, "{}", t),
+            Self::Expression(t) => write!(
+                f,
+                "{}",
+                t.iter()
+                    .map(|a| a.to_string())
+                    .collect::<Vec<_>>()
+                    .join(" || ")
+            ),
         }
     }
 }
 
-impl ToString for Term {
-    fn to_string(&self) -> String {
+#[cfg(feature = "display")]
+impl Display for Term {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Term::Not(t) => format!("!{}", t.to_string()),
-            Term::Atom(t) => t.to_string(),
+            Term::Not(atom) => write!(f, "!{}", atom),
+            Term::Atom(atom) => write!(f, "{}", atom),
         }
     }
 }
 
-impl ToString for Atom {
-    fn to_string(&self) -> String {
+#[cfg(feature = "display")]
+impl Display for Atom {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Atom::Symbol(s) => s.to_string(),
-            Atom::Number(d) => d.to_string(),
-            Atom::Compare(c) => c.to_string(),
-            Atom::Function(f) => f.to_string(),
-            Atom::Parenthesis(d) => d.to_string(),
-            Atom::String(s) => s.to_string(),
+            Atom::Symbol(s) => write!(f, "{}", s),
+            Atom::Number(d) => write!(f, "{}", d),
+            Atom::Compare(c) => write!(f, "{}", c),
+            Atom::Function(func) => write!(f, "{}", func),
+            Atom::Parenthesis(d) => write!(f, "({})", d),
+            Atom::String(s) => write!(f, "{}", s),
         }
-    }
-}
-
-impl Default for OrExpression {
-    fn default() -> Self {
-        Self::Term(Default::default())
-    }
-}
-
-impl Default for AndExpression {
-    fn default() -> Self {
-        Self::Term(Default::default())
-    }
-}
-
-impl Default for Term {
-    fn default() -> Self {
-        Self::Atom(Default::default())
-    }
-}
-impl Default for Atom {
-    fn default() -> Self {
-        Self::Symbol(Default::default())
     }
 }
 
@@ -243,7 +221,7 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
 }
 
 pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    map(parse_or_expression, Expression)(input)
+    parse_or_expression(input)
 }
 
 pub fn parse_compare_operator(input: KconfigInput) -> IResult<KconfigInput, CompareOperator> {
@@ -278,13 +256,7 @@ pub fn parse_if_expression_attribute(input: KconfigInput) -> IResult<KconfigInpu
     map(tuple((wsi(tag("if")), wsi(parse_expression))), |(_, e)| e)(input)
 }
 
-pub fn parse_hex_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
-    map_res(
-        recognize(pair(opt(char('-')), digit1)),
-        |d: KconfigInput| FromStr::from_str(d.fragment()),
-    )(input)
-}
-
+// TODO ugly
 pub fn parse_number_or_symbol(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     let (input, sym) = parse_symbol(input)?;
     match sym.clone() {

@@ -68,3 +68,19 @@ fn test_parse_help_indent_2() {
         ))
     )
 }
+
+/*
+#[test]
+fn test_parse_help_not_indentation() {
+    let input = "	help
+The Alpha is a 64-bit general-purpose processor.";
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok((
+            "",
+            "The Alpha is a 64-bit general-purpose processor designed and\nmarketed by the Digital Equipment Corporation of blessed memory, now\nCompaq.  Alpha Linux dates from 1995-1996 and was the first non-x86\nport. The Alpha Linux project has a home page at\n<http://www.alphalinux.org/>.".to_string()
+        ))
+    )
+}
+*/

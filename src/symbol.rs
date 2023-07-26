@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use nom::{
     branch::alt,
     bytes::complete::take_until,
@@ -25,12 +27,6 @@ pub enum Symbol {
     NonConstant(String),
 }
 
-impl Default for Symbol {
-    fn default() -> Self {
-        Self::Constant("".to_string())
-    }
-}
-
 pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
     alt((
         map(parse_constant_symbol, |c: &str| {
@@ -54,11 +50,12 @@ pub fn parse_constant_symbol(input: KconfigInput) -> IResult<KconfigInput, &str>
     )(input)
 }
 
-impl ToString for Symbol {
-    fn to_string(&self) -> String {
+#[cfg(feature = "display")]
+impl Display for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Symbol::Constant(c) => c.to_string(),
-            Symbol::NonConstant(c) => c.to_string(),
+            Symbol::Constant(c) => write!(f, "{}", c),
+            Symbol::NonConstant(c) => write!(f, "\"{}\"", c),
         }
     }
 }

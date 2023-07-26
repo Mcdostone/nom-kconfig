@@ -12,8 +12,8 @@ fn test_parse_depends_on() {
         "depends on PCI",
         Ok((
             "",
-            Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Term(
-                Term::Atom(Atom::Symbol(Symbol::Constant("PCI".to_string())))
+            Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
+                Atom::Symbol(Symbol::Constant("PCI".to_string()))
             ))))
         ))
     )
@@ -27,8 +27,8 @@ fn test_parse_depends_on_weird_tab() {
         "depends 	on LIVEPATCH",
         Ok((
             "",
-            Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Term(
-                Term::Atom(Atom::Symbol(Symbol::Constant("LIVEPATCH".to_string())))
+            Attribute::DependsOn(OrExpression::Term(AndExpression::Term(Term::Atom(
+                Atom::Symbol(Symbol::Constant("LIVEPATCH".to_string()))
             ))))
         ))
     )
@@ -43,25 +43,23 @@ fn test_parse_depends_on_backslash() {
 		    || MACH_ARMCORE || ARCH_PXA_PALM)"#,
         Ok((
             "",
-            Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Term(
-                Term::Atom(Atom::Parenthesis(Box::new(Expression(
-                    OrExpression::Expression(vec!(
-                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                            "ARCH_LUBBOCK".to_string()
-                        )))),
-                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                            "MACH_MAINSTONE".to_string()
-                        )))),
-                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                            "PXA_SHARPSL".to_string()
-                        )))),
-                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                            "MACH_ARMCORE".to_string()
-                        )))),
-                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                            "ARCH_PXA_PALM".to_string()
-                        )))),
-                    ))
+            Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
+                Atom::Parenthesis(Box::new(Expression::Expression(vec!(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                        "ARCH_LUBBOCK".to_string()
+                    )))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                        "MACH_MAINSTONE".to_string()
+                    )))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                        "PXA_SHARPSL".to_string()
+                    )))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                        "MACH_ARMCORE".to_string()
+                    )))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                        "ARCH_PXA_PALM".to_string()
+                    )))),
                 ))))
             ))))
         ))

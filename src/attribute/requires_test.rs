@@ -2,7 +2,7 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         requires::{parse_requires, Requires},
-        AndExpression, Atom, CompareExpression, CompareOperator, Expression, OrExpression, Term,
+        AndExpression, Atom, CompareExpression, CompareOperator, Expression, Term,
     },
     symbol::Symbol,
 };
@@ -17,12 +17,12 @@ fn test_parse_requires() {
         Ok((
             "",
             Requires {
-                symbol: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Compare(CompareExpression {
+                symbol: Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+                    CompareExpression {
                         left: Symbol::Constant("MTK_INFRACFG".to_string()),
                         operator: CompareOperator::Equal,
                         right: Symbol::Constant("y".to_string())
-                    })
+                    }
                 ))))
             }
         ))
@@ -34,8 +34,8 @@ fn test_parse_requires() {
         Ok((
             "",
             Requires {
-                symbol: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("KVM".to_string()))
+                symbol: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::Constant("KVM".to_string())
                 ))))
             }
         ))
