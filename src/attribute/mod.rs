@@ -1,5 +1,3 @@
-pub mod def_bool;
-pub mod def_tristate;
 pub mod default;
 pub mod depends_on;
 pub mod enable;
@@ -22,10 +20,7 @@ use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
-use self::r#type::{parse_bool_type, parse_tristate_type};
 pub use self::{
-    def_bool::{parse_def_bool, DefBool},
-    def_tristate::{parse_def_tristate, DefTristate},
     default::{parse_default, DefaultAttribute},
     depends_on::parse_depends_on,
     enable::{parse_enable, Enable},
@@ -35,7 +30,6 @@ pub use self::{
     modules::parse_modules,
     option::{parse_option, OptionValues},
     prompt::{parse_prompt, parse_prompt_option, Prompt},
-    r#type::{parse_type, EntryType, Type},
     range::{parse_range, Range},
     requires::{parse_requires, Requires},
     select::{parse_select, Select},
@@ -54,7 +48,6 @@ pub enum Attribute {
     Help(String),
     Prompt(Prompt),
     Modules,
-    Type(EntryType),
     Select(Select),
     DependsOn(Expression),
     Optional,
@@ -62,55 +55,32 @@ pub enum Attribute {
     Visible(Visible),
     Default(DefaultAttribute),
     Enable(Enable),
-    DefBool(DefBool),
-    DefTristate(DefTristate),
     Imply(Imply),
     Requires(Requires),
     Option(OptionValues),
-}
-
-macro_rules! parse_attribute_with_type {
-    ($fn:expr) => {{
-        alt((
-            map(ws(parse_def_bool), Attribute::DefBool),
-            map(ws($fn), Attribute::Type),
-            map(ws(parse_prompt), Attribute::Prompt),
-            map(ws(parse_help), Attribute::Help),
-            ws(parse_depends_on),
-            map(ws(parse_select), Attribute::Select),
-            map(ws(parse_default), Attribute::Default),
-            map(ws(parse_requires), Attribute::Requires),
-            map(ws(parse_def_tristate), Attribute::DefTristate),
-            map(ws(parse_modules), |_| Attribute::Modules),
-            map(ws(parse_range), Attribute::Range),
-            map(ws(parse_imply), Attribute::Imply),
-            map(ws(parse_visible), Attribute::Visible),
-            map(ws(parse_option), Attribute::Option),
-            map(ws(parse_enable), Attribute::Enable),
-        ))
-    }};
 }
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
     ws(many0(parse_attribute))(input)
 }
 
-pub fn parse_tristate_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
-    parse_attribute_with_type!(ws(parse_tristate_type))(input)
-}
-
-pub fn parse_bool_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
-    parse_attribute_with_type!(ws(parse_bool_type))(input)
-}
-
 pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
-    parse_attribute_with_type!(parse_type)(input)
+    alt((
+        map(ws(parse_prompt), Attribute::Prompt),
+        map(ws(parse_help), Attribute::Help),
+        ws(parse_depends_on),
+        map(ws(parse_select), Attribute::Select),
+        map(ws(parse_default), Attribute::Default),
+        map(ws(parse_requires), Attribute::Requires),
+        map(ws(parse_modules), |_| Attribute::Modules),
+        map(ws(parse_range), Attribute::Range),
+        map(ws(parse_imply), Attribute::Imply),
+        map(ws(parse_visible), Attribute::Visible),
+        map(ws(parse_option), Attribute::Option),
+        map(ws(parse_enable), Attribute::Enable),
+    ))(input)
 }
 
-#[cfg(test)]
-mod def_bool_test;
-#[cfg(test)]
-mod def_tristate_test;
 #[cfg(test)]
 mod default_test;
 #[cfg(test)]

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use nom_kconfig::{
     attribute::{
         expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        r#type::{EntryType, Type},
+        r#type::{ConfigType, Type},
         select::Select,
     },
     entry::config::Config,
@@ -29,12 +29,12 @@ fn test_parse() {
     assert_parsing!(result, Ok(("", Kconfig { file: input_file.display().to_string(), entries: vec!(Entry::Config(
         Config {
             symbol: "KVM".to_string(),
-            attributes: vec!(
-                Attribute::Type(EntryType {
+            r#type: ConfigType {
                 r#type: Type::Tristate,
                 prompt: Some("Kernel-based Virtual Machine (KVM) support".to_string()),
                 r#if: None
-                }),
+            },
+            attributes: vec!(
                 Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("HAVE_KVM".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("HIGH_RES_TIMERS".to_string()))),

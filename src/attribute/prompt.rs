@@ -54,7 +54,7 @@ pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
             // TODO linux v-3.2, in file /arch/arm/plat-tcc/Kconfig
             verify(
                 terminated(not_line_ending, alt((line_ending, eof))),
-                |d: &KconfigInput| !d.is_empty(),
+                |d: &KconfigInput| !d.trim().is_empty(),
             ),
         )),
         |d: KconfigInput| d.fragment().to_owned().trim(),

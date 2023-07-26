@@ -43,7 +43,7 @@ pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
         terminated(
             pair(
                 parse_choice_attributes,
-                many0(alt((parse_bool_config, parse_tristate_config))),
+                many0(ws(alt((parse_bool_config, parse_tristate_config)))),
             ),
             ws(tag("endchoice")),
         ),

@@ -1,6 +1,9 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{AndExpression, Atom, Attribute, DefBool, Expression, OrExpression, Term},
+    attribute::{
+        r#type::{ConfigType, Type},
+        AndExpression, Atom, Expression, OrExpression, Term,
+    },
     entry::{parse_menu_config, MenuConfig},
     symbol::Symbol,
 };
@@ -15,12 +18,14 @@ fn test_parse_menuconfig() {
             "",
             MenuConfig {
                 symbol: "VIRTUALIZATION".to_string(),
-                attributes: vec!(Attribute::DefBool(DefBool {
-                    expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-                        Atom::Symbol(Symbol::Constant("y".to_string()))
+                r#type: ConfigType {
+                    r#type: Type::DefBool(Expression(OrExpression::Term(AndExpression::Term(
+                        Term::Atom(Atom::Symbol(Symbol::Constant("y".to_string())))
                     )))),
-                    ..Default::default()
-                })),
+                    prompt: None,
+                    r#if: None,
+                },
+                attributes: vec!()
             }
         ))
     )

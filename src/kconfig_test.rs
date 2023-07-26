@@ -1,9 +1,9 @@
 use crate::{
     assert_parsing_eq,
-    attribute::r#type::{EntryType, Type},
-    entry::config::Config,
+    attribute::r#type::{ConfigType, Type},
+    entry::{config::Config, Choice},
     kconfig::parse_kconfig,
-    Attribute, Entry, Kconfig,
+    Entry, Kconfig,
 };
 
 #[test]
@@ -22,12 +22,47 @@ fn test_parse_kconfig() {
                 file: "".to_string(),
                 entries: vec!(Entry::Config(Config {
                     symbol: "SND_INTEL_NHLT".to_string(),
-                    attributes: vec!(Attribute::Type(EntryType {
+                    r#type: ConfigType {
                         r#type: Type::Tristate,
                         prompt: None,
                         r#if: None
-                    }))
+                    },
+                    attributes: vec!()
                 }))
+            }
+        ))
+    )
+}
+
+#[test]
+fn test_parse_kconfig_choice() {
+    let input = "
+choice
+config RAPIDIO_ENUM_BASIC
+	tristate
+
+
+endchoice
+";
+    assert_parsing_eq!(
+        parse_kconfig,
+        input,
+        Ok((
+            "",
+            Kconfig {
+                file: "".to_string(),
+                entries: vec!(Entry::Choice(Choice {
+                    options: vec!(),
+                    configs: vec!(Config {
+                        symbol: "RAPIDIO_ENUM_BASIC".to_string(),
+                        r#type: ConfigType {
+                            r#type: Type::Tristate,
+                            prompt: None,
+                            r#if: None
+                        },
+                        attributes: vec!()
+                    })
+                })),
             }
         ))
     )

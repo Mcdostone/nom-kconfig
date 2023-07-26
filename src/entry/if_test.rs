@@ -1,7 +1,7 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        r#type::{EntryType, Type},
+        r#type::{ConfigType, Type},
         select::Select,
         AndExpression, Atom, Expression, OrExpression, Term,
     },
@@ -51,17 +51,15 @@ fn test_parse_if_entry_with_config() {
                 )))),
                 entries: vec!(Entry::Config(Config {
                     symbol: "KVM".to_string(),
-                    attributes: vec!(
-                        Attribute::Type(EntryType {
-                            r#type: Type::Bool,
-                            prompt: None,
-                            r#if: None
-                        }),
-                        Attribute::Select(Select {
-                            symbol: "KVM_MMIO".to_string(),
-                            r#if: None
-                        })
-                    )
+                    r#type: ConfigType {
+                        r#type: Type::Bool,
+                        prompt: None,
+                        r#if: None
+                    },
+                    attributes: vec!(Attribute::Select(Select {
+                        symbol: "KVM_MMIO".to_string(),
+                        r#if: None
+                    }))
                 }))
             }
         ))

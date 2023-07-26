@@ -2,16 +2,12 @@ use test_case::test_case;
 
 use crate::assert_parsing_eq;
 use crate::attribute::{
-    def_bool::DefBool, def_tristate::DefTristate, default::DefaultAttribute, imply::Imply,
-    parse_attribute, prompt::Prompt, r#type::EntryType, r#type::Type, range::Range, select::Select,
-    visible::Visible, AndExpression, Atom, Attribute, CompareExpression, CompareOperator, Enable,
-    Expression, OptionValues, OrExpression, Requires, Term,
+    default::DefaultAttribute, imply::Imply, parse_attribute, prompt::Prompt, range::Range,
+    select::Select, visible::Visible, AndExpression, Atom, Attribute, CompareExpression,
+    CompareOperator, Enable, Expression, OptionValues, OrExpression, Requires, Term,
 };
 use crate::symbol::Symbol;
 
-#[test_case( "def_bool y", Attribute::DefBool(DefBool { expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(
-    Atom::Symbol(Symbol::Constant("y".to_string())))))), r#if: None }); "DefBool")]
-#[test_case( "def_tristate m", Attribute::DefTristate(DefTristate {expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("m".to_string())))))),r#if: None}); "DefTristate")]
 #[test_case( "    default  m", Attribute::Default(DefaultAttribute {expression: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("m".to_string())))))), r#if: None}); "Default")]
 #[test_case( "depends on KVM",  Attribute::DependsOn(Expression(OrExpression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("KVM".to_string()))))))); "DependsOn")]
 #[test_case("enable MTK_INFRACFG",  Attribute::Enable( Enable {
@@ -38,7 +34,6 @@ use crate::symbol::Symbol;
 }); "Requires")]
 #[test_case( "select KVM", Attribute::Select(Select {symbol: "KVM".to_string(), r#if: None }); "Select")]
 #[test_case( "    visible", Attribute::Visible(Visible {r#if: None}); "Visible")]
-#[test_case( "   string", Attribute::Type(EntryType {r#type: Type::String,prompt: None, r#if: None}))]
 fn parse_attribute_test(input: &str, expected: Attribute) {
     assert_parsing_eq!(parse_attribute, input, Ok(("", expected)))
 }

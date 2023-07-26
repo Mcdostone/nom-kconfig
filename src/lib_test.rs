@@ -2,12 +2,12 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         expression::{AndExpression, Atom, Expression, OrExpression, Term},
-        r#type::{EntryType, Type},
+        r#type::{ConfigType, Type},
     },
     entry::{config::Config, r#if::If},
     kconfig::parse_kconfig,
     symbol::Symbol,
-    Attribute, Entry, Kconfig,
+    Entry, Kconfig,
 };
 
 #[macro_export]
@@ -44,11 +44,12 @@ endif"#;
                 entries: vec!(
                     Entry::Config(Config {
                         symbol: "BLK_DEV_IDEDMA_SFF".to_string(),
-                        attributes: vec!(Attribute::Type(EntryType {
+                        r#type: ConfigType {
                             r#type: Type::Bool,
                             prompt: None,
                             r#if: None
-                        }))
+                        },
+                        attributes: vec!()
                     }),
                     Entry::If(If {
                         condition: Expression(OrExpression::Term(AndExpression::Term(Term::Atom(

@@ -1,6 +1,6 @@
 use nom::{bytes::complete::tag, combinator::map, sequence::pair, IResult};
 
-use crate::{attribute::parse_attributes, util::ws, KconfigInput};
+use crate::{attribute::r#type::parse_type, generic_config_parser, util::ws, KconfigInput};
 
 use super::{config::parse_config_symbol, Config};
 
@@ -8,17 +8,5 @@ use super::{config::parse_config_symbol, Config};
 pub type MenuConfig = Config;
 
 pub fn parse_menu_config(input: KconfigInput) -> IResult<KconfigInput, MenuConfig> {
-    map(
-        pair(
-            map(
-                pair(ws(tag("menuconfig")), ws(parse_config_symbol)),
-                |(_, id)| id,
-            ),
-            parse_attributes,
-        ),
-        |(symbol, attributes)| MenuConfig {
-            symbol: symbol.to_string(),
-            attributes,
-        },
-    )(input)
+    generic_config_parser!(MenuConfig, "menuconfig", parse_type)(input)
 }
