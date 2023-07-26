@@ -72,7 +72,7 @@ jobs:
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
-          version: 0.26.0
+          version:" .22.0"
           args: '-- --all-features --out Xml'
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
