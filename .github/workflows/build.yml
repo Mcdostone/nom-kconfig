@@ -10,8 +10,8 @@ env:
   RUSTFLAGS: "-D warnings"
 
 jobs:
-  test-linux:
-    name: Tests on ubuntu
+  test:
+    name: Unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -69,11 +69,10 @@ jobs:
         with:
             toolchain: stable
             override: true
-      - run: cargo install tarpaulin
-      - uses: actions-rs/cargo@v1
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
         with:
-          command: tarpaulin
-          args: --all-features --out Xml
+          args: '-- --all-features --out Xml'
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
