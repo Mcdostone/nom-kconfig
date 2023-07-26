@@ -17,7 +17,7 @@ jobs:
       image: ubuntu:latest
     steps:
       - uses: actions/checkout@v3
-      - run: apt-get update && apt-get install -y curl
+      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: apt-get update && apt-get install -y curl
+      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: apt-get update && apt-get install -y curl
+      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: apt-get update && apt-get install -y curl
+      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
