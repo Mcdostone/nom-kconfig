@@ -1,5 +1,3 @@
-
-
 use crate::parse_config_type;
 use crate::{util::ws, KconfigInput};
 use nom::{
