@@ -38,16 +38,15 @@ fn test_parse_source_no_quote() {
 
 #[test]
 fn test_parse_source_fail_to_parse() {
-    let res: Result<
-        (&str, Kconfig),
-        nom::Err<nom::error::Error<KconfigInput>>> = parse_source(KconfigInput::new_extra(
-        "source cargo.toml",
-        KconfigFile {
-            root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")),
-            ..Default::default()
-        },
-    ))
-    .map(|r| (r.0.fragment().to_owned(), r.1));
+    let res: Result<(&str, Kconfig), nom::Err<nom::error::Error<KconfigInput>>> =
+        parse_source(KconfigInput::new_extra(
+            "source cargo.toml",
+            KconfigFile {
+                root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")),
+                ..Default::default()
+            },
+        ))
+        .map(|r| (r.0.fragment().to_owned(), r.1));
     assert_eq!(
         res,
         Err(nom::Err::Error(nom::error::Error::new(
