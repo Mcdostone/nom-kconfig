@@ -1,4 +1,4 @@
-use std::fmt::Display;
+
 
 use crate::parse_config_type;
 use crate::{util::ws, KconfigInput};
@@ -81,6 +81,8 @@ pub struct ConfigType {
     pub r#if: Option<Expression>,
 }
 
+#[cfg(feature = "display")]
+use std::fmt::Display;
 #[cfg(feature = "display")]
 impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

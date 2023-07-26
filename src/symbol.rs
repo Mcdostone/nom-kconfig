@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use nom::{
     branch::alt,
     bytes::complete::take_until,
@@ -50,6 +48,8 @@ pub fn parse_constant_symbol(input: KconfigInput) -> IResult<KconfigInput, &str>
     )(input)
 }
 
+#[cfg(feature = "display")]
+use std::fmt::Display;
 #[cfg(feature = "display")]
 impl Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
