@@ -73,7 +73,7 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           version: 0.22.0
-          args: '-- --all-features --out Xml'
+          args: --all-features --out Xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
