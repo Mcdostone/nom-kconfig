@@ -43,7 +43,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: clippy --all-targets -- --deny warnings
+          args: --all-targets -- --deny warnings
 
   fmt:
     name: Cargo fmt
@@ -72,7 +72,10 @@ jobs:
             toolchain: stable
             override: true
       - run: cargo install tarpaulin
-      - run: cargo tarpaulin --all-features --out Xml
+      - uses: actions-rs/cargo@v1
+        with:
+          command: tarpaulin
+          args: --all-features --out Xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
