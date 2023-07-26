@@ -13,8 +13,6 @@ jobs:
   test-linux:
     name: Tests on ubuntu
     runs-on: ubuntu-latest
-    container:
-      image: ubuntu:latest
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install -y curl
