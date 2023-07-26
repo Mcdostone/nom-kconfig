@@ -5,3 +5,4 @@ Kconfig
 .vscode
 *.json
 *.profraw
+tests/!Kconfig

@@ -1,0 +1,13 @@
+config KVM
+	tristate "Kernel-based Virtual Machine (KVM) support"
+	depends on HAVE_KVM && \
+	HIGH_RES_TIMERS    &&     X86_LOCAL_APIC
+	select PREEMPT_NOTIFIERS
+	select MMU_NOTIFIER
+	select HAVE_KVM_IRQCHIP
+	select HAVE_KVM_PFNCACHE
+	help
+	  Support hosting fully virtualized guest machines using hardware
+	  virtualization extensions.  You will need a fairly recent
+	  processor equipped with virtualization extensions. You will also
+	  need to select one or more of the processor modules below.
