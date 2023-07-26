@@ -12,7 +12,7 @@ env:
 jobs:
   test:
     name: Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - run: apt-get update && apt-get install -y curl
@@ -29,10 +29,10 @@ jobs:
 
   clippy:
     name: Clippy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
+      - run: apt-get update && apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
@@ -45,10 +45,10 @@ jobs:
 
   fmt:
     name: Cargo fmt
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
+      - run: apt-get update && apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
@@ -61,10 +61,10 @@ jobs:
 
   code-coverage:
     name: Code coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
+      - run: apt-get update && apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
