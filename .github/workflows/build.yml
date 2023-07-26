@@ -17,6 +17,10 @@ jobs:
       image: ubuntu:latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
@@ -29,6 +33,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+            components: clippy
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
@@ -39,6 +48,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+            components: rustfmt
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -49,6 +63,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
       - run: cargo install tarpaulin
       - run: cargo tarpaulin --all-features --out Xml
       - name: Upload coverage reports to Codecov
