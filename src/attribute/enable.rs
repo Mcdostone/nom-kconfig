@@ -1,9 +1,9 @@
 use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
-#[derive(Debug, Default, Serialize, Clone, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Enable {
     pub symbol: String,
 }

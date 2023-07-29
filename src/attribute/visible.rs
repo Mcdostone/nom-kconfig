@@ -6,10 +6,10 @@ use nom::{
     sequence::tuple,
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// The `visible` attribute is only applicable to menu blocks, if the condition is false, the menu block is not displayed to the user (the symbols contained there can still be selected by other symbols, though). It is similar to a conditional "prompt" attribute for individual menu entries. Default value of "visible" is true.
-#[derive(Debug, Serialize, PartialEq, Clone, Default)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone, Default)]
 pub struct Visible {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#if: Option<Expression>,

@@ -8,7 +8,7 @@ use nom::{
     sequence::{delimited, terminated, tuple},
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{util::ws, KconfigInput};
 
@@ -62,7 +62,7 @@ pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
 }
 
 /// Every menu entry can have at most one prompt, which is used to display to the user. Optionally dependencies only for this prompt can be added with "if".
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Prompt {
     pub prompt: String,
     #[serde(skip_serializing_if = "Option::is_none")]

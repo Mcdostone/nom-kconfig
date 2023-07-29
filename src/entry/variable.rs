@@ -7,7 +7,7 @@ use nom::{
     sequence::tuple,
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     attribute::function::{parse_expression_token_variable_parameter, ExpressionToken},
@@ -15,20 +15,20 @@ use crate::{
     KconfigInput,
 };
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct VariableAssignment {
     pub identifier: VariableIdentifier,
     pub operator: String,
     pub right: Value,
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum VariableIdentifier {
     Identifier(String),
     VariableRef(Vec<ExpressionToken>),
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum Value {
     Literal(String),
     ExpandedVariable(String),

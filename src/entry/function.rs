@@ -7,11 +7,11 @@ use nom::{
     sequence::{terminated, tuple},
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{util::ws, KconfigInput};
 
-#[derive(Debug, Serialize, PartialEq, Clone, Default)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone, Default)]
 pub struct Function {
     pub name: String,
     pub body: String,

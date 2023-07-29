@@ -1,5 +1,5 @@
 use nom::{branch::alt, combinator::map, multi::many0, sequence::delimited, IResult};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     attribute::function::{parse_function_call, FunctionCall},
@@ -31,7 +31,7 @@ pub mod menuconfig;
 pub mod source;
 pub mod variable;
 
-#[derive(Debug, Serialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum Entry {
     Config(Config),
     Choice(Choice),

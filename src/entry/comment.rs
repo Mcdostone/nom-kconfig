@@ -1,5 +1,5 @@
 use nom::{bytes::complete::tag, combinator::map, multi::many0, sequence::tuple, IResult};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     attribute::{depends_on::parse_depends_on, prompt::parse_prompt_option, Attribute},
@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// This defines a comment which is displayed to the user during the configuration process and is also echoed to the output files. The only possible options are dependencies.
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Comment {
     pub prompt: String,
     pub dependencies: Vec<Attribute>,

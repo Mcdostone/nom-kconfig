@@ -11,7 +11,7 @@ use nom::{
     sequence::{delimited, pair, preceded, tuple},
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     symbol::{parse_symbol, Symbol},
@@ -29,7 +29,7 @@ pub enum Operator {
     Or,
 }
 
-#[derive(Debug, PartialEq, Serialize, Clone)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub enum CompareOperator {
     GreaterThan,
     GreaterOrEqual,
@@ -55,7 +55,7 @@ impl Display for CompareOperator {
 
 // https://stackoverflow.com/questions/9509048/antlr-parser-for-and-or-logic-how-to-get-expressions-between-logic-operators
 pub type Expression = OrExpression;
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum AndExpression {
     #[serde(rename = "AndTerm")]
     Term(Term),
@@ -64,7 +64,7 @@ pub enum AndExpression {
     Expression(Vec<Term>),
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum OrExpression {
     #[serde(rename = "OrTerm")]
     Term(AndExpression),
@@ -72,13 +72,13 @@ pub enum OrExpression {
     Expression(Vec<AndExpression>),
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum Term {
     Not(Atom),
     Atom(Atom),
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 #[serde(rename = "Compare")]
 pub struct CompareExpression {
     pub left: Symbol,
@@ -93,7 +93,7 @@ impl Display for CompareExpression {
     }
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum Atom {
     Symbol(Symbol),
     Number(i64),

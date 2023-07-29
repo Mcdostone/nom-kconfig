@@ -5,11 +5,11 @@ use nom::{
     sequence::{delimited, tuple},
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub enum OptionValues {
     #[serde(rename = "defconfig_list")]
     DefconfigList,

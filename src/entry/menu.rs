@@ -6,7 +6,7 @@ use nom::{
     sequence::{pair, preceded, terminated},
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     attribute::{
@@ -19,7 +19,7 @@ use crate::{
 use super::{parse_entry, Entry};
 
 /// This defines a menu block, see ["Menu structure"](https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html#menu-structure) for more information. The only possible options are dependencies and "visible" attributes.
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Menu {
     pub prompt: String,
     #[serde(skip_serializing_if = "Option::is_none")]

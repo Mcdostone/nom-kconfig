@@ -9,11 +9,11 @@ use nom::{
     sequence::{delimited, preceded, terminated, tuple},
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{util::ws, KconfigInput};
 
-#[derive(Debug, Serialize, PartialEq, Clone, Default)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone, Default)]
 pub struct FunctionCall {
     pub name: String,
     pub parameters: Vec<Parameter>,
@@ -69,12 +69,12 @@ impl Display for FunctionCall {
     }
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone, Default)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone, Default)]
 pub struct Parameter {
     pub tokens: Vec<ExpressionToken>,
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum ExpressionToken {
     Literal(String),
     Variable(String),

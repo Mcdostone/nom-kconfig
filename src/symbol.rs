@@ -8,7 +8,7 @@ use nom::{
     sequence::delimited,
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::KconfigInput;
 
@@ -19,7 +19,7 @@ use super::util::ws;
 /// phanumeric characters or underscores. Constant symbols are only part of expressions. Constant symbols
 /// are always surrounded by single or double quotes. Within the quote, any other character is allowed and
 /// the quotes can be escaped using ''.
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum Symbol {
     Constant(String),
     NonConstant(String),

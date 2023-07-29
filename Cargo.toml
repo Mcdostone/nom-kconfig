@@ -27,5 +27,6 @@ name = "my_benchmark"
 harness = false
 
 [features]
-#default = ["display"]
+#default = ["display", "hash"]
 display = []
+hash = []

@@ -5,7 +5,7 @@ use nom::{
     sequence::tuple,
     IResult,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     symbol::{parse_symbol, Symbol},
@@ -16,7 +16,7 @@ use crate::{
 use super::expression::{parse_if_expression_attribute, parse_number, Expression};
 
 /// This allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Range {
     pub lhs: Symbol,
     pub rhs: Symbol,

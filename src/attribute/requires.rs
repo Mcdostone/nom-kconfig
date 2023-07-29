@@ -1,11 +1,11 @@
 use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{util::ws, KconfigInput};
 
 use super::expression::{parse_expression, Expression};
 
-#[derive(Debug, Serialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Requires {
     pub symbol: Expression,
 }
