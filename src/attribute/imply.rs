@@ -1,9 +1,4 @@
-use nom::{
-    bytes::complete::tag,
-    combinator::{map, opt},
-    sequence::tuple,
-    IResult,
-};
+use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -15,7 +10,7 @@ use crate::{
     KconfigInput,
 };
 
-use super::expression::{parse_if_expression, Expression};
+use super::{expression::Expression, parse_if_attribute};
 
 /// Imply` is similar "select" as it enforces a lower limit on another symbol except that the "implied" symbol's value may still be set to n from a direct dependency or with a visible prompt.
 #[derive(Debug, Clone, PartialEq)]
@@ -54,11 +49,7 @@ pub struct Imply {
 /// ```
 pub fn parse_imply(input: KconfigInput) -> IResult<KconfigInput, Imply> {
     map(
-        tuple((
-            ws(tag("imply")),
-            ws(parse_symbol),
-            opt(ws(parse_if_expression)),
-        )),
+        tuple((ws(tag("imply")), ws(parse_symbol), parse_if_attribute)),
         |(_, s, i)| Imply { symbol: s, r#if: i },
     )(input)
 }

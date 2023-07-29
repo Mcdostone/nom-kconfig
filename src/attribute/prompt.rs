@@ -3,7 +3,7 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete::char,
     character::complete::{alphanumeric1, line_ending, multispace1, not_line_ending, one_of},
-    combinator::{eof, map, opt, recognize, verify},
+    combinator::{eof, map, recognize, verify},
     multi::many1,
     sequence::{delimited, terminated, tuple},
     IResult,
@@ -15,15 +15,11 @@ use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
-use super::expression::{parse_if_expression_attribute, Expression};
+use super::expression::{parse_if_attribute, Expression};
 
 pub fn parse_prompt(input: KconfigInput) -> IResult<KconfigInput, Prompt> {
     map(
-        tuple((
-            ws(tag("prompt")),
-            parse_prompt_option,
-            opt(parse_if_expression_attribute),
-        )),
+        tuple((ws(tag("prompt")), parse_prompt_option, parse_if_attribute)),
         |(_, p, i)| Prompt {
             prompt: p.to_string(),
             r#if: i,

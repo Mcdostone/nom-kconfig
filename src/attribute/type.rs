@@ -12,7 +12,7 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
-use super::{parse_expression, parse_if_expression_attribute, parse_prompt_option, Expression};
+use super::{parse_expression, parse_if_attribute, parse_prompt_option, Expression};
 
 pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, ConfigType> {
     parse_config_type!(alt((
@@ -38,7 +38,7 @@ macro_rules! parse_config_type {
             tuple((
                 ws($fn),
                 opt(map(parse_prompt_option, |o| o.to_string())),
-                opt(parse_if_expression_attribute),
+                parse_if_attribute,
             )),
             |(he, wo, e)| ConfigType {
                 r#type: he,

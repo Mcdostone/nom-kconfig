@@ -274,8 +274,11 @@ pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     )(input)
 }
 
-pub fn parse_if_expression_attribute(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    map(tuple((wsi(tag("if")), wsi(parse_expression))), |(_, e)| e)(input)
+pub fn parse_if_attribute(input: KconfigInput) -> IResult<KconfigInput, Option<Expression>> {
+    opt(map(
+        tuple((wsi(tag("if")), wsi(parse_expression))),
+        |(_, e)| e,
+    ))(input)
 }
 
 // TODO ugly

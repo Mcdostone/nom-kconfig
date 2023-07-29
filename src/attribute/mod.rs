@@ -40,8 +40,8 @@ pub use self::{
 };
 
 pub use self::expression::{
-    parse_expression, parse_if_expression_attribute, AndExpression, Atom, CompareExpression,
-    CompareOperator, OrExpression, Term,
+    parse_expression, parse_if_attribute, AndExpression, Atom, CompareExpression, CompareOperator,
+    OrExpression, Term,
 };
 pub use self::function::{parse_function_call, ExpressionToken, FunctionCall, Parameter};
 pub use self::optional::parse_optional;

@@ -1,10 +1,4 @@
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    combinator::{map, opt},
-    sequence::tuple,
-    IResult,
-};
+use nom::{branch::alt, bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -16,7 +10,7 @@ use crate::{
     KconfigInput,
 };
 
-use super::expression::{parse_if_expression_attribute, parse_number, Expression};
+use super::expression::{parse_if_attribute, parse_number, Expression};
 
 /// This allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
 #[derive(Debug, Clone, PartialEq)]
@@ -70,11 +64,7 @@ fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
 /// ```
 pub fn parse_range(input: KconfigInput) -> IResult<KconfigInput, Range> {
     map(
-        tuple((
-            ws(tag("range")),
-            ws(parse_hs),
-            opt(parse_if_expression_attribute),
-        )),
+        tuple((ws(tag("range")), ws(parse_hs), parse_if_attribute)),
         |(_, (l, r), i)| Range {
             lhs: l,
             rhs: r,

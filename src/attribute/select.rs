@@ -1,9 +1,4 @@
-use nom::{
-    bytes::complete::tag,
-    combinator::{map, opt},
-    sequence::tuple,
-    IResult,
-};
+use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -11,7 +6,7 @@ use serde::Serialize;
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
-use super::expression::{parse_if_expression_attribute, Expression};
+use super::expression::{parse_if_attribute, Expression};
 
 /// While normal dependencies reduce the upper limit of a symbol (see below), reverse dependencies can be used to force a lower limit of another symbol. The value of the current menu symbol is used as the minimal value [symbol](crate::symbol::Symbol) can be set to. If [symbol](crate::symbol::Symbol) is selected multiple times, the limit is set to the largest selection. Reverse dependencies can only be used with boolean or tristate symbols.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -50,7 +45,7 @@ pub fn parse_select(input: KconfigInput) -> IResult<KconfigInput, Select> {
         tuple((
             ws(tag("select")),
             ws(parse_constant_symbol),
-            opt(parse_if_expression_attribute),
+            parse_if_attribute,
         )),
         |(_, s, i)| Select {
             symbol: s.to_string(),

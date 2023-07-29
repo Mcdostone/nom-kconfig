@@ -1,11 +1,6 @@
-use super::expression::{parse_if_expression, Expression};
+use super::{expression::Expression, parse_if_attribute};
 use crate::{util::ws, KconfigInput};
-use nom::{
-    bytes::complete::tag,
-    combinator::{map, opt},
-    sequence::tuple,
-    IResult,
-};
+use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -35,7 +30,7 @@ pub struct Visible {
 /// ```
 pub fn parse_visible(input: KconfigInput) -> IResult<KconfigInput, Visible> {
     map(
-        tuple((ws(tag("visible")), opt(ws(parse_if_expression)))),
+        tuple((ws(tag("visible")), parse_if_attribute)),
         |(_s, i)| Visible { r#if: i },
     )(input)
 }

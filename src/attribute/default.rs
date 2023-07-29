@@ -1,9 +1,4 @@
-use nom::{
-    bytes::complete::tag,
-    combinator::{map, opt},
-    sequence::tuple,
-    IResult,
-};
+use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -11,7 +6,7 @@ use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
-use super::{parse_expression, parse_if_expression_attribute, Expression};
+use super::{parse_expression, parse_if_attribute, Expression};
 
 /// A config option can have any number of default values. If multiple default values are visible, only the first defined one is active. Default values are not limited to the menu entry where they are defined. This means the default can be defined somewhere else or be overridden by an earlier definition. The default value is only assigned to the config symbol if no other value was set by the user (via the input prompt above).
 
@@ -57,11 +52,7 @@ pub struct DefaultAttribute {
 /// ```
 pub fn parse_default(input: KconfigInput) -> IResult<KconfigInput, DefaultAttribute> {
     map(
-        tuple((
-            ws(tag("default")),
-            ws(parse_expression),
-            opt(parse_if_expression_attribute),
-        )),
+        tuple((ws(tag("default")), ws(parse_expression), parse_if_attribute)),
         |(_, e, i)| DefaultAttribute {
             expression: e,
             r#if: i,
