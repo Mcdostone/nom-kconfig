@@ -4,7 +4,10 @@ use nom::{
     sequence::tuple,
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     symbol::{parse_symbol, Symbol},
@@ -15,10 +18,16 @@ use crate::{
 use super::expression::{parse_if_expression, Expression};
 
 /// Imply` is similar "select" as it enforces a lower limit on another symbol except that the "implied" symbol's value may still be set to n from a direct dependency or with a visible prompt.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Imply {
     pub symbol: Symbol,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub r#if: Option<Expression>,
 }
 

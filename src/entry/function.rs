@@ -7,11 +7,17 @@ use nom::{
     sequence::{terminated, tuple},
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone, Default)]
+#[derive(Debug, PartialEq, Clone, Default)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Function {
     pub name: String,
     pub body: String,

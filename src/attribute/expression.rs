@@ -11,7 +11,10 @@ use nom::{
     sequence::{delimited, pair, preceded, tuple},
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     symbol::{parse_symbol, Symbol},
@@ -23,13 +26,18 @@ use super::function::{parse_function_call, FunctionCall};
 
 // (GFS2_FS!=n) && NET && INET && (IPV6 || IPV6=n) && CONFIGFS_FS && SYSFS && (DLM=y || DLM=GFS2_FS)
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum Operator {
     And,
     Or,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum CompareOperator {
     GreaterThan,
     GreaterOrEqual,
@@ -55,31 +63,42 @@ impl Display for CompareOperator {
 
 // https://stackoverflow.com/questions/9509048/antlr-parser-for-and-or-logic-how-to-get-expressions-between-logic-operators
 pub type Expression = OrExpression;
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum AndExpression {
-    #[serde(rename = "AndTerm")]
+    #[cfg_attr(feature = "serialize", serde(rename = "AndTerm"))]
     Term(Term),
-
-    #[serde(rename = "And")]
+    #[cfg_attr(feature = "serialize", serde(rename = "And"))]
     Expression(Vec<Term>),
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum OrExpression {
-    #[serde(rename = "OrTerm")]
+    #[cfg_attr(feature = "serialize", serde(rename = "OrTerm"))]
     Term(AndExpression),
-    #[serde(rename = "Or")]
+    #[cfg_attr(feature = "serialize", serde(rename = "Or"))]
     Expression(Vec<AndExpression>),
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum Term {
     Not(Atom),
     Atom(Atom),
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
-#[serde(rename = "Compare")]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serialize", serde(rename = "Compare"))]
 pub struct CompareExpression {
     pub left: Symbol,
     pub operator: CompareOperator,
@@ -93,7 +112,10 @@ impl Display for CompareExpression {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum Atom {
     Symbol(Symbol),
     Number(i64),

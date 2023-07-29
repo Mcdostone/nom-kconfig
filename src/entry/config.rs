@@ -7,7 +7,10 @@ use nom::{
     sequence::pair,
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     attribute::{
@@ -19,7 +22,10 @@ use crate::{
 };
 
 /// This defines a config symbol.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Config {
     pub symbol: String,
     pub r#type: ConfigType,

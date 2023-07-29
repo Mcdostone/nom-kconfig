@@ -1,9 +1,15 @@
 use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Enable {
     pub symbol: String,
 }

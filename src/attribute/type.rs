@@ -7,7 +7,10 @@ use nom::{
     sequence::{preceded, tuple},
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use super::{parse_expression, parse_if_expression_attribute, parse_prompt_option, Expression};
 
@@ -57,8 +60,14 @@ pub fn parse_tristate_type(input: KconfigInput) -> IResult<KconfigInput, ConfigT
     parse_config_type!(value(Type::Tristate, ws(tag("tristate"))))(input)
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
-#[serde(rename_all = "lowercase")]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(
+    any(feature = "serialize", feature = "deserialize"),
+    serde(rename_all = "lowercase")
+)]
 pub enum Type {
     DefBool(Expression),
     DefTristate(Expression),
@@ -70,12 +79,21 @@ pub enum Type {
 }
 
 /// Every config option must have a type. There are only two basic types: tristate and string; the other types are based on these two. The type definition optionally accepts an input prompt.
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct ConfigType {
     pub r#type: Type,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub prompt: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub r#if: Option<Expression>,
 }
 

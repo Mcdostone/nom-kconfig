@@ -6,7 +6,10 @@ use nom::{
     sequence::{pair, preceded, terminated},
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     attribute::{
@@ -19,10 +22,16 @@ use crate::{
 use super::{parse_entry, Entry};
 
 /// This defines a menu block, see ["Menu structure"](https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html#menu-structure) for more information. The only possible options are dependencies and "visible" attributes.
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Menu {
     pub prompt: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub visible: Option<Visible>,
     pub depends_on: Vec<Expression>,
     pub entries: Vec<Entry>,

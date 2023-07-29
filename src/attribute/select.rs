@@ -4,17 +4,26 @@ use nom::{
     sequence::tuple,
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
 use super::expression::{parse_if_expression_attribute, Expression};
 
 /// While normal dependencies reduce the upper limit of a symbol (see below), reverse dependencies can be used to force a lower limit of another symbol. The value of the current menu symbol is used as the minimal value [symbol](crate::symbol::Symbol) can be set to. If [symbol](crate::symbol::Symbol) is selected multiple times, the limit is set to the largest selection. Reverse dependencies can only be used with boolean or tristate symbols.
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Select {
     pub symbol: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub r#if: Option<Expression>,
 }
 

@@ -5,7 +5,10 @@ use nom::{
     sequence::{pair, terminated},
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     attribute::expression::{parse_if_expression, Expression},
@@ -16,7 +19,10 @@ use crate::{
 use super::{parse_entry, Entry};
 
 /// This defines an if block. The dependency expression [expr]((crate::attribute::expression)) is appended to all enclosed menu entries.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct If {
     pub condition: Expression,
     pub entries: Vec<Entry>,

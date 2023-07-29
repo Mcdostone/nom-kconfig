@@ -17,7 +17,7 @@ keywords = ["parser",  "parsing", "kconfig", "linux-kernel"]
 nom = "7.1.3"
 nom_locate = "4.1.0"
 regex = "1.8.4"
-serde = { version = "1.0.163", features = ["derive"] }
+serde = { version = "1.0.163", features = ["derive"], optional = true }
 
 [dev-dependencies]
 criterion = { version = "0.4", features = ["html_reports"] }
@@ -27,6 +27,8 @@ name = "my_benchmark"
 harness = false
 
 [features]
-#default = ["display", "hash"]
+#default = ["display", "hash", "serialize", "deserialize"]
 display = []
 hash = []
+serialize = ["dep:serde"]
+deserialize = ["dep:serde"]

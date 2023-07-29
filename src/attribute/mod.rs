@@ -16,7 +16,10 @@ pub mod r#type;
 pub mod visible;
 
 use nom::{branch::alt, combinator::map, multi::many0, IResult};
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
@@ -43,7 +46,10 @@ pub use self::expression::{
 pub use self::function::{parse_function_call, ExpressionToken, FunctionCall, Parameter};
 pub use self::optional::parse_optional;
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum Attribute {
     Help(String),
     Prompt(Prompt),

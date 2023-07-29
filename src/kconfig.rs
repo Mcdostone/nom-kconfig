@@ -4,7 +4,10 @@ use nom::{
     sequence::delimited,
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     entry::{parse_entry, Entry},
@@ -14,7 +17,10 @@ use crate::{
 
 /// A Kconfig file.
 /// `file` is always relative to the root directory defined in [KconfigFile](crate::KconfigFile)
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Kconfig {
     pub file: String,
     pub entries: Vec<Entry>,

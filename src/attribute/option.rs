@@ -5,15 +5,27 @@ use nom::{
     sequence::{delimited, tuple},
     IResult,
 };
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum OptionValues {
-    #[serde(rename = "defconfig_list")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(rename = "defconfig_list")
+    )]
     DefconfigList,
-    #[serde(rename = "modules")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(rename = "modules")
+    )]
     Modules,
     AllNoConfigY,
     Env(String),
