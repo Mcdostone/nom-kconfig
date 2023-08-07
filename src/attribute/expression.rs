@@ -5,9 +5,9 @@ use std::str::FromStr;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{char, digit1},
-    combinator::{all_consuming, map, map_res, opt, recognize, value},
-    multi::many0,
+    character::complete::{anychar, char, digit1, line_ending},
+    combinator::{all_consuming, eof, map, map_res, opt, recognize, value},
+    multi::{many0, many_till},
     sequence::{delimited, pair, preceded, tuple},
     IResult,
 };
@@ -122,7 +122,7 @@ pub enum Atom {
     Compare(CompareExpression),
     Function(FunctionCall),
     Parenthesis(Box<Expression>),
-    String(Box<Atom>),
+    String(String),
 }
 
 #[cfg(feature = "display")]
@@ -230,16 +230,25 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     alt((
         wsi(parse_compare),
         map(parse_function_call, Atom::Function),
-        map(delimited(tag("\""), parse_atom, tag("\"")), |d| {
-            Atom::String(Box::new(d))
-        }),
         map(
             delimited(wsi(tag("(")), parse_expression, wsi(tag(")"))),
             |expr: Expression| Atom::Parenthesis(Box::new(expr)),
         ),
         parse_number_or_symbol,
         map(parse_number, Atom::Number),
+        map(parse_string, Atom::String),
     ))(input)
+}
+
+pub fn parse_string(input: KconfigInput) -> IResult<KconfigInput, String> {
+    let (input, ok) = many_till(recognize(anychar), alt((tag("if"), eof, line_ending)))(input)?;
+    Ok((
+        input,
+        ok.0.iter()
+            .map(|d| d.to_string())
+            .collect::<Vec<String>>()
+            .join(""),
+    ))
 }
 
 pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {

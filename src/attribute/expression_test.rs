@@ -2,8 +2,8 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         expression::{
-            parse_expression, AndExpression, Atom, CompareExpression, CompareOperator, Expression,
-            Term,
+            parse_expression, parse_string, AndExpression, Atom, CompareExpression,
+            CompareOperator, Expression, Term,
         },
         function::{ExpressionToken, FunctionCall, Parameter},
     },
@@ -55,18 +55,45 @@ fn test_parse_depends_on_and() {
 fn test_parse_number_or_symbol() {
     assert_parsing_eq!(
         parse_expression,
-        "64BITS = y",
+        "64BITS",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
-                CompareExpression {
-                    left: Symbol::Constant("64BITS".to_string()),
-                    operator: CompareOperator::Equal,
-                    right: Symbol::Constant("y".to_string())
-                }
-            ),)))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant("64BITS".to_string()),
+            ))))
         ))
-    )
+    );
+
+    assert_parsing_eq!(
+        parse_expression,
+        "64",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64))),)
+        ))
+    );
+
+    assert_parsing_eq!(
+        parse_expression,
+        "\"64\"",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::NonConstant("\"64\"".to_string())
+            )),))
+        ))
+    );
+
+    assert_parsing_eq!(
+        parse_expression,
+        "'64'",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::NonConstant("'64'".to_string())
+            )),))
+        ))
+    );
 }
 
 #[test]
@@ -87,6 +114,17 @@ fn test_parse_depends_on_ambigus() {
             ))
         ))
     )
+}
+
+#[test]
+fn test_parse_weird_string() {
+    assert_parsing_eq!(
+        parse_string,
+        r#""$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")""#,
+        Ok((
+            "",
+            "\"$(shell,$(srctree)/scripts/gcc-plugin.sh \"$(preferred-plugin-hostcc)\" \"$(HOSTCXX)\" \"$(CC)\")\"".to_string()),
+        ))
 }
 
 #[test]
@@ -281,9 +319,7 @@ fn test_expression_to_string() {
         r#"(hello)"#,
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Parenthesis(
             Box::new(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::String(Box::new(Atom::Symbol(Symbol::Constant(
-                    "hello".to_string()
-                ))))
+                Atom::Symbol(Symbol::Constant("hello".to_string()))
             ))))
         ))))
         .to_string()

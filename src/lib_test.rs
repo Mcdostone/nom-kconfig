@@ -11,6 +11,16 @@ use crate::{
 };
 
 #[macro_export]
+macro_rules! assert_parsing_fail {
+    ($fn:ident, $input:expr) => {{
+        use $crate::KconfigInput;
+        let res = $fn(KconfigInput::new_extra($input, Default::default()));
+        assert!(res.is_err())
+    }};
+}
+
+#[cfg(test)]
+#[macro_export]
 macro_rules! assert_parsing_source_eq {
     ($fn:ident, $input:expr, $expected:expr) => {{
         use $crate::KconfigInput;

@@ -1,9 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        parse_default, AndExpression, Atom, DefaultAttribute, Expression, ExpressionToken,
-        FunctionCall, Parameter, Term,
-    },
+    attribute::{parse_default, AndExpression, Atom, DefaultAttribute, Expression, Term},
     symbol::Symbol,
 };
 
@@ -51,35 +48,8 @@ fn test_parse_default_ambigus() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
-                    Box::new(Atom::Function(FunctionCall {
-                        name: "shell".to_string(),
-                        parameters: vec!(Parameter {
-                            tokens: vec!(
-                                ExpressionToken::Function(Box::new(FunctionCall {
-                                    name: "srctree".to_string(),
-                                    parameters: vec!()
-                                })),
-                                ExpressionToken::Literal("/scripts/gcc-plugin.sh".to_string()),
-                                ExpressionToken::Space,
-                                ExpressionToken::DoubleQuotes(vec!(ExpressionToken::Function(
-                                    Box::new(FunctionCall {
-                                        name: "preferred-plugin-hostcc".to_string(),
-                                        parameters: vec!()
-                                    })
-                                ))),
-                                ExpressionToken::Space,
-                                ExpressionToken::DoubleQuotes(vec!(ExpressionToken::Variable(
-                                    "HOSTCXX".to_string()
-                                ))),
-                                ExpressionToken::Space,
-                                ExpressionToken::DoubleQuotes(vec!(ExpressionToken::Variable(
-                                    "CC".to_string()
-                                ))),
-                            )
-                        },)
-                    }))
-                )))),
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string())
+                    ))),
                 r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                     Atom::Symbol(Symbol::Constant("CC_IS_GCC".to_string()))
                 ))))
