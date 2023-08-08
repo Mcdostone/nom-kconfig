@@ -10,12 +10,12 @@ use nom::{
 
 use crate::{util::ws, KconfigInput};
 
-fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, (usize, usize, usize)> {
+fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, usize> {
     let (input, _) = many0(newline)(input)?;
     // TODO: something is wrong here with the indentation level calculation
     // println!("{:?}", input.chars().next().unwrap());
     map(peek(pair(many0(tab), many0(space1))), |(t, s)| {
-        (t.len(), s.len(), s.len() + t.len())
+        s.len() + t.len()
     })(input)
 }
 
@@ -44,7 +44,7 @@ pub fn weirdo_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
 /// assert_parsing_eq!(parse_help, "help\n   hello world", Ok(("", "hello world".to_string())))
 /// ```
 pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
-    let (mut input, _) = pair(
+    let (input, _) = pair(
         alt((
             ws(tag("help")),
             // TODO linux v-3.2, in file /drivers/net/ethernet/stmicro/stmmac/Kconfig
@@ -53,21 +53,7 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
         preceded(many0(space1), newline),
     )(input)?;
 
-    let r = indentation_level(input);
-    let indent: usize;
-    match r {
-        Ok((i, (_, _, tt))) => {
-            input = i;
-            indent = tt;
-        }
-        Err(e) => {
-            return match e {
-                nom::Err::Error(i) => Ok((i.input, "".to_string())),
-                nom::Err::Failure(i) => Ok((i.input, "".to_string())),
-                _ => return Err(e),
-            };
-        }
-    }
+    let (input, indent) = indentation_level(input)?;
     if indent == 0 {
         return Ok((input, "".to_string()));
     }

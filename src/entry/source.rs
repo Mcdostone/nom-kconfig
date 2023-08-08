@@ -5,7 +5,7 @@ use nom::{
     bytes::complete::tag,
     character::complete::{alphanumeric1, one_of},
     combinator::{cut, map, recognize},
-    error::ErrorKind,
+    error::{Error, ErrorKind, ParseError},
     multi::many1,
     sequence::delimited,
     IResult,
@@ -44,24 +44,23 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             },
         ));
     }
-    if let Ok(ff) = source_kconfig_file.read_to_string() {
-        return match cut(parse_kconfig)(KconfigInput::new_extra(
-            ff.as_str(),
-            source_kconfig_file.clone(),
-        )) {
-            Ok((_, kconfig)) => Ok((input, kconfig)),
-            Err(_err) => {
-                return Err(nom::Err::Error(nom::error::Error::new(
-                    KconfigInput::new_extra("", source_kconfig_file),
-                    ErrorKind::Fail,
-                )))
-            }
-        };
-    }
-    Err(nom::Err::Error(nom::error::Error::new(
-        KconfigInput::new_extra("", source_kconfig_file),
-        ErrorKind::Fail,
-    )))
+    let source_content = source_kconfig_file
+        .read_to_string()
+        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+
+    let binding = source_content.clone();
+    #[allow(clippy::let_and_return)]
+    let x = match cut(parse_kconfig)(KconfigInput::new_extra(
+        &binding,
+        source_kconfig_file.clone(),
+    )) {
+        Ok((_, kconfig)) => Ok((input, kconfig)),
+        Err(_e) => Err(nom::Err::Error(nom::error::Error::new(
+            KconfigInput::new_extra("", source_kconfig_file),
+            ErrorKind::Fail,
+        ))),
+    };
+    x
 }
 
 fn is_dynamic_source(file: &str) -> bool {

@@ -1,7 +1,5 @@
 use std::path::PathBuf;
 
-use nom::error::ErrorKind;
-
 use crate::{
     entry::{parse_source, Source},
     Kconfig, KconfigFile, KconfigInput,
@@ -37,29 +35,27 @@ fn test_parse_source_no_quote() {
 }
 
 #[test]
+fn test_parse_source_fail_file_not_exist() {
+    let res = parse_source(KconfigInput::new_extra(
+        "source a/random/file",
+        KconfigFile {
+            root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")),
+            ..Default::default()
+        },
+    ));
+    assert!(res.is_err())
+}
+
+#[test]
 fn test_parse_source_fail_to_parse() {
-    let res: Result<(&str, Kconfig), nom::Err<nom::error::Error<KconfigInput>>> =
-        parse_source(KconfigInput::new_extra(
-            "source cargo.toml",
-            KconfigFile {
-                root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")),
-                ..Default::default()
-            },
-        ))
-        .map(|r| (r.0.fragment().to_owned(), r.1));
-    assert_eq!(
-        res,
-        Err(nom::Err::Error(nom::error::Error::new(
-            KconfigInput::new_extra(
-                "",
-                KconfigFile {
-                    root_dir: PathBuf::from(""),
-                    ..Default::default()
-                }
-            ),
-            ErrorKind::Fail,
-        )))
-    )
+    let res = parse_source(KconfigInput::new_extra(
+        "source \"Cargo.toml\"",
+        KconfigFile {
+            root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")),
+            ..Default::default()
+        },
+    ));
+    assert!(res.is_err())
 }
 
 fn assert_parsing_source_eq(

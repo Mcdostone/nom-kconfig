@@ -12,6 +12,18 @@ fn test_parse_help_space() {
     assert_parsing_eq!(parse_help, input, Ok(("", "hello world".to_string())))
 }
 
+#[test]
+fn test_parse_help_no_indent() {
+    let input = "help\nhello world";
+    assert_parsing_eq!(parse_help, input, Ok(("hello world", "".to_string())))
+}
+
+#[test]
+fn test_parse_help_no_content() {
+    let input = "help\n";
+    assert_parsing_eq!(parse_help, input, Ok(("", "".to_string())))
+}
+
 // 3.2/drivers/net/ethernet/stmicro/stmmac/Kconfig
 #[test]
 fn test_parse_help_prefixed_by_hypen() {

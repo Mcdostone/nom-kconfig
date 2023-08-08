@@ -1,5 +1,5 @@
 use crate::{
-    assert_parsing_eq,
+    assert_parsing_eq, assert_parsing_fail,
     attribute::{
         expression::{
             parse_expression, parse_string, AndExpression, Atom, CompareExpression,
@@ -78,9 +78,9 @@ fn test_parse_number_or_symbol() {
         "\"64\"",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                Symbol::NonConstant("\"64\"".to_string())
-            )),))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
+                "64".to_string()
+            ))))
         ))
     );
 
@@ -116,15 +116,30 @@ fn test_parse_depends_on_ambigus() {
     )
 }
 
+// 5.0/scripts/gcc-plugins/Kconfig
 #[test]
-fn test_parse_weird_string() {
+fn test_parse_string() {
     assert_parsing_eq!(
         parse_string,
         r#""$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")""#,
         Ok((
             "",
-            "\"$(shell,$(srctree)/scripts/gcc-plugin.sh \"$(preferred-plugin-hostcc)\" \"$(HOSTCXX)\" \"$(CC)\")\"".to_string()),
-        ))
+            r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string()),
+        ));
+
+    assert_parsing_eq!(
+        parse_string,
+        r#""hello "world"" if NET"#,
+        Ok((" if NET", r#"hello "world""#.to_string()),)
+    );
+
+    assert_parsing_fail!(parse_string, r#""hello "world""#);
+
+    assert_parsing_fail!(
+        parse_string,
+        r#""hello "world"
+""#
+    )
 }
 
 #[test]
@@ -270,6 +285,13 @@ fn test_expression_to_string() {
                 operator: CompareOperator::GreaterThan,
                 right: Symbol::Constant("5".to_string())
             }
+        ))))
+        .to_string()
+    );
+    assert_eq!(
+        r#""A string with "double quotes"""#,
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
+            r#"A string with "double quotes""#.to_string()
         ))))
         .to_string()
     );

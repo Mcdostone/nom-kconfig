@@ -5,11 +5,12 @@ use std::str::FromStr;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{anychar, char, digit1, line_ending},
-    combinator::{all_consuming, eof, map, map_res, opt, recognize, value},
-    multi::{many0, many_till},
+    character::complete::{char, digit1},
+    combinator::{all_consuming, map, map_res, opt, recognize, value},
+    error::{Error, ErrorKind, ParseError},
+    multi::many0,
     sequence::{delimited, pair, preceded, tuple},
-    IResult,
+    IResult, InputTake,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -178,7 +179,7 @@ impl Display for Atom {
             Atom::Compare(c) => write!(f, "{}", c),
             Atom::Function(func) => write!(f, "{}", func),
             Atom::Parenthesis(d) => write!(f, "({})", d),
-            Atom::String(s) => write!(f, "{}", s),
+            Atom::String(s) => write!(f, r#""{}""#, s),
         }
     }
 }
@@ -234,21 +235,50 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
             delimited(wsi(tag("(")), parse_expression, wsi(tag(")"))),
             |expr: Expression| Atom::Parenthesis(Box::new(expr)),
         ),
-        parse_number_or_symbol,
-        map(parse_number, Atom::Number),
         map(parse_string, Atom::String),
+        parse_number_or_symbol,
+        // needed to parse negative numbers, see test_parse_expression_number() in expression_test.rs
+        map(parse_number, Atom::Number),
     ))(input)
 }
 
 pub fn parse_string(input: KconfigInput) -> IResult<KconfigInput, String> {
-    let (input, ok) = many_till(recognize(anychar), alt((tag("if"), eof, line_ending)))(input)?;
-    Ok((
-        input,
-        ok.0.iter()
-            .map(|d| d.to_string())
-            .collect::<Vec<String>>()
-            .join(""),
-    ))
+    map(
+        delimited(tag("\""), take_until_unbalanced('"'), tag("\"")),
+        |d| d.fragment().to_string(),
+    )(input)
+}
+
+pub fn take_until_unbalanced(
+    delimiter: char,
+) -> impl Fn(KconfigInput) -> IResult<KconfigInput, KconfigInput> {
+    move |i: KconfigInput| {
+        let mut index: usize = 0;
+        let mut delimiter_counter = 0;
+        while let Some(n) = &i[index..].find(delimiter) {
+            delimiter_counter += 1;
+            if i[index..index + n].contains('\n') {
+                return Err(nom::Err::Error(Error::from_error_kind(
+                    i,
+                    ErrorKind::TakeUntil,
+                )));
+            }
+            index += n + 1;
+        }
+
+        // we split just before the last double quote
+        index -= 1;
+        // Last delimiter is the string delimiter
+        delimiter_counter -= 1;
+
+        match delimiter_counter % 2 == 0 {
+            true => Ok(i.take_split(index)),
+            false => Err(nom::Err::Error(Error::from_error_kind(
+                i,
+                ErrorKind::TakeUntil,
+            ))),
+        }
+    }
 }
 
 pub fn parse_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
@@ -283,13 +313,6 @@ pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     )(input)
 }
 
-pub fn parse_if_attribute(input: KconfigInput) -> IResult<KconfigInput, Option<Expression>> {
-    opt(map(
-        tuple((wsi(tag("if")), wsi(parse_expression))),
-        |(_, e)| e,
-    ))(input)
-}
-
 // TODO ugly
 pub fn parse_number_or_symbol(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     let (input, sym) = parse_symbol(input)?;
@@ -306,6 +329,10 @@ pub fn string_to_number(input: &str) -> IResult<&str, i64> {
     all_consuming(map_res(recognize(pair(opt(char('-')), digit1)), |d| {
         FromStr::from_str(d)
     }))(input)
+}
+
+pub fn parse_if_attribute(input: KconfigInput) -> IResult<KconfigInput, Option<Expression>> {
+    opt(parse_if_expression)(input)
 }
 
 pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
