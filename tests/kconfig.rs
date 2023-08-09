@@ -29,12 +29,11 @@ fn test_parse() {
     assert_parsing!(result, Ok(("", Kconfig { file: input_file.display().to_string(), entries: vec!(Entry::Config(
         Config {
             symbol: "KVM".to_string(),
-            r#type: ConfigType {
-                r#type: Type::Tristate,
-                prompt: Some("Kernel-based Virtual Machine (KVM) support".to_string()),
-                r#if: None
-            },
             attributes: vec!(
+                Attribute::Type( ConfigType {
+                    r#type: Type::Tristate(Some("Kernel-based Virtual Machine (KVM) support".to_string())),
+                    r#if: None
+                }),
                 Attribute::DependsOn(Expression::Term(AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("HAVE_KVM".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("HIGH_RES_TIMERS".to_string()))),

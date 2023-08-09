@@ -32,9 +32,9 @@ pub fn parse_prompt(input: KconfigInput) -> IResult<KconfigInput, Prompt> {
 /// ```
 /// use nom_kconfig::{assert_parsing_eq, attribute::parse_prompt_option};
 ///
-/// assert_parsing_eq!(parse_prompt_option, "scripts/Kconfig.include", Ok(("", "scripts/Kconfig.include")))
+/// assert_parsing_eq!(parse_prompt_option, "scripts/Kconfig.include", Ok(("", "scripts/Kconfig.include".to_string())))
 /// ```
-pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
+pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, String> {
     map(
         alt((
             delimited(
@@ -56,7 +56,7 @@ pub fn parse_prompt_option(input: KconfigInput) -> IResult<KconfigInput, &str> {
                 |d: &KconfigInput| !d.trim().is_empty(),
             ),
         )),
-        |d: KconfigInput| d.fragment().to_owned().trim(),
+        |d: KconfigInput| d.fragment().to_owned().trim().to_string(),
     )(input)
 }
 

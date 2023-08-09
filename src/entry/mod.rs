@@ -34,6 +34,7 @@ pub mod menuconfig;
 pub mod source;
 pub mod variable;
 
+/// Official documentation about the different entries: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries)
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]

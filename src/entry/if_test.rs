@@ -51,15 +51,16 @@ fn test_parse_if_entry_with_config() {
                 )))),
                 entries: vec!(Entry::Config(Config {
                     symbol: "KVM".to_string(),
-                    r#type: ConfigType {
-                        r#type: Type::Bool,
-                        prompt: None,
-                        r#if: None
-                    },
-                    attributes: vec!(Attribute::Select(Select {
-                        symbol: "KVM_MMIO".to_string(),
-                        r#if: None
-                    }))
+                    attributes: vec!(
+                        Attribute::Type(ConfigType {
+                            r#type: Type::Bool(None),
+                            r#if: None
+                        }),
+                        Attribute::Select(Select {
+                            symbol: "KVM_MMIO".to_string(),
+                            r#if: None
+                        })
+                    )
                 }))
             }
         ))

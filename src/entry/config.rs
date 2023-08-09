@@ -14,7 +14,7 @@ use serde::Serialize;
 
 use crate::{
     attribute::{
-        r#type::{parse_bool_type, parse_tristate_type, parse_type, ConfigType},
+        r#type::{parse_bool_type, parse_tristate_type, parse_type},
         Attribute,
     },
     util::ws,
@@ -28,26 +28,23 @@ use crate::{
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Config {
     pub symbol: String,
-    pub r#type: ConfigType,
     pub attributes: Vec<Attribute>,
 }
 
 #[macro_export]
 macro_rules! generic_config_parser {
     ($t:ident, $tag:expr, $fn:expr) => {{
+        use nom::branch::alt;
         use nom::multi::many0;
-        use nom::sequence::tuple;
         use $crate::attribute::parse_attribute;
 
         map(
-            tuple((
+            pair(
                 map(pair(ws(tag($tag)), ws(parse_config_symbol)), |(_, id)| id),
-                ws($fn),
-                ws(many0(parse_attribute)),
-            )),
-            |(symbol, t, attributes)| $t {
+                many0(ws(alt(($fn, parse_attribute)))),
+            ),
+            |(symbol, attributes)| $t {
                 symbol: symbol.to_string(),
-                r#type: t,
                 attributes,
             },
         )

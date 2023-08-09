@@ -23,6 +23,7 @@ use serde::Serialize;
 
 use crate::{util::ws, KconfigInput};
 
+use self::r#type::ConfigType;
 pub use self::{
     default::{parse_default, DefaultAttribute},
     depends_on::parse_depends_on,
@@ -46,6 +47,7 @@ pub use self::expression::{
 pub use self::function::{parse_function_call, ExpressionToken, FunctionCall, Parameter};
 pub use self::optional::parse_optional;
 
+/// Official documentation regarding the different attributes: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes)
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
@@ -63,6 +65,7 @@ pub enum Attribute {
     Enable(Enable),
     Imply(Imply),
     Requires(Requires),
+    Type(ConfigType),
     Option(OptionValues),
 }
 

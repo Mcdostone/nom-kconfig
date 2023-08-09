@@ -4,10 +4,10 @@ use crate::{
         expression::{AndExpression, Atom, Expression, Term},
         r#type::{ConfigType, Type},
     },
-    entry::{config::Config, r#if::If},
+    entry::{config::Config, r#if::If, MenuConfig},
     kconfig::parse_kconfig,
     symbol::Symbol,
-    Entry, Kconfig,
+    Attribute, Entry, Kconfig,
 };
 
 #[macro_export]
@@ -54,12 +54,10 @@ endif"#;
                 entries: vec!(
                     Entry::Config(Config {
                         symbol: "BLK_DEV_IDEDMA_SFF".to_string(),
-                        r#type: ConfigType {
-                            r#type: Type::Bool,
-                            prompt: None,
+                        attributes: vec!(Attribute::Type(ConfigType {
+                            r#type: Type::Bool(None),
                             r#if: None
-                        },
-                        attributes: vec!()
+                        }))
                     }),
                     Entry::If(If {
                         condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
@@ -67,6 +65,37 @@ endif"#;
                         )))),
                         entries: vec!()
                     })
+                )
+            },
+        ))
+    )
+}
+
+// 6.4.9/arch/powerpc/platforms/86xx/Kconfig
+#[test]
+fn test_parse_config_without_attribute() {
+    assert_parsing_eq!(
+        parse_kconfig,
+        r#"config PPC_86xx
+        menuconfig PPC_86xx
+            bool "86xx-based boards"
+        "#,
+        Ok((
+            "",
+            Kconfig {
+                file: "".to_string(),
+                entries: vec!(
+                    Entry::Config(Config {
+                        symbol: "PPC_86xx".to_string(),
+                        attributes: vec!()
+                    }),
+                    Entry::MenuConfig(MenuConfig {
+                        symbol: "PPC_86xx".to_string(),
+                        attributes: vec!(Attribute::Type(ConfigType {
+                            r#type: Type::Bool(Some("86xx-based boards".to_string())),
+                            r#if: None
+                        }))
+                    }),
                 )
             },
         ))

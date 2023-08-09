@@ -6,7 +6,7 @@ fn test_parse_prompt() {
     assert_parsing_eq!(
         parse_prompt_option,
         input,
-        Ok(("", "scripts/Kconfig.include"))
+        Ok(("", "scripts/Kconfig.include".to_string()))
     )
 }
 
@@ -16,7 +16,7 @@ fn test_parse_prompt_1() {
     assert_parsing_eq!(
         parse_prompt_option,
         input,
-        Ok(("", "Support in-kernel module decompression"))
+        Ok(("", "Support in-kernel module decompression".to_string()))
     )
 }
 
@@ -24,5 +24,5 @@ fn test_parse_prompt_1() {
 #[test]
 fn test_parse_prompt_no_quote() {
     let input = " TCC8000";
-    assert_parsing_eq!(parse_prompt_option, input, Ok(("", "TCC8000")))
+    assert_parsing_eq!(parse_prompt_option, input, Ok(("", "TCC8000".to_string())))
 }

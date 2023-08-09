@@ -12,14 +12,19 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::{
-    attribute::{optional::parse_optional, parse_attribute, Attribute},
+    attribute::{
+        optional::parse_optional,
+        parse_attribute,
+        r#type::{parse_bool_type, parse_tristate_type},
+        Attribute,
+    },
     util::ws,
-    KconfigInput,
+    Entry, KconfigInput,
 };
 
 use super::{
     config::{parse_bool_config, parse_tristate_config},
-    Config,
+    parse_comment,
 };
 
 /// This defines a choice group and accepts any of the above attributes as options. A choice can only be of type bool or tristate. If no type is specified for a choice, its type will be determined by the type of the first choice element in the group or remain unknown if none of the choice elements have a type specified, as well.
@@ -33,12 +38,14 @@ use super::{
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Choice {
     pub options: Vec<Attribute>,
-    pub configs: Vec<Config>,
+    pub entries: Vec<Entry>,
 }
 
 fn parse_choice_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
     ws(many0(alt((
         parse_attribute,
+        parse_bool_type,
+        parse_tristate_type,
         map(ws(parse_optional), |_| Attribute::Optional),
     ))))(input)
 }
@@ -49,10 +56,14 @@ pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
         terminated(
             pair(
                 parse_choice_attributes,
-                many0(ws(alt((parse_bool_config, parse_tristate_config)))),
+                many0(ws(alt((
+                    map(parse_comment, Entry::Comment),
+                    map(parse_bool_config, Entry::Config),
+                    map(parse_tristate_config, Entry::Config),
+                )))),
             ),
             ws(tag("endchoice")),
         ),
-        |(options, configs)| Choice { options, configs },
+        |(options, entries)| Choice { options, entries },
     )(input)
 }

@@ -5,6 +5,7 @@ use crate::{
         AndExpression, Atom, Expression, ExpressionToken, FunctionCall, Parameter, Term,
     },
     symbol::Symbol,
+    Attribute,
 };
 
 #[test]
@@ -15,11 +16,10 @@ fn test_parse_type() {
         input,
         Ok((
             "",
-            ConfigType {
-                r#type: Type::String,
-                prompt: None,
+            Attribute::Type(ConfigType {
+                r#type: Type::String(None),
                 r#if: None
-            },
+            },)
         ))
     )
 }
@@ -33,11 +33,10 @@ fn test_parse_type_with_weird_prompt() {
         input,
         Ok((
             "",
-            ConfigType {
-                r#type: Type::Bool,
-                prompt: Some("TCC8000".to_string()),
+            Attribute::Type(ConfigType {
+                r#type: Type::Bool(Some("TCC8000".to_string())),
                 r#if: None
-            },
+            },)
         ))
     )
 }
@@ -51,11 +50,10 @@ fn test_parse_type_bool() {
         input,
         Ok((
             "",
-            ConfigType {
-                r#type: Type::Bool,
-                prompt: None,
+            Attribute::Type(ConfigType {
+                r#type: Type::Bool(None),
                 r#if: None
-            },
+            },)
         ))
     )
 }
@@ -70,9 +68,10 @@ fn test_parse_type_backslash() {
         input,
         Ok((
             "",
-            ConfigType {
-                r#type: Type::Bool,
-                prompt: Some("Enable freezer for suspend to RAM/standby".to_string()),
+            Attribute::Type(ConfigType {
+                r#type: Type::Bool(Some(
+                    "Enable freezer for suspend to RAM/standby".to_string()
+                )),
                 r#if: Some(Expression::Expression(vec!(
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
                         "ARCH_WANTS_FREEZER_CONTROL".to_string()
@@ -81,7 +80,7 @@ fn test_parse_type_backslash() {
                         "BROKEN".to_string()
                     ))),)
                 )))
-            },
+            },)
         ))
     )
 }
@@ -93,13 +92,12 @@ fn test_parse_def_bool() {
         "def_bool     !PCI ",
         Ok((
             " ",
-            ConfigType {
+            Attribute::Type(ConfigType {
                 r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Not(
                     Atom::Symbol(Symbol::Constant("PCI".to_string()))
                 )))),
-                prompt: None,
                 r#if: None
-            }
+            })
         ))
     )
 }
@@ -108,18 +106,17 @@ fn test_parse_def_bool() {
 fn test_parse_type_if() {
     assert_parsing_eq!(
         parse_type,
-        r#"def_bool     !PCI "PCI support" if NET"#,
+        r#"def_bool     !PCI  if NET"#,
         Ok((
             "",
-            ConfigType {
+            Attribute::Type(ConfigType {
                 r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Not(
                     Atom::Symbol(Symbol::Constant("PCI".to_string()))
                 )))),
-                prompt: Some("PCI support".to_string()),
                 r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                     Atom::Symbol(Symbol::Constant("NET".to_string()))
                 ))))
-            }
+            })
         ))
     )
 }
@@ -132,7 +129,7 @@ fn test_parse_def_bool_function() {
         "def_bool $(as-instr,vpmovm2b %k1$(comma)%zmm5)",
         Ok((
             "",
-            ConfigType {
+            Attribute::Type(ConfigType {
                 r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
                     Atom::Function(FunctionCall {
                         name: "as-instr".to_string(),
@@ -151,8 +148,7 @@ fn test_parse_def_bool_function() {
                     })
                 )))),
                 r#if: None,
-                prompt: None,
-            }
+            })
         ))
     )
 }
@@ -164,24 +160,26 @@ fn test_parse_def_tristate() {
         "def_tristate m",
         Ok((
             "",
-            ConfigType {
+            Attribute::Type(ConfigType {
                 r#type: Type::DefTristate(Expression::Term(AndExpression::Term(Term::Atom(
                     Atom::Symbol(Symbol::Constant("m".to_string()))
                 )))),
-                prompt: None,
                 r#if: None
-            }
+            })
         ))
     )
 }
 
 #[test]
 fn test_type_to_string() {
-    assert_eq!("bool", Type::Bool.to_string());
-    assert_eq!("tristate", Type::Tristate.to_string());
-    assert_eq!("hex", Type::Hex.to_string());
-    assert_eq!("int", Type::Int.to_string());
-    assert_eq!("string", Type::String.to_string());
+    assert_eq!(
+        "bool \"Support of rust\"",
+        Type::Bool(Some("Support of rust".to_string())).to_string()
+    );
+    assert_eq!("tristate", Type::Tristate(None).to_string());
+    assert_eq!("hex", Type::Hex(None).to_string());
+    assert_eq!("int", Type::Int(None).to_string());
+    assert_eq!("string", Type::String(None).to_string());
     assert_eq!(
         "def_bool y",
         Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
@@ -205,11 +203,10 @@ fn test_type_with_prompt() {
         r#"bool "enable it for KVM""#,
         Ok((
             "",
-            ConfigType {
-                r#type: Type::Bool,
-                prompt: Some("enable it for KVM".to_string()),
+            Attribute::Type(ConfigType {
+                r#type: Type::Bool(Some("enable it for KVM".to_string())),
                 r#if: None
-            }
+            })
         ))
     )
 }

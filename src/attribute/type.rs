@@ -1,10 +1,11 @@
-use crate::parse_config_type;
+use crate::{parse_config_type, Attribute};
 use crate::{util::ws, KconfigInput};
+use nom::sequence::pair;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::{map, opt, value},
-    sequence::{preceded, tuple},
+    combinator::{map, opt},
+    sequence::preceded,
     IResult,
 };
 #[cfg(feature = "deserialize")]
@@ -14,14 +15,23 @@ use serde::Serialize;
 
 use super::{parse_expression, parse_if_attribute, parse_prompt_option, Expression};
 
-pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, ConfigType> {
+pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     parse_config_type!(alt((
-        value(Type::Bool, tag("boolean")),
-        value(Type::Bool, tag("bool")),
-        value(Type::Hex, tag("hex")),
-        value(Type::Int, tag("int")),
-        value(Type::String, tag("string")),
-        value(Type::Tristate, tag("tristate")),
+        map(
+            preceded(tag("boolean"), opt(parse_prompt_option)),
+            Type::Bool
+        ),
+        map(preceded(tag("bool"), opt(parse_prompt_option)), Type::Bool),
+        map(preceded(tag("hex"), opt(parse_prompt_option)), Type::Hex),
+        map(preceded(tag("int"), opt(parse_prompt_option)), Type::Int),
+        map(
+            preceded(tag("string"), opt(parse_prompt_option)),
+            Type::String
+        ),
+        map(
+            preceded(tag("tristate"), opt(parse_prompt_option)),
+            Type::Tristate
+        ),
         map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
             Type::DefBool(e)
         }),
@@ -34,30 +44,31 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, ConfigType> {
 #[macro_export]
 macro_rules! parse_config_type {
     ($fn:expr) => {{
-        map(
-            tuple((
-                ws($fn),
-                opt(map(parse_prompt_option, |o| o.to_string())),
-                parse_if_attribute,
-            )),
-            |(he, wo, e)| ConfigType {
+        use $crate::attribute::Attribute;
+        map(pair(ws($fn), parse_if_attribute), |(he, e)| {
+            Attribute::Type(ConfigType {
                 r#type: he,
-                prompt: wo,
                 r#if: e,
-            },
-        )
+            })
+        })
     }};
 }
 
-pub fn parse_bool_type(input: KconfigInput) -> IResult<KconfigInput, ConfigType> {
+pub fn parse_bool_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     parse_config_type!(alt((
-        ws(value(Type::Bool, tag("boolean"))),
-        ws(value(Type::Bool, tag("bool")))
+        map(
+            preceded(tag("boolean"), opt(parse_prompt_option)),
+            Type::Bool
+        ),
+        map(preceded(tag("bool"), opt(parse_prompt_option)), Type::Bool),
     )))(input)
 }
 
-pub fn parse_tristate_type(input: KconfigInput) -> IResult<KconfigInput, ConfigType> {
-    parse_config_type!(value(Type::Tristate, ws(tag("tristate"))))(input)
+pub fn parse_tristate_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
+    parse_config_type!(map(
+        preceded(tag("tristate"), opt(parse_prompt_option)),
+        Type::Tristate
+    ))(input)
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -71,11 +82,11 @@ pub fn parse_tristate_type(input: KconfigInput) -> IResult<KconfigInput, ConfigT
 pub enum Type {
     DefBool(Expression),
     DefTristate(Expression),
-    Bool,
-    Tristate,
-    String,
-    Hex,
-    Int,
+    Bool(Option<String>),
+    Tristate(Option<String>),
+    String(Option<String>),
+    Hex(Option<String>),
+    Int(Option<String>),
 }
 
 /// Every config option must have a type. There are only two basic types: tristate and string; the other types are based on these two. The type definition optionally accepts an input prompt.
@@ -89,11 +100,6 @@ pub struct ConfigType {
         any(feature = "serialize", feature = "deserialize"),
         serde(skip_serializing_if = "Option::is_none")
     )]
-    pub prompt: Option<String>,
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(skip_serializing_if = "Option::is_none")
-    )]
     pub r#if: Option<Expression>,
 }
 
@@ -103,13 +109,24 @@ use std::fmt::Display;
 impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Type::Bool => write!(f, "bool"),
-            Type::Tristate => write!(f, "tristate"),
-            Type::String => write!(f, "string"),
-            Type::Hex => write!(f, "hex"),
-            Type::Int => write!(f, "int"),
+            Type::Bool(prompt) => fmt_type(f, "bool", prompt),
+            Type::Tristate(prompt) => fmt_type(f, "tristate", prompt),
+            Type::String(prompt) => fmt_type(f, "string", prompt),
+            Type::Hex(prompt) => fmt_type(f, "hex", prompt),
+            Type::Int(prompt) => fmt_type(f, "int", prompt),
             Type::DefBool(v) => write!(f, "def_bool {}", v),
             Type::DefTristate(v) => write!(f, "def_tristate {}", v),
         }
+    }
+}
+
+fn fmt_type(
+    f: &mut std::fmt::Formatter,
+    keyword: &str,
+    prompt: &Option<String>,
+) -> std::fmt::Result {
+    match prompt {
+        Some(p) => write!(f, "{} \"{}\"", keyword, p),
+        None => write!(f, "{}", keyword),
     }
 }

@@ -2,7 +2,7 @@ use crate::{
     assert_parsing_eq,
     attribute::r#type::{ConfigType, Type},
     entry::{parse_entries, Comment, Config},
-    Entry,
+    Attribute, Entry,
 };
 
 #[test]
@@ -18,12 +18,10 @@ fn test_parse_entries() {
             vec!(
                 Entry::Config(Config {
                     symbol: "KVM".to_string(),
-                    r#type: ConfigType {
-                        r#type: Type::Bool,
-                        prompt: None,
+                    attributes: vec!(Attribute::Type(ConfigType {
+                        r#type: Type::Bool(None),
                         r#if: None
-                    },
-                    attributes: vec!()
+                    }))
                 }),
                 Entry::Comment(Comment {
                     prompt: "some configs".to_string(),
