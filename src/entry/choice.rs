@@ -17,7 +17,7 @@ use crate::{
     Entry, KconfigInput,
 };
 
-use super::{parse_comment, parse_config};
+use super::{parse_comment, parse_config, parse_entry};
 
 /// This defines a choice group and accepts any of the above attributes as options. A choice can only be of type bool or tristate. If no type is specified for a choice, its type will be determined by the type of the first choice element in the group or remain unknown if none of the choice elements have a type specified, as well.
 ///
@@ -47,10 +47,7 @@ pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
             tag("choice"),
             pair(
                 parse_choice_attributes,
-                many0(ws(alt((
-                    map(parse_comment, Entry::Comment),
-                    map(parse_config, Entry::Config),
-                )))),
+                many0(ws(parse_entry))
             ),
             ws(tag("endchoice")),
         ),
