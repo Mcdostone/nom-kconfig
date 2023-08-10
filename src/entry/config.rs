@@ -3,8 +3,8 @@ use nom::{
     bytes::complete::tag,
     character::complete::{alphanumeric1, one_of},
     combinator::{map, recognize},
-    multi::many1,
-    sequence::pair,
+    multi::{many1, many0},
+    sequence::{pair, preceded},
     IResult,
 };
 #[cfg(feature = "deserialize")]
@@ -14,8 +14,8 @@ use serde::Serialize;
 
 use crate::{
     attribute::{
-        r#type::{parse_bool_type, parse_tristate_type, parse_type},
-        Attribute,
+        r#type::parse_type,
+        Attribute, parse_attribute,
     },
     util::ws,
     KconfigInput,
@@ -58,25 +58,15 @@ pub fn parse_config_symbol(input: KconfigInput) -> IResult<KconfigInput, &str> {
     )(input)
 }
 
-/*
-pub fn parse_config_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
-    config_parser_with_type!(parse_bool_attribute)(input)
-}
-*/
-
-macro_rules! config_parser {
-    ($fn:expr) => {{
-        generic_config_parser!(Config, "config", $fn)
-    }};
-}
-pub fn parse_bool_config(input: KconfigInput) -> IResult<KconfigInput, Config> {
-    config_parser!(parse_bool_type)(input)
-}
-
-pub fn parse_tristate_config(input: KconfigInput) -> IResult<KconfigInput, Config> {
-    config_parser!(parse_tristate_type)(input)
-}
-
 pub fn parse_config(input: KconfigInput) -> IResult<KconfigInput, Config> {
-    config_parser!(parse_type)(input)
+    map(
+        pair(
+            preceded(ws(tag("config")), ws(parse_config_symbol)),
+            many0(ws(alt((parse_type, parse_attribute)))),
+        ),
+        |(symbol, attributes)| Config {
+            symbol: symbol.to_string(),
+            attributes,
+        },
+    )(input)
 }

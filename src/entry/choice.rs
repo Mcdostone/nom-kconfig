@@ -3,7 +3,7 @@ use nom::{
     bytes::complete::tag,
     combinator::map,
     multi::many0,
-    sequence::{pair, terminated},
+    sequence::{pair, terminated, delimited},
     IResult,
 };
 #[cfg(feature = "deserialize")]
@@ -15,17 +15,13 @@ use crate::{
     attribute::{
         optional::parse_optional,
         parse_attribute,
-        r#type::{parse_bool_type, parse_tristate_type},
-        Attribute,
+        Attribute, r#type::parse_type,
     },
     util::ws,
     Entry, KconfigInput,
 };
 
-use super::{
-    config::{parse_bool_config, parse_tristate_config},
-    parse_comment,
-};
+use super::{parse_comment, parse_config};
 
 /// This defines a choice group and accepts any of the above attributes as options. A choice can only be of type bool or tristate. If no type is specified for a choice, its type will be determined by the type of the first choice element in the group or remain unknown if none of the choice elements have a type specified, as well.
 ///
@@ -44,22 +40,20 @@ pub struct Choice {
 fn parse_choice_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
     ws(many0(alt((
         parse_attribute,
-        parse_bool_type,
-        parse_tristate_type,
+        parse_type,
         map(ws(parse_optional), |_| Attribute::Optional),
     ))))(input)
 }
 
 pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
-    let (input, _) = tag("choice")(input)?;
     map(
-        terminated(
+        delimited(
+            tag("choice"),
             pair(
                 parse_choice_attributes,
                 many0(ws(alt((
                     map(parse_comment, Entry::Comment),
-                    map(parse_bool_config, Entry::Config),
-                    map(parse_tristate_config, Entry::Config),
+                    map(parse_config, Entry::Config),
                 )))),
             ),
             ws(tag("endchoice")),

@@ -4,7 +4,7 @@ use crate::{
         r#type::{ConfigType, Type},
         AndExpression, Atom, DefaultAttribute, Expression, Term,
     },
-    entry::{config::parse_tristate_config, parse_config, Config},
+    entry::{parse_config, Config},
     symbol::Symbol,
     Attribute,
 };
@@ -66,7 +66,7 @@ fn test_parse_config_no_type() {
 fn test_parse_config_tristate() {
     let input = "config RAPIDIO_ENUM_BASIC\n    tristate";
     assert_parsing_eq!(
-        parse_tristate_config,
+        parse_config,
         input,
         Ok((
             "",

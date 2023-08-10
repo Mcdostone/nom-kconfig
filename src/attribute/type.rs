@@ -1,4 +1,4 @@
-use crate::{parse_config_type, Attribute};
+use crate::Attribute;
 use crate::{util::ws, KconfigInput};
 use nom::sequence::pair;
 use nom::{
@@ -16,60 +16,36 @@ use serde::Serialize;
 use super::{parse_expression, parse_if_attribute, parse_prompt_option, Expression};
 
 pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
-    parse_config_type!(alt((
-        map(
-            preceded(tag("boolean"), opt(parse_prompt_option)),
-            Type::Bool
-        ),
-        map(preceded(tag("bool"), opt(parse_prompt_option)), Type::Bool),
-        map(preceded(tag("hex"), opt(parse_prompt_option)), Type::Hex),
-        map(preceded(tag("int"), opt(parse_prompt_option)), Type::Int),
-        map(
-            preceded(tag("string"), opt(parse_prompt_option)),
-            Type::String
-        ),
-        map(
-            preceded(tag("tristate"), opt(parse_prompt_option)),
-            Type::Tristate
-        ),
-        map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
-            Type::DefBool(e)
-        }),
-        map(preceded(tag("def_tristate"), ws(parse_expression)), |e| {
-            Type::DefTristate(e)
-        })
-    )))(input)
+    map(
+        pair(
+            ws(alt((
+                map(
+                    preceded(tag("boolean"), opt(parse_prompt_option)),
+                    Type::Bool
+                ),
+                map(preceded(tag("bool"), opt(parse_prompt_option)), Type::Bool),
+                map(preceded(tag("hex"), opt(parse_prompt_option)), Type::Hex),
+                map(preceded(tag("int"), opt(parse_prompt_option)), Type::Int),
+                map(
+                    preceded(tag("string"), opt(parse_prompt_option)),
+                    Type::String
+                ),
+                map(
+                    preceded(tag("tristate"), opt(parse_prompt_option)),
+                    Type::Tristate
+                ),
+                map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
+                    Type::DefBool(e)
+                }),
+                map(preceded(tag("def_tristate"), ws(parse_expression)), |e| {
+                    Type::DefTristate(e)
+                })
+            ))),
+            parse_if_attribute
+    ), |(t, i)| Attribute::Type(ConfigType { r#type: t, r#if: i }))(input)
 }
 
-#[macro_export]
-macro_rules! parse_config_type {
-    ($fn:expr) => {{
-        use $crate::attribute::Attribute;
-        map(pair(ws($fn), parse_if_attribute), |(he, e)| {
-            Attribute::Type(ConfigType {
-                r#type: he,
-                r#if: e,
-            })
-        })
-    }};
-}
 
-pub fn parse_bool_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
-    parse_config_type!(alt((
-        map(
-            preceded(tag("boolean"), opt(parse_prompt_option)),
-            Type::Bool
-        ),
-        map(preceded(tag("bool"), opt(parse_prompt_option)), Type::Bool),
-    )))(input)
-}
-
-pub fn parse_tristate_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
-    parse_config_type!(map(
-        preceded(tag("tristate"), opt(parse_prompt_option)),
-        Type::Tristate
-    ))(input)
-}
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "hash", derive(Hash))]
