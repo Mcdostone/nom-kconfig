@@ -3,7 +3,7 @@ use nom::{
     bytes::complete::tag,
     character::complete::{alphanumeric1, one_of},
     combinator::{map, recognize},
-    multi::{many1, many0},
+    multi::{many0, many1},
     sequence::{pair, preceded},
     IResult,
 };
@@ -13,10 +13,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::{
-    attribute::{
-        r#type::parse_type,
-        Attribute, parse_attribute,
-    },
+    attribute::{parse_attribute, r#type::parse_type, Attribute},
     util::ws,
     KconfigInput,
 };

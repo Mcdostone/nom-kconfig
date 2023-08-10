@@ -1,5 +1,5 @@
 use crate::{
-    assert_parsing_eq, assert_parsing_fail,
+    assert_parsing_eq,
     attribute::{
         r#type::{ConfigType, Type},
         AndExpression, Atom, DefaultAttribute, Expression, Term,
@@ -29,7 +29,7 @@ fn test_parse_choice_optional() {
 // fn test_parse_choice_string_not_allowed() {
 //     assert_parsing_fail!(
 //         parse_choice,
-//         r#"choice 
+//         r#"choice
 //         config TESTCHOICE1
 //     string "Choice 1"
 //         endchoice"#

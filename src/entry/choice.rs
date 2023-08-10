@@ -3,7 +3,7 @@ use nom::{
     bytes::complete::tag,
     combinator::map,
     multi::many0,
-    sequence::{pair, terminated, delimited},
+    sequence::{delimited, pair},
     IResult,
 };
 #[cfg(feature = "deserialize")]
@@ -12,11 +12,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::{
-    attribute::{
-        optional::parse_optional,
-        parse_attribute,
-        Attribute, r#type::parse_type,
-    },
+    attribute::{optional::parse_optional, parse_attribute, r#type::parse_type, Attribute},
     util::ws,
     Entry, KconfigInput,
 };

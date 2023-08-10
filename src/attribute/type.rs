@@ -21,31 +21,31 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
             ws(alt((
                 map(
                     preceded(tag("boolean"), opt(parse_prompt_option)),
-                    Type::Bool
+                    Type::Bool,
                 ),
                 map(preceded(tag("bool"), opt(parse_prompt_option)), Type::Bool),
                 map(preceded(tag("hex"), opt(parse_prompt_option)), Type::Hex),
                 map(preceded(tag("int"), opt(parse_prompt_option)), Type::Int),
                 map(
                     preceded(tag("string"), opt(parse_prompt_option)),
-                    Type::String
+                    Type::String,
                 ),
                 map(
                     preceded(tag("tristate"), opt(parse_prompt_option)),
-                    Type::Tristate
+                    Type::Tristate,
                 ),
                 map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
                     Type::DefBool(e)
                 }),
                 map(preceded(tag("def_tristate"), ws(parse_expression)), |e| {
                     Type::DefTristate(e)
-                })
+                }),
             ))),
-            parse_if_attribute
-    ), |(t, i)| Attribute::Type(ConfigType { r#type: t, r#if: i }))(input)
+            parse_if_attribute,
+        ),
+        |(t, i)| Attribute::Type(ConfigType { r#type: t, r#if: i }),
+    )(input)
 }
-
-
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "hash", derive(Hash))]
