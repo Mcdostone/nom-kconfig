@@ -10,6 +10,9 @@
 </div>
 <br/>
 <p align="center">
+  <a href="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml">
+    <img src="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml/badge.svg" alt="Build status"/>
+  </a>
   <a href="https://www.rust-lang.org/">
     <img src="https://img.shields.io/badge/Rust-1.71.0-green.svg?logo=rust" alt="Rust version"/>
   </a>
