@@ -10,7 +10,7 @@ readme = "README.md"
 description = "A Kconfig parser"
 categories = ["parsing"]
 keywords = ["parser",  "parsing", "kconfig", "linux-kernel"]
-rust-version = "1.71"
+rust-version = "1.56"
 exclude = [
     ".github",
 ]
@@ -33,7 +33,7 @@ name = "my_benchmark"
 harness = false
 
 [features]
-default = ["display", "hash", "serialize", "deserialize"]
+# default = ["display", "hash", "serialize", "deserialize"]
 display = []
 hash = []
 serialize = ["dep:serde"]

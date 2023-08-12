@@ -10,7 +10,25 @@ env:
   RUSTFLAGS: "-D warnings"
 
 jobs:
-  test:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update && sudo apt-get install -y curl
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --all-features --locked --release --all
+
+  unit-tests:
+    needs: check
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
@@ -28,6 +46,7 @@ jobs:
           args: --all-features --locked --release --all
 
   clippy:
+    needs: check
     name: Clippy
     runs-on: ubuntu-latest
     steps:
@@ -44,6 +63,7 @@ jobs:
           args: --all-targets --all-features -- --deny warnings
 
   fmt:
+    needs: check
     name: Fmt
     runs-on: ubuntu-latest
     steps:
@@ -60,6 +80,7 @@ jobs:
           args: --all -- --check
 
   code-coverage:
+    needs: unit-tests
     name: Code coverage
     runs-on: ubuntu-latest
     steps:
@@ -72,7 +93,7 @@ jobs:
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
-          version: 0.22.0
+          version: 0.26.1
           args: --all-features --out Xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
@@ -80,6 +101,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   doc:
+    needs: check
     name: documentation
     runs-on: ubuntu-latest
     steps:

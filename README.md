@@ -11,15 +11,49 @@
   <a href="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml">
     <img src="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml/badge.svg" alt="Build status"/>
   </a>
-  <a href="https://www.rust-lang.org/">
-    <img src="https://img.shields.io/badge/Rust-1.71.0-green.svg?logo=rust" alt="Rust version"/>
-  </a>
 <a href="https://codecov.io/gh/Mcdostone/nom-kconfig" > 
  <img src="https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C" alt="code coverage"/> 
  </a>
+ <a href="https://github.com/rust-bakery/nom#rust-version-requirements-msrv" > 
+   <img src="https://img.shields.io/badge/MSRV-1.56.0+-lightgray.svg?logo=rust" alt="Minimum supported rust version: 1.56.0 or plus"/> 
+ </a>
+ <a href="https://crates.io/crates/nom-kconfig" > 
+   <img src="https://img.shields.io/crates/v/nom-kconfig.svg?logo=crate" alt="crates.io Version"/> 
+ </a>
 </p>
 
-Parsing relies on the [nom library](https://github.com/rust-bakery/nom).
+Kconfig is a language that describes configuration options for the linux Kernel. The syntax looks like this:
+```bash
+# https://github.com/torvalds/linux/blob/master/arch/riscv/Kconfig#L771
+config EFI
+	bool "UEFI runtime support"
+	depends on MMU
+	default y
+	select EFI_STUB
+	help
+	  This option provides support for runtime services provided
+	  by UEFI firmware.
+```
+
+- The file starts with a `config` entry: We define a config named `EFI`. The next lines are the attributes of this entry.
+- `EFI` is a boolean config.
+- `EFI` [depends on](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes) the config `MMU`.
+- Its default value is `y`.
+- If `EFI` is equals to `true` then it enables `EFI_STUB`.
+- the `help` attribute defines a help text for the end user.
+
+There are plenty of other keywords in the Kconfig language, check out [the official documentation](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html) for more details.
+
+**Features**
+
+ - This a syntaxic parser.
+ - There is no semantic analysis in this library.
+ - This library only supports UTF-8 encoded files.
+ - List of supported entris can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/entry/enum.Entry.html).
+ - List of supported attributes can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/attribute/enum.Attribute.html).
+ - This parser has been tested on the linux kernel repository from 2.6.11 to the latest.
+ - When [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries) is met, it reads and parses the specified configuration file.
+
 ## Getting started
 
 ```bash
