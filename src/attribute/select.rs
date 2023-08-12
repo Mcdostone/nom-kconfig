@@ -27,7 +27,7 @@ pub struct Select {
 /// ```
 /// use nom_kconfig::{
 /// assert_parsing_eq,
-/// attribute::select::{parse_select, Select},
+/// attribute::{parse_select, Select}
 /// };
 ///
 /// assert_parsing_eq!(

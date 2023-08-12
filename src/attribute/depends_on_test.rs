@@ -39,8 +39,8 @@ fn test_parse_depends_on_weird_tab() {
 fn test_parse_depends_on_backslash() {
     assert_parsing_eq!(
         parse_depends_on,
-        r#"depends on (ARCH_LUBBOCK || MACH_MAINSTONE || PXA_SHARPSL \
-		    || MACH_ARMCORE || ARCH_PXA_PALM)"#,
+        r"depends on (ARCH_LUBBOCK || MACH_MAINSTONE || PXA_SHARPSL \
+		    || MACH_ARMCORE || ARCH_PXA_PALM)",
         Ok((
             "",
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(

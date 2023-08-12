@@ -30,9 +30,12 @@ cargo add nom-kconfig
 use std::path::PathBuf;
 use nom_kconfig::{kconfig::parse_kconfig, KconfigInput, KconfigFile};
 
+// curl https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz | tar -xJ -C /tmp/
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // curl https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz | tar -xJ -C /tmp/
-    let kconfig_file = KconfigFile::new(PathBuf::from("/tmp/linux-6.4.9"), PathBuf::from("/tmp/linux-6.4.9/Kconfig"));
+    let kconfig_file = KconfigFile::new(
+        PathBuf::from("/tmp/linux-6.4.9"), 
+        PathBuf::from("/tmp/linux-6.4.9/Kconfig")
+    );
     let input = kconfig_file.read_to_string().unwrap();
     let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
     println!("{:?}", kconfig);

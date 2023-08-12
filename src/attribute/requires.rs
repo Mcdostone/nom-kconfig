@@ -24,7 +24,7 @@ pub struct Requires {
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::{
-///     requires::{parse_requires, Requires},
+///     parse_requires, Requires,
 ///     AndExpression, Atom, CompareExpression, CompareOperator, Expression, OrExpression, Term},
 ///     symbol::Symbol,
 /// };

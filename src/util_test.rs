@@ -9,7 +9,7 @@ fn test_ws() {
 
 #[test]
 fn test_wsi_backslash() {
-    let input = r#"   \
-          "#;
+    let input = r"   \
+          ";
     assert_eq!(wsi(eof::<&str, ()>)(input), Ok(("", "")))
 }

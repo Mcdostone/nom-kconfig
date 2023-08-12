@@ -1,3 +1,5 @@
+//! A entry can have a number of attributes: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes)
+
 pub mod default;
 pub mod depends_on;
 pub mod enable;

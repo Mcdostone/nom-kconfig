@@ -20,7 +20,7 @@ pub struct Enable {
 /// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
-///     attribute::enable::{parse_enable, Enable},
+///     attribute::{parse_enable, Enable},
 /// };
 ///
 /// assert_parsing_eq!(

@@ -80,12 +80,25 @@ where
     preceded(ws_comment, inner)
 }
 
+/// Parses the content until EOF or new line.
+///
+/// # Example
+/// ```rust
+/// use nom::combinator::map;
+/// use nom_kconfig::util::parse_until_eol;
+/// use nom_kconfig::KconfigInput;
+///
+/// let input  = KconfigInput::new_extra("parse me if you\ncan!", Default::default());
+/// let (remaining, line) = parse_until_eol(input).unwrap();
+/// assert_eq!(line.to_string(), "parse me if you");
+/// assert_eq!(remaining.to_string(), "can!");
+/// ```
+///
 pub fn parse_until_eol(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
     terminated(not_line_ending, alt((line_ending, eof)))(input)
 }
 
 /// Gets rid of spaces, tabs and backslash + newline.
-/// `wsi` for *whitespaces inline*
 /// # Example
 /// ```
 /// use nom::bytes::complete::tag;

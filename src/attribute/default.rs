@@ -8,7 +8,13 @@ use crate::{util::ws, KconfigInput};
 
 use super::{parse_expression, parse_if_attribute, Expression};
 
-/// A config option can have any number of default values. If multiple default values are visible, only the first defined one is active. Default values are not limited to the menu entry where they are defined. This means the default can be defined somewhere else or be overridden by an earlier definition. The default value is only assigned to the config symbol if no other value was set by the user (via the input prompt above).
+/// A config option can have any number of default values.
+/// If multiple default values are visible, only the first defined one is active.
+/// Default values are not limited to the menu entry where they are defined.
+/// This means the default can be defined somewhere else or be overridden by an earlier definition.
+/// The default value is only assigned to the config symbol if no other value was set by the user.
+///
+/// see ["default value"](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes) for more information.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
@@ -29,9 +35,8 @@ pub struct DefaultAttribute {
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::{
-///         default::{parse_default, DefaultAttribute},
-///         expression::{Expression, AndExpression, Atom, OrExpression, Term},
-///         function::{ExpressionToken, FunctionCall, Parameter},
+///         parse_default, DefaultAttribute,
+///         Expression, AndExpression, Atom, OrExpression, Term
 ///     },
 ///     symbol::Symbol,
 /// };

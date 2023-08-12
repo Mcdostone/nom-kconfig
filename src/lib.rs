@@ -2,13 +2,16 @@
 //!
 //! A parser for kconfig files. The parsing is done with [nom](https://github.com/rust-bakery/nom).
 //!
-//! ```rust
+//! ```no_run
 //! use std::path::PathBuf;
-//! use nom_kconfig::{kconfig::parse_kconfig, KconfigInput, KconfigFile};
+//! use nom_kconfig::{parse_kconfig, KconfigInput, KconfigFile};
 //!
+//! // curl https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz | tar -xJ -C /tmp/
 //! fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     // curl https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz | tar -xJ -C /tmp/
-//!     let kconfig_file = KconfigFile::new(PathBuf::from("/tmp/linux-6.4.9"), PathBuf::from("/tmp/linux-6.4.9/Kconfig"));
+//!     let kconfig_file = KconfigFile::new(
+//!         PathBuf::from("/tmp/linux-6.4.9"),
+//!         PathBuf::from("/tmp/linux-6.4.9/Kconfig")
+//!     );
 //!     let input = kconfig_file.read_to_string().unwrap();
 //!     let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
 //!     println!("{:?}", kconfig);
@@ -29,7 +32,8 @@ pub mod util;
 
 pub use self::attribute::Attribute;
 pub use self::entry::Entry;
-pub use self::kconfig::Kconfig;
+pub use self::kconfig::{parse_kconfig, Kconfig};
+pub use self::symbol::Symbol;
 
 /// [KconfigInput] is a struct gathering a [KconfigFile] and its associated content.
 pub type KconfigInput<'a> = LocatedSpan<&'a str, KconfigFile>;
@@ -39,9 +43,9 @@ pub type KconfigInput<'a> = LocatedSpan<&'a str, KconfigFile>;
 #[derive(Debug, Clone, Default)]
 pub struct KconfigFile {
     /// The absolute path of the kernel root directory.
-    pub root_dir: PathBuf,
+    root_dir: PathBuf,
     /// The path the the Kconfig you want to parse.
-    pub file: PathBuf,
+    file: PathBuf,
 }
 
 impl KconfigFile {

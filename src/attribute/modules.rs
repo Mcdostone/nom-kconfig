@@ -6,7 +6,7 @@ use crate::{util::ws, KconfigInput};
 ///
 /// # Example
 /// ```
-/// use nom_kconfig::{assert_parsing_eq, attribute::modules::parse_modules};
+/// use nom_kconfig::{assert_parsing_eq, attribute::parse_modules};
 /// assert_parsing_eq!(parse_modules, "modules", Ok(("", ())))
 /// ```
 pub fn parse_modules(input: KconfigInput) -> IResult<KconfigInput, ()> {

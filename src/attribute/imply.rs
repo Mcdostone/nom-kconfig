@@ -32,7 +32,7 @@ pub struct Imply {
 /// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
-///     symbol::Symbol,
+///     Symbol,
 ///     attribute::{parse_imply, Imply}
 /// };
 ///
