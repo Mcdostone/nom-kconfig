@@ -5,10 +5,8 @@
     src="./doc/tux.png"
     width=100px
   />
-  <br/>
   <h1>A Kconfig parser written in rust.</h1>
 </div>
-<br/>
 <p align="center">
   <a href="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml">
     <img src="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml/badge.svg" alt="Build status"/>
@@ -19,7 +17,6 @@
 <a href="https://codecov.io/gh/Mcdostone/nom-kconfig" > 
  <img src="https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C" alt="code coverage"/> 
  </a>
-
 </p>
 
 Parsing relies on the [nom library](https://github.com/rust-bakery/nom).

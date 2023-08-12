@@ -12,7 +12,7 @@ env:
 jobs:
   test:
     name: Unit tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install -y curl
@@ -29,7 +29,7 @@ jobs:
 
   clippy:
     name: Clippy
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install -y curl
@@ -44,8 +44,8 @@ jobs:
           args: --all-targets --all-features -- --deny warnings
 
   fmt:
-    name: Cargo fmt
-    runs-on: ubuntu-22.04
+    name: Fmt
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install -y curl
@@ -61,7 +61,7 @@ jobs:
 
   code-coverage:
     name: Code coverage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install -y curl
@@ -80,7 +80,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   doc:
-    name: Build documentation
+    name: documentation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
