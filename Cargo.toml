@@ -19,6 +19,12 @@ exclude = [
 all-features = true
 rustdoc-args = ["--generate-link-to-definition"]
 
+
+[workspace]
+members = [
+    "fuzzing",
+]
+
 [dependencies]
 nom = "7.1.3"
 nom_locate = "4.1.0"

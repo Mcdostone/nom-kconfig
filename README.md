@@ -46,7 +46,7 @@ There are plenty of other keywords in the Kconfig language, check out [the offic
 
 **Features**
 
- - This a syntaxic parser.
+ - This is a parser.
  - There is no semantic analysis in this library.
  - This library only supports UTF-8 encoded files.
  - List of supported entris can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/entry/enum.Entry.html).
