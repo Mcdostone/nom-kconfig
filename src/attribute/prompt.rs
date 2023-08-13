@@ -73,3 +73,15 @@ pub struct Prompt {
     )]
     pub r#if: Option<Expression>,
 }
+
+#[cfg(feature = "display")]
+use std::fmt::Display;
+#[cfg(feature = "display")]
+impl Display for Prompt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, r#""{}" if {}"#, self.prompt, i),
+            None => write!(f, r#""{}""#, self.prompt),
+        }
+    }
+}

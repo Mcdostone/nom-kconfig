@@ -210,3 +210,26 @@ fn test_type_with_prompt() {
         ))
     )
 }
+
+#[test]
+fn test_config_type_tostring() {
+    assert_eq!(
+        ConfigType {
+            r#type: Type::Bool(None),
+            r#if: None
+        }
+        .to_string(),
+        "bool"
+    );
+
+    assert_eq!(
+        ConfigType {
+            r#type: Type::Bool(None),
+            r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
+                Atom::Symbol(Symbol::Constant("NET".to_string()))
+            ))))
+        }
+        .to_string(),
+        "bool if NET".to_string()
+    );
+}

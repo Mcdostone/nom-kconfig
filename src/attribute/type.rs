@@ -12,6 +12,8 @@ use nom::{
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
+#[cfg(feature = "display")]
+use std::fmt::Display;
 
 use super::{parse_expression, parse_if_attribute, parse_prompt_option, Expression};
 
@@ -80,7 +82,15 @@ pub struct ConfigType {
 }
 
 #[cfg(feature = "display")]
-use std::fmt::Display;
+impl Display for ConfigType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, "{} if {}", self.r#type, i),
+            None => write!(f, "{}", self.r#type),
+        }
+    }
+}
+
 #[cfg(feature = "display")]
 impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

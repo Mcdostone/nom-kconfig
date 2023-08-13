@@ -29,7 +29,7 @@ use self::r#type::ConfigType;
 pub use self::{
     default::{parse_default, DefaultAttribute},
     depends_on::parse_depends_on,
-    enable::{parse_enable, Enable},
+    enable::parse_enable,
     expression::Expression,
     help::parse_help,
     imply::{parse_imply, Imply},
@@ -37,9 +37,9 @@ pub use self::{
     option::{parse_option, OptionValues},
     prompt::{parse_prompt, parse_prompt_option, Prompt},
     range::{parse_range, Range},
-    requires::{parse_requires, Requires},
+    requires::parse_requires,
     select::{parse_select, Select},
-    visible::{parse_visible, Visible},
+    visible::parse_visible,
 };
 
 pub use self::expression::{
@@ -62,11 +62,11 @@ pub enum Attribute {
     DependsOn(Expression),
     Optional,
     Range(Range),
-    Visible(Visible),
+    Visible(Option<Expression>),
     Default(DefaultAttribute),
-    Enable(Enable),
+    Enable(String),
     Imply(Imply),
-    Requires(Requires),
+    Requires(Expression),
     Type(ConfigType),
     Option(OptionValues),
 }
@@ -90,6 +90,33 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_option), Attribute::Option),
         map(ws(parse_enable), Attribute::Enable),
     ))(input)
+}
+
+#[cfg(feature = "display")]
+use std::fmt::Display;
+#[cfg(feature = "display")]
+impl Display for Attribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Attribute::Help(s) => write!(f, "help\n  {}", s),
+            Attribute::Prompt(p) => write!(f, "prompt {p}"),
+            Attribute::Modules => write!(f, "modules"),
+            Attribute::Select(s) => write!(f, "select {s}"),
+            Attribute::DependsOn(d) => write!(f, "depends on {d}"),
+            Attribute::Optional => write!(f, "optional"),
+            Attribute::Range(r) => write!(f, "range {r}"),
+            Attribute::Visible(v) => match v {
+                Some(e) => write!(f, "visible if {e}"),
+                None => write!(f, "visible"),
+            },
+            Attribute::Default(d) => write!(f, "default {d}"),
+            Attribute::Enable(s) => write!(f, "enable {s}"),
+            Attribute::Imply(i) => write!(f, "imply {i}"),
+            Attribute::Requires(r) => write!(f, "requires {r}"),
+            Attribute::Type(t) => write!(f, "{t}"),
+            Attribute::Option(o) => write!(f, "option {o}"),
+        }
+    }
 }
 
 #[cfg(test)]

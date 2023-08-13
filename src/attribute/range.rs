@@ -3,6 +3,8 @@ use nom::{branch::alt, bytes::complete::tag, combinator::map, sequence::tuple, I
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
+#[cfg(feature = "display")]
+use std::fmt::Display;
 
 use crate::{
     symbol::{parse_symbol, Symbol},
@@ -25,6 +27,16 @@ pub struct Range {
         serde(skip_serializing_if = "Option::is_none")
     )]
     pub r#if: Option<Expression>,
+}
+
+#[cfg(feature = "display")]
+impl Display for Range {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, "{} {} if {}", self.lhs, self.rhs, i),
+            None => write!(f, "{} {}", self.lhs, self.rhs),
+        }
+    }
 }
 
 fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {

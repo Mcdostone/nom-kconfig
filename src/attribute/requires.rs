@@ -1,20 +1,8 @@
-use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
-
-use crate::{util::ws, KconfigInput};
+use nom::{bytes::complete::tag, sequence::preceded, IResult};
 
 use super::expression::{parse_expression, Expression};
+use crate::{util::ws, KconfigInput};
 
-#[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "hash", derive(Hash))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Requires {
-    pub symbol: Expression,
-}
 /// Parses a `requires` attribute.
 /// TODO: I think this attribute is deprecated.
 ///
@@ -24,7 +12,7 @@ pub struct Requires {
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
 ///     attribute::{
-///     parse_requires, Requires,
+///     parse_requires,
 ///     AndExpression, Atom, CompareExpression, CompareOperator, Expression, OrExpression, Term},
 ///     symbol::Symbol,
 /// };
@@ -34,17 +22,12 @@ pub struct Requires {
 ///     " requires  KVM",
 ///     Ok((
 ///         "",
-///         Requires {
-///             symbol: Expression::Term(AndExpression::Term(Term::Atom(
-///                    Atom::Symbol(Symbol::Constant("KVM".to_string())
-///                ))))
-///         }
+///         Expression::Term(AndExpression::Term(Term::Atom(
+///             Atom::Symbol(Symbol::Constant("KVM".to_string())
+///         ))))
 ///     ))
 /// )
 /// ```
-pub fn parse_requires(input: KconfigInput) -> IResult<KconfigInput, Requires> {
-    map(
-        tuple((ws(tag("requires")), ws(parse_expression))),
-        |(_, s)| Requires { symbol: s },
-    )(input)
+pub fn parse_requires(input: KconfigInput) -> IResult<KconfigInput, Expression> {
+    preceded(ws(tag("requires")), ws(parse_expression))(input)
 }

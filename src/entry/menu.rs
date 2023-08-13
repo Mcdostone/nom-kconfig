@@ -13,7 +13,8 @@ use serde::Serialize;
 
 use crate::{
     attribute::{
-        parse_depends_on, parse_prompt_option, parse_visible, Attribute, Expression, Visible,
+        parse_depends_on, parse_prompt_option, parse_visible, visible::Visible, Attribute,
+        Expression,
     },
     util::ws,
     KconfigInput,

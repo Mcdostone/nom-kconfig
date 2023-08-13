@@ -51,8 +51,10 @@ There are plenty of other keywords in the Kconfig language, check out [the offic
  - This library only supports UTF-8 encoded files.
  - List of supported entris can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/entry/enum.Entry.html).
  - List of supported attributes can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/attribute/enum.Attribute.html).
- - This parser has been tested on the linux kernel repository from 2.6.11 to the latest.
  - When [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries) is met, it reads and parses the specified configuration file.
+ - This library uses `clone()` a lot. Do not expect amazing performances.
+ - [ ] This parser has been tested on the linux kernel repository from 2.6.11 to the latest.
+ 
 
 ## Getting started
 

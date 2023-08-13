@@ -3,6 +3,8 @@ use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
+#[cfg(feature = "display")]
+use std::fmt::Display;
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
@@ -20,6 +22,16 @@ pub struct Select {
         serde(skip_serializing_if = "Option::is_none")
     )]
     pub r#if: Option<Expression>,
+}
+
+#[cfg(feature = "display")]
+impl Display for Select {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, "{} if {}", self.symbol, i),
+            None => write!(f, "{}", self.symbol),
+        }
+    }
 }
 
 /// Parses a `select` attribute.

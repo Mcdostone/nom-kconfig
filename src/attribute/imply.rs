@@ -26,6 +26,18 @@ pub struct Imply {
     pub r#if: Option<Expression>,
 }
 
+#[cfg(feature = "display")]
+use std::fmt::Display;
+#[cfg(feature = "display")]
+impl Display for Imply {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, "{} if {}", self.symbol, i),
+            None => write!(f, "{}", self.symbol),
+        }
+    }
+}
+
 /// This parses a `imply` attribute.
 ///
 /// # Example
