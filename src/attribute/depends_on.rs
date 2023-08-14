@@ -10,7 +10,9 @@ use crate::{util::wsi, KconfigInput};
 use super::{expression::parse_expression, Attribute};
 
 /// Parses a `depends on` attribute.
-/// If multiple dependencies are defined, they are connected with '&&'. Dependencies are applied to all other options within this menu entry (which also accept an "if" expression), so these two examples are equivalent:
+/// If multiple dependencies are defined, they are connected with '&&'.
+/// Dependencies are applied to all other options within this menu entry (which also accept an "if" expression).
+/// See [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes) for more information.
 ///
 /// # Example
 /// ```

@@ -16,7 +16,7 @@ use crate::{
 };
 
 /// A Kconfig file.
-/// `file` is relative to the root directory defined in [KconfigFile](crate::KconfigFile)
+/// Field `file` is relative to the root directory defined in [KconfigFile](crate::KconfigFile).
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]

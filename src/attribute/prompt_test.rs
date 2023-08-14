@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{parse_prompt_option, AndExpression, Atom, Expression, Prompt, Term},
+    attribute::{parse_prompt_value, AndExpression, Atom, Expression, Prompt, Term},
     Symbol,
 };
 
@@ -8,7 +8,7 @@ use crate::{
 fn test_parse_prompt() {
     let input = "\"scripts/Kconfig.include\"";
     assert_parsing_eq!(
-        parse_prompt_option,
+        parse_prompt_value,
         input,
         Ok(("", "scripts/Kconfig.include".to_string()))
     )
@@ -18,7 +18,7 @@ fn test_parse_prompt() {
 fn test_parse_prompt_1() {
     let input = "\"Support in-kernel module decompression\"";
     assert_parsing_eq!(
-        parse_prompt_option,
+        parse_prompt_value,
         input,
         Ok(("", "Support in-kernel module decompression".to_string()))
     )
@@ -28,7 +28,7 @@ fn test_parse_prompt_1() {
 #[test]
 fn test_parse_prompt_no_quote() {
     let input = " TCC8000";
-    assert_parsing_eq!(parse_prompt_option, input, Ok(("", "TCC8000".to_string())))
+    assert_parsing_eq!(parse_prompt_value, input, Ok(("", "TCC8000".to_string())))
 }
 
 #[test]

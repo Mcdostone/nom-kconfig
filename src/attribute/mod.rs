@@ -1,3 +1,4 @@
+//! Module defining the different attributes.
 //! A entry can have a number of attributes: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes)
 
 pub mod default;
@@ -35,7 +36,7 @@ pub use self::{
     imply::{parse_imply, Imply},
     modules::parse_modules,
     option::{parse_option, OptionValues},
-    prompt::{parse_prompt, parse_prompt_option, Prompt},
+    prompt::{parse_prompt, Prompt},
     range::{parse_range, Range},
     requires::parse_requires,
     select::{parse_select, Select},
@@ -48,6 +49,7 @@ pub use self::expression::{
 };
 pub use self::function::{parse_function_call, ExpressionToken, FunctionCall, Parameter};
 pub use self::optional::parse_optional;
+pub use self::prompt::parse_prompt_value;
 
 /// Official documentation regarding the different attributes: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes)
 #[derive(Debug, Clone, PartialEq)]

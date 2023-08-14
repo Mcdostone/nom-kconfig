@@ -12,8 +12,8 @@ fn test_parse_range() {
         Ok((
             "",
             Range {
-                lhs: Symbol::Constant("1".to_string()),
-                rhs: Symbol::Constant("5".to_string()),
+                lower_bound: Symbol::Constant("1".to_string()),
+                upper_bound: Symbol::Constant("5".to_string()),
                 r#if: None
             }
         ))
@@ -24,8 +24,8 @@ fn test_parse_range() {
 fn test_parse_range_to_string() {
     assert_eq!(
         Range {
-            lhs: Symbol::Constant("1".to_string()),
-            rhs: Symbol::Constant("5".to_string()),
+            lower_bound: Symbol::Constant("1".to_string()),
+            upper_bound: Symbol::Constant("5".to_string()),
             r#if: None
         }
         .to_string(),
@@ -34,8 +34,8 @@ fn test_parse_range_to_string() {
 
     assert_eq!(
         Range {
-            lhs: Symbol::Constant("1".to_string()),
-            rhs: Symbol::Constant("5".to_string()),
+            lower_bound: Symbol::Constant("1".to_string()),
+            upper_bound: Symbol::Constant("5".to_string()),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Symbol(Symbol::Constant("NET".to_string()))
             ))))

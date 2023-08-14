@@ -39,7 +39,7 @@ name = "my_benchmark"
 harness = false
 
 [features]
-# default = ["display", "hash", "serialize", "deserialize"]
+default = ["display", "hash", "serialize", "deserialize"]
 display = []
 hash = []
 serialize = ["dep:serde"]

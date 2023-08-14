@@ -18,6 +18,27 @@
 //!     Ok(())
 //! }
 //! ```
+//! If you're not familiar with Kconfig, here it is an example of what it looks like:
+//! ```bash
+//! # https://github.com/torvalds/linux/blob/master/arch/riscv/Kconfig#L771
+//! config EFI
+//!     bool "UEFI runtime support"
+//!     depends on MMU
+//!     default y
+//!     select EFI_STUB
+//!     help
+//!       This option provides support for runtime services provided
+//!       by UEFI firmware.
+//! ```
+//!
+//! - The file starts with a `config` entry: We define a config named `EFI`. The next lines are the attributes of this entry.
+//! - `EFI` is a boolean config.
+//! - `EFI` [depends on](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes) the config `MMU`.
+//! - Its default value is `y`.
+//! - If `EFI` is equals to `true` then it enables `EFI_STUB`.
+//! - the `help` attribute defines a help text for the end user.
+//!
+//! There are plenty of other keywords in the Kconfig language, check out [the official documentation](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html) for more details.
 
 use nom_locate::LocatedSpan;
 
@@ -40,9 +61,9 @@ pub type KconfigInput<'a> = LocatedSpan<&'a str, KconfigFile>;
 
 /// Represents a Kconfig file.
 /// It stores the kernel root directory because we need this information when a [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#kconfig-syntax) keyword is met.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct KconfigFile {
-    /// The absolute path of the kernel root directory.
+    /// The absolute path of the kernel root directory. This field is necessary to parse [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#kconfig-syntax) entry.
     root_dir: PathBuf,
     /// The path the the Kconfig you want to parse.
     file: PathBuf,

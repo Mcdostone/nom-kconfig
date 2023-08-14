@@ -1,3 +1,4 @@
+//! Module defining the different Kconfig entries.
 //! Most entries define a config option; all other entries help to organize them. [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries)
 
 use nom::{branch::alt, combinator::map, multi::many0, sequence::delimited, IResult};

@@ -1,7 +1,10 @@
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 
-/// Parses a `enable` attribute. It looks like this attribute is deprecated....
+/// Parses a `enable` attribute. I was not able to find documentation regarding this attribute.
+/// I think it is deprecated.
+/// This attribute has been found in this file [v2.6.1/drivers/net/wireless/Kconfig](https://cdn.kernel.org/pub/linux/kernel/v2.6/linux-2.6.1.tar.xz).
+/// `enable` has been replaced with `select`.
 ///
 /// # Example
 /// ```

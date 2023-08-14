@@ -78,8 +78,8 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Range(Range {
-                lhs: Symbol::Constant("0".to_string()),
-                rhs: Symbol::Constant("512".to_string()),
+                lower_bound: Symbol::Constant("0".to_string()),
+                upper_bound: Symbol::Constant("512".to_string()),
                 r#if: None
             })
         ))
@@ -180,8 +180,8 @@ fn test_attributes_to_string() {
     );
     assert_eq!(
         Attribute::Range(Range {
-            lhs: Symbol::Constant("0".to_string()),
-            rhs: Symbol::Constant("15".to_string()),
+            lower_bound: Symbol::Constant("0".to_string()),
+            upper_bound: Symbol::Constant("15".to_string()),
             r#if: None
         })
         .to_string(),

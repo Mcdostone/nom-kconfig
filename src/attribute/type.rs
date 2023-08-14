@@ -15,25 +15,25 @@ use serde::Serialize;
 #[cfg(feature = "display")]
 use std::fmt::Display;
 
-use super::{parse_expression, parse_if_attribute, parse_prompt_option, Expression};
+use super::{parse_expression, parse_if_attribute, parse_prompt_value, Expression};
 
 pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     map(
         pair(
             ws(alt((
                 map(
-                    preceded(tag("boolean"), opt(parse_prompt_option)),
+                    preceded(tag("boolean"), opt(parse_prompt_value)),
                     Type::Bool,
                 ),
-                map(preceded(tag("bool"), opt(parse_prompt_option)), Type::Bool),
-                map(preceded(tag("hex"), opt(parse_prompt_option)), Type::Hex),
-                map(preceded(tag("int"), opt(parse_prompt_option)), Type::Int),
+                map(preceded(tag("bool"), opt(parse_prompt_value)), Type::Bool),
+                map(preceded(tag("hex"), opt(parse_prompt_value)), Type::Hex),
+                map(preceded(tag("int"), opt(parse_prompt_value)), Type::Int),
                 map(
-                    preceded(tag("string"), opt(parse_prompt_option)),
+                    preceded(tag("string"), opt(parse_prompt_value)),
                     Type::String,
                 ),
                 map(
-                    preceded(tag("tristate"), opt(parse_prompt_option)),
+                    preceded(tag("tristate"), opt(parse_prompt_value)),
                     Type::Tristate,
                 ),
                 map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
