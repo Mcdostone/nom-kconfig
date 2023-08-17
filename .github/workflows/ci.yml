@@ -22,7 +22,7 @@ jobs:
           toolchain: stable
           profile: default
           override: true
-      - name: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: check
@@ -39,7 +39,7 @@ jobs:
           toolchain: stable
           profile: default
           override: true
-      - name: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
@@ -55,7 +55,7 @@ jobs:
           toolchain: stable
           profile: default
           override: true
-      - name: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -72,7 +72,7 @@ jobs:
           toolchain: stable
           profile: default
           override: true
-      - name: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - name: Install cargo-tarpaulin
         uses: actions-rs/cargo@v1
         with:
@@ -99,7 +99,7 @@ jobs:
         with:
           toolchain: stable
           profile: default
-      - name: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - name: Build documentation
         env:
           RUSTDOCFLAGS: -D warnings
