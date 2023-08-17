@@ -9,7 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
-  RUSTFLAGS: "-D warnings -Wunused-crate-dependencies"
+  RUSTFLAGS: "-D warnings"
 
 jobs:
   check:

@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use criterion::{black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use nom_kconfig::{kconfig::parse_kconfig, KconfigFile, KconfigInput};
 
 fn criterion_benchmark(c: &mut Criterion) {
