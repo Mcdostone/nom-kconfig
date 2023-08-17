@@ -22,8 +22,7 @@ jobs:
           toolchain: stable
           profile: minimal
           override: true
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - name: Install cargo-release
         run: cargo install cargo-release
       - name: configure git
