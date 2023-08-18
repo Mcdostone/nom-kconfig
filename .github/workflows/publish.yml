@@ -8,8 +8,10 @@ on:
       - main
 
 jobs:
-  dry-run-publish:
+
+  publish:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -19,8 +21,5 @@ jobs:
           override: true
       - name: Make sure crate is ready
         run: cargo publish --dry-run
-  publish:
-    runs-on: ubuntu-latest
-    steps:
       - name: Publish the crate
         run: cargo publish --token ${CRATES_TOKEN}

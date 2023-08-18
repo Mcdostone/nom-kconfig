@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches-ignore:
+      - main
   pull_request:
-      branches: [main]
+    branches:
+      - main
 
 env:
   CARGO_TERM_COLOR: always
@@ -95,13 +97,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           profile: default
+          override: true
       - uses: Swatinem/rust-cache@v2
       - name: Build documentation
-        env:
-          RUSTDOCFLAGS: -D warnings
         run: cargo doc --no-deps --document-private-items --verbose
