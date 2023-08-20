@@ -13,7 +13,8 @@ use serde::Serialize;
 
 use crate::{
     attribute::{
-        parse_depends_on, parse_prompt_option, parse_visible, Attribute, Expression, Visible,
+        parse_depends_on, parse_prompt_value, parse_visible, visible::Visible, Attribute,
+        Expression,
     },
     util::ws,
     KconfigInput,
@@ -48,7 +49,7 @@ pub fn parse_menu(input: KconfigInput) -> IResult<KconfigInput, Menu> {
     let (input, mut menu) = map(
         preceded(
             ws(tag("menu")),
-            pair(ws(parse_prompt_option), ws(parse_menu_attributes)),
+            pair(ws(parse_prompt_value), ws(parse_menu_attributes)),
         ),
         |(prompt, attributes)| {
             let mut menu = Menu {

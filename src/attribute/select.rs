@@ -1,14 +1,16 @@
-use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
+use nom::{branch::alt, bytes::complete::tag, combinator::map, sequence::tuple, IResult};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
+#[cfg(feature = "display")]
+use std::fmt::Display;
 
 use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
 
 use super::expression::{parse_if_attribute, Expression};
 
-/// While normal dependencies reduce the upper limit of a symbol (see below), reverse dependencies can be used to force a lower limit of another symbol. The value of the current menu symbol is used as the minimal value [symbol](crate::symbol::Symbol) can be set to. If [symbol](crate::symbol::Symbol) is selected multiple times, the limit is set to the largest selection. Reverse dependencies can only be used with boolean or tristate symbols.
+/// While normal dependencies reduce the upper limit of a symbol, reverse dependencies can be used to force a lower limit of another symbol. The value of the current menu symbol is used as the minimal value [symbol](crate::Symbol) can be set to. If [symbol](crate::Symbol) is selected multiple times, the limit is set to the largest selection. Reverse dependencies can only be used with boolean or tristate symbols.
 #[derive(Debug, Default, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
@@ -20,6 +22,16 @@ pub struct Select {
         serde(skip_serializing_if = "Option::is_none")
     )]
     pub r#if: Option<Expression>,
+}
+
+#[cfg(feature = "display")]
+impl Display for Select {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, "{} if {}", self.symbol, i),
+            None => write!(f, "{}", self.symbol),
+        }
+    }
 }
 
 /// Parses a `select` attribute.
@@ -43,7 +55,7 @@ pub struct Select {
 pub fn parse_select(input: KconfigInput) -> IResult<KconfigInput, Select> {
     map(
         tuple((
-            ws(tag("select")),
+            ws(alt((tag("select"), tag("enable")))),
             ws(parse_constant_symbol),
             parse_if_attribute,
         )),

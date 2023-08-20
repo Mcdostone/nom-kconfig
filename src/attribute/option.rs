@@ -31,6 +31,20 @@ pub enum OptionValues {
     Env(String),
 }
 
+#[cfg(feature = "display")]
+use std::fmt::Display;
+#[cfg(feature = "display")]
+impl Display for OptionValues {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            OptionValues::DefconfigList => write!(f, "defconfig_list"),
+            OptionValues::Modules => write!(f, "modules"),
+            OptionValues::AllNoConfigY => write!(f, "allnoconfig_y"),
+            OptionValues::Env(s) => write!(f, r#"env="{}""#, s),
+        }
+    }
+}
+
 pub fn parse_option(input: KconfigInput) -> IResult<KconfigInput, OptionValues> {
     map(
         tuple((ws(tag("option")), ws(parse_option_value))),

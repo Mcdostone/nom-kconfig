@@ -253,14 +253,14 @@ pub fn take_until_unbalanced(
     move |i: KconfigInput| {
         let mut index: usize = 0;
         let mut delimiter_counter = 0;
-        while let Some(n) = &i[index..].find(delimiter) {
+
+        let end_of_line = match &i.find('\n') {
+            Some(e) => *e,
+            None => i.len(),
+        };
+
+        while let Some(n) = &i[index..end_of_line].find(delimiter) {
             delimiter_counter += 1;
-            if i[index..index + n].contains('\n') {
-                return Err(nom::Err::Error(Error::from_error_kind(
-                    i,
-                    ErrorKind::TakeUntil,
-                )));
-            }
             index += n + 1;
         }
 

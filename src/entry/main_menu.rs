@@ -4,11 +4,11 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
-use crate::{attribute::prompt::parse_prompt_option, util::ws, KconfigInput};
+use crate::{attribute::parse_prompt_value, util::ws, KconfigInput};
 
 pub fn parse_main_menu(input: KconfigInput) -> IResult<KconfigInput, MainMenu> {
     map(
-        pair(ws(tag("mainmenu")), ws(parse_prompt_option)),
+        pair(ws(tag("mainmenu")), ws(parse_prompt_value)),
         |(_, prompt)| MainMenu {
             prompt: prompt.to_string(),
         },
