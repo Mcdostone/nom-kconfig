@@ -8,3 +8,5 @@ Kconfig
 tests/!Kconfig
 tarpaulin-report.html
 cobertura.xml
+fuzzing/out
+fuzzing/in

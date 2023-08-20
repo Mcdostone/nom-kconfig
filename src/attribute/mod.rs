@@ -1,8 +1,8 @@
+//! Module defining the different attributes.
 //! A entry can have a number of attributes: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes)
 
 pub mod default;
 pub mod depends_on;
-pub mod enable;
 pub mod expression;
 pub mod function;
 pub mod help;
@@ -29,17 +29,16 @@ use self::r#type::ConfigType;
 pub use self::{
     default::{parse_default, DefaultAttribute},
     depends_on::parse_depends_on,
-    enable::{parse_enable, Enable},
     expression::Expression,
     help::parse_help,
     imply::{parse_imply, Imply},
     modules::parse_modules,
     option::{parse_option, OptionValues},
-    prompt::{parse_prompt, parse_prompt_option, Prompt},
+    prompt::{parse_prompt, Prompt},
     range::{parse_range, Range},
-    requires::{parse_requires, Requires},
+    requires::parse_requires,
     select::{parse_select, Select},
-    visible::{parse_visible, Visible},
+    visible::parse_visible,
 };
 
 pub use self::expression::{
@@ -48,6 +47,7 @@ pub use self::expression::{
 };
 pub use self::function::{parse_function_call, ExpressionToken, FunctionCall, Parameter};
 pub use self::optional::parse_optional;
+pub use self::prompt::parse_prompt_value;
 
 /// Official documentation regarding the different attributes: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes)
 #[derive(Debug, Clone, PartialEq)]
@@ -62,11 +62,10 @@ pub enum Attribute {
     DependsOn(Expression),
     Optional,
     Range(Range),
-    Visible(Visible),
+    Visible(Option<Expression>),
     Default(DefaultAttribute),
-    Enable(Enable),
     Imply(Imply),
-    Requires(Requires),
+    Requires(Expression),
     Type(ConfigType),
     Option(OptionValues),
 }
@@ -88,16 +87,39 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_imply), Attribute::Imply),
         map(ws(parse_visible), Attribute::Visible),
         map(ws(parse_option), Attribute::Option),
-        map(ws(parse_enable), Attribute::Enable),
     ))(input)
+}
+
+#[cfg(feature = "display")]
+use std::fmt::Display;
+#[cfg(feature = "display")]
+impl Display for Attribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Attribute::Help(s) => write!(f, "help\n  {}", s),
+            Attribute::Prompt(p) => write!(f, "prompt {p}"),
+            Attribute::Modules => write!(f, "modules"),
+            Attribute::Select(s) => write!(f, "select {s}"),
+            Attribute::DependsOn(d) => write!(f, "depends on {d}"),
+            Attribute::Optional => write!(f, "optional"),
+            Attribute::Range(r) => write!(f, "range {r}"),
+            Attribute::Visible(v) => match v {
+                Some(e) => write!(f, "visible if {e}"),
+                None => write!(f, "visible"),
+            },
+            Attribute::Default(d) => write!(f, "default {d}"),
+            Attribute::Imply(i) => write!(f, "imply {i}"),
+            Attribute::Requires(r) => write!(f, "requires {r}"),
+            Attribute::Type(t) => write!(f, "{t}"),
+            Attribute::Option(o) => write!(f, "option {o}"),
+        }
+    }
 }
 
 #[cfg(test)]
 mod default_test;
 #[cfg(test)]
 mod depends_on_test;
-#[cfg(test)]
-mod enable_test;
 #[cfg(test)]
 mod expression_test;
 #[cfg(test)]

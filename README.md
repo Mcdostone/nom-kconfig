@@ -40,19 +40,21 @@ config EFI
 - `EFI` [depends on](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-attributes) the config `MMU`.
 - Its default value is `y`.
 - If `EFI` is equals to `true` then it enables `EFI_STUB`.
-- the `help` attribute defines a help text for the end user.
+- The `help` attribute defines a help text for the end user.
 
 There are plenty of other keywords in the Kconfig language, check out [the official documentation](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html) for more details.
 
 **Features**
 
- - This a syntaxic parser.
+ - This is a parser.
  - There is no semantic analysis in this library.
  - This library only supports UTF-8 encoded files.
  - List of supported entris can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/entry/enum.Entry.html).
  - List of supported attributes can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/attribute/enum.Attribute.html).
- - This parser has been tested on the linux kernel repository from 2.6.11 to the latest.
  - When [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries) is met, it reads and parses the specified configuration file.
+ - This library uses `clone()` a lot. Do not expect amazing performances.
+ - This parser has been tested on the linux kernel repository from [2.6.11](https://cdn.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.xz) to [6.4.9](https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz) (3733 versions).
+ 
 
 ## Getting started
 

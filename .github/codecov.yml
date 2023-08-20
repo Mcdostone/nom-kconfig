@@ -1,0 +1,12 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 100%
+        threshold: 0%
+        base: auto
+        branches: 
+          - main
+        if_ci_failed: error
+        informational: false
+        only_pulls: false

@@ -1,8 +1,13 @@
-name: Build
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -15,13 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
-            override: true
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
+          toolchain: stable
+          profile: default
+          override: true
+      - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: check
@@ -33,12 +37,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
-            override: true
-            components: clippy
+          toolchain: stable
+          profile: default
+          override: true
+      - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
@@ -50,12 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
-            override: true
-            components: rustfmt
+          toolchain: stable
+          profile: default
+          override: true
+      - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -67,11 +71,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
-            override: true
+          toolchain: stable
+          profile: default
+          override: true
+      - uses: Swatinem/rust-cache@v2
       - name: Install cargo-tarpaulin
         uses: actions-rs/cargo@v1
         with:
@@ -93,12 +98,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install -y curl
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
-            override: true
-      - name: Build
-        env:
-          RUSTDOCFLAGS: -D warnings
+          toolchain: stable
+          profile: default
+          override: true
+      - uses: Swatinem/rust-cache@v2
+      - name: Build documentation
         run: cargo doc --no-deps --document-private-items --verbose

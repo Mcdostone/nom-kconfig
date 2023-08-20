@@ -1,8 +1,16 @@
-use nom::{branch::alt, bytes::complete::tag, combinator::map, sequence::tuple, IResult};
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    combinator::map,
+    sequence::{pair, preceded, tuple},
+    IResult,
+};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
+#[cfg(feature = "display")]
+use std::fmt::Display;
 
 use crate::{
     symbol::{parse_symbol, Symbol},
@@ -12,14 +20,14 @@ use crate::{
 
 use super::expression::{parse_if_attribute, parse_number, Expression};
 
-/// This allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
+/// This attribute allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Range {
-    pub lhs: Symbol,
-    pub rhs: Symbol,
+    pub lower_bound: Symbol,
+    pub upper_bound: Symbol,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
         serde(skip_serializing_if = "Option::is_none")
@@ -27,8 +35,17 @@ pub struct Range {
     pub r#if: Option<Expression>,
 }
 
-fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
-    // TODO semantic controls: lhs < rhs
+#[cfg(feature = "display")]
+impl Display for Range {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, "{} {} if {}", self.lower_bound, self.upper_bound, i),
+            None => write!(f, "{} {}", self.lower_bound, self.upper_bound),
+        }
+    }
+}
+
+fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
     alt((
         map(tuple((ws(parse_number), ws(parse_number))), |(l, r)| {
             (
@@ -40,7 +57,7 @@ fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
     ))(input)
 }
 
-/// Parses a `range` attribute.
+/// Parses the `range` attribute.
 /// # Example
 /// ```
 /// use nom_kconfig::{
@@ -55,8 +72,8 @@ fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
 ///     Ok((
 ///         "",
 ///         Range {
-///             lhs: Symbol::Constant("1".to_string()),
-///             rhs: Symbol::Constant("5".to_string()),
+///             lower_bound: Symbol::Constant("1".to_string()),
+///             upper_bound: Symbol::Constant("5".to_string()),
 ///             r#if: None
 ///         }
 ///     ))
@@ -64,10 +81,10 @@ fn parse_hs(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
 /// ```
 pub fn parse_range(input: KconfigInput) -> IResult<KconfigInput, Range> {
     map(
-        tuple((ws(tag("range")), ws(parse_hs), parse_if_attribute)),
-        |(_, (l, r), i)| Range {
-            lhs: l,
-            rhs: r,
+        preceded(ws(tag("range")), pair(ws(parse_bounds), parse_if_attribute)),
+        |((l, r), i)| Range {
+            lower_bound: l,
+            upper_bound: r,
             r#if: i,
         },
     )(input)

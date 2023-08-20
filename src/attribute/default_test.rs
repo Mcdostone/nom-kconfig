@@ -57,3 +57,26 @@ fn test_parse_default_ambigus() {
         ))
     )
 }
+
+#[test]
+fn test_default_attribute_to_string() {
+    assert_eq!(
+        DefaultAttribute {
+            expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64)))),
+            r#if: None
+        }
+        .to_string(),
+        "64"
+    );
+
+    assert_eq!(
+        DefaultAttribute {
+            expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64)))),
+            r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
+                Atom::Symbol(Symbol::Constant("NET".to_string()))
+            ))))
+        }
+        .to_string(),
+        "64 if NET"
+    )
+}

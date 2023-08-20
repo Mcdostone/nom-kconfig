@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: new version to release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      - name: Install cargo-release
+        run: cargo install cargo-release
+      - name: Configure git
+        run: |
+          git config --global user.name "Boat"
+          git config --global user.email "boat@users.noreply.github.com"
+      - name: Release new version
+        run: cargo-release release -v "${{ github.event.inputs.version }}" --no-publish --no-confirm --execute
+        

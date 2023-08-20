@@ -5,7 +5,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::{
-    attribute::{depends_on::parse_depends_on, prompt::parse_prompt_option, Attribute},
+    attribute::{depends_on::parse_depends_on, prompt::parse_prompt_value, Attribute},
     util::ws,
     KconfigInput,
 };
@@ -24,7 +24,7 @@ pub fn parse_comment(input: KconfigInput) -> IResult<KconfigInput, Comment> {
     map(
         tuple((
             ws(tag("comment")),
-            ws(parse_prompt_option),
+            ws(parse_prompt_value),
             many0(ws(parse_depends_on)),
         )),
         |(_, prompt, dependencies)| Comment {

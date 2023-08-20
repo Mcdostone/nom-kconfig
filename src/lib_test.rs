@@ -3,6 +3,7 @@ use crate::{
     attribute::{
         expression::{AndExpression, Atom, Expression, Term},
         r#type::{ConfigType, Type},
+        DefaultAttribute,
     },
     entry::{config::Config, r#if::If, MenuConfig},
     kconfig::parse_kconfig,
@@ -93,6 +94,47 @@ fn test_parse_config_without_attribute() {
                         symbol: "PPC_86xx".to_string(),
                         attributes: vec!(Attribute::Type(ConfigType {
                             r#type: Type::Bool(Some("86xx-based boards".to_string())),
+                            r#if: None
+                        }))
+                    }),
+                )
+            },
+        ))
+    )
+}
+
+// 4.18/arch/Kconfig
+#[test]
+fn test_parse_config_string_with_double_quotes() {
+    assert_parsing_eq!(
+        parse_kconfig,
+        r#"
+        config PLUGIN_HOSTCC
+	string
+	default "$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"
+
+menuconfig GCC_PLUGINS
+	bool "GCC plugins"
+"#,
+        Ok((
+            "",
+            Kconfig {
+                file: "".to_string(),
+                entries: vec!(
+                    Entry::Config(Config {
+                        symbol: "PLUGIN_HOSTCC".to_string(),
+                        attributes: vec!(
+                            Attribute::Type(ConfigType {
+                                r#type: Type::String(None),
+                                r#if: None
+                            }),
+                            Attribute::Default(DefaultAttribute { expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string())))), r#if: None })
+                        )
+                    }),
+                    Entry::MenuConfig(MenuConfig {
+                        symbol: "GCC_PLUGINS".to_string(),
+                        attributes: vec!(Attribute::Type(ConfigType {
+                            r#type: Type::Bool(Some("GCC plugins".to_string())),
                             r#if: None
                         }))
                     }),

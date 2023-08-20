@@ -12,7 +12,7 @@ use crate::{
 
 use super::{expression::Expression, parse_if_attribute};
 
-/// Imply` is similar "select" as it enforces a lower limit on another symbol except that the "implied" symbol's value may still be set to n from a direct dependency or with a visible prompt.
+/// Imply` is similar to "select" as it enforces a lower limit on another symbol except that the "implied" symbol's value may still be set to n from a direct dependency or with a visible prompt.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
@@ -24,6 +24,18 @@ pub struct Imply {
         serde(skip_serializing_if = "Option::is_none")
     )]
     pub r#if: Option<Expression>,
+}
+
+#[cfg(feature = "display")]
+use std::fmt::Display;
+#[cfg(feature = "display")]
+impl Display for Imply {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.r#if {
+            Some(i) => write!(f, "{} if {}", self.symbol, i),
+            None => write!(f, "{}", self.symbol),
+        }
+    }
 }
 
 /// This parses a `imply` attribute.
