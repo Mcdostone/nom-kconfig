@@ -1,0 +1,30 @@
+name: Security
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  dependencies:
+   runs-on: ubuntu-latest
+   steps:
+      - uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      - name: Install cargo-outdated
+        run: cargo install cargo-outdated
+      - name: Check for outdated dependencies
+        run: cargo outdated --exit-code 1
+
+  audit:
+   runs-on: ubuntu-latest
+   steps:
+      - uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      - name: Install cargo-outdated
+        run: cargo install cargo-audit
+      - name: Audit dependencies
+        run: cargo audit
