@@ -1,15 +1,21 @@
+<<<<<<< HEAD
 name: Benchmark
 
+=======
+>>>>>>> 9df32bf (ci: github workflow for benchmark)
 on:
   pull_request:
     branches: 
       - main
 
+<<<<<<< HEAD
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"
 
+=======
+>>>>>>> 9df32bf (ci: github workflow for benchmark)
 jobs:
   benchmark:
     name: Benchmark
