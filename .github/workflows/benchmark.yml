@@ -1,0 +1,24 @@
+on:
+  pull_request:
+    branches: 
+      - main
+
+jobs:
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: default
+          override: true
+      - uses: Swatinem/rust-cache@v2
+      - uses: boa-dev/criterion-compare-action@v3
+        with:
+          benchName: my_benchmark
+          branchName: main
+          token: ${{ secrets.GITHUB_TOKEN }}

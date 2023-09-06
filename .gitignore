@@ -10,3 +10,4 @@ tarpaulin-report.html
 cobertura.xml
 fuzzing/out
 fuzzing/in
+**/*.DS_Store
