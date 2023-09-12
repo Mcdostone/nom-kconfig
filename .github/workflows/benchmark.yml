@@ -1,32 +1,15 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 name: Benchmark
 
-=======
->>>>>>> 9df32bf (ci: github workflow for benchmark)
-=======
-name: Benchmark
-
->>>>>>> aafde45 (refactor: Update dependencies, github workflow for benchmark)
 on:
   pull_request:
     branches: 
       - main
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> aafde45 (refactor: Update dependencies, github workflow for benchmark)
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"
 
-<<<<<<< HEAD
-=======
->>>>>>> 9df32bf (ci: github workflow for benchmark)
-=======
->>>>>>> aafde45 (refactor: Update dependencies, github workflow for benchmark)
 jobs:
   benchmark:
     name: Benchmark
