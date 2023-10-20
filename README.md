@@ -7,20 +7,13 @@
   />
   <h1>A Kconfig parser written in rust.</h1>
 </div>
-<p align="center">
-  <a href="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml">
-    <img src="https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml/badge.svg" alt="Build status"/>
-  </a>
-<a href="https://codecov.io/gh/Mcdostone/nom-kconfig" > 
- <img src="https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C" alt="code coverage"/> 
- </a>
- <a href="https://github.com/rust-bakery/nom#rust-version-requirements-msrv" > 
-   <img src="https://img.shields.io/badge/MSRV-1.56.0+-lightgray.svg?logo=rust" alt="Minimum supported rust version: 1.56.0 or plus"/> 
- </a>
- <a href="https://crates.io/crates/nom-kconfig" > 
-   <img src="https://img.shields.io/crates/v/nom-kconfig.svg?logo=crate" alt="crates.io Version"/> 
- </a>
-</p>
+
+[![Build status](https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml/badge.svg)](https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml)
+[![Code coverage](https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C)](https://codecov.io/gh/Mcdostone/nom-kconfig)
+[![Minimum supported rust version: 1.56.0 or plus](https://img.shields.io/badge/MSRV-1.56.0+-lightgray.svg?logo=rust)](https://github.com/rust-bakery/nom#rust-version-requirements-msrv)
+[![crates.io Version](https://img.shields.io/crates/v/nom-kconfig.svg?logo=crate)](https://crates.io/crates/nom-kconfig)
+
+
 
 Kconfig is a language that describes configuration options for the linux Kernel. The syntax looks like this:
 ```bash
@@ -46,8 +39,7 @@ There are plenty of other keywords in the Kconfig language, check out [the offic
 
 **Features**
 
- - This is a parser.
- - There is no semantic analysis in this library.
+ - This is a parser, there is no semantic analysis in this library.
  - This library only supports UTF-8 encoded files.
  - List of supported entris can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/entry/enum.Entry.html).
  - List of supported attributes can be found [here](https://docs.rs/nom-kconfig/latest/nom_kconfig/attribute/enum.Attribute.html).
