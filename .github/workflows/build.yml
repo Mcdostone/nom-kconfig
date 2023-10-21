@@ -13,6 +13,8 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"
+  MINIMUM_SUPPORTED_RUST_VERSION: 1.65.0
+
 
 jobs:
   check:
@@ -26,6 +28,45 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Run cargo check
         run: cargo check --all-features --locked --release --all
+
+  build:
+    name: Build
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - nightly
+          - 1.65.0
+        features:
+          - ''
+        include:
+          - rust: stable
+            features: '--all-features'
+          - rust: stable
+            features: '--no-default-features'
+          - rust: stable
+            features: '--features "display"'
+          - rust: stable
+            features: '--features "hash"'
+          - rust: stable
+            features: '--features "serialize"'
+          - rust: stable
+            features: '--features "deserialize"'
+          - rust: nightly
+            features: '--all-features'
+          - rust: nightly
+            features: '--no-default-features'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Run cargo build
+        run: cargo build ${{ matrix.features }}
 
   clippy:
     needs: check

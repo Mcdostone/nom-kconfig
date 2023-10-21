@@ -18,8 +18,7 @@ jobs:
    runs-on: ubuntu-latest
    steps:
       - uses: actions/checkout@v4
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - name: Install cargo-outdated
         run: cargo install cargo-outdated
       - name: Check for outdated dependencies
@@ -29,8 +28,7 @@ jobs:
    runs-on: ubuntu-latest
    steps:
       - uses: actions/checkout@v4
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
       - name: Install cargo-outdated
         run: cargo install cargo-audit
       - name: Audit dependencies
