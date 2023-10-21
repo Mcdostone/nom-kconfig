@@ -106,6 +106,7 @@ impl Display for Type {
     }
 }
 
+#[cfg(feature = "display")]
 fn fmt_type(
     f: &mut std::fmt::Formatter,
     keyword: &str,
