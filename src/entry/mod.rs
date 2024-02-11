@@ -42,17 +42,18 @@ pub mod variable;
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum Entry {
-    Config(Config),
-    Choice(Choice),
-    MenuConfig(MenuConfig),
-    Menu(Menu),
-    Comment(Comment),
-    Source(Source),
+pub enum Entry<'a> {
+    Config(Config<'a>),
+    Choice(Choice<'a>),
+    MenuConfig(MenuConfig<'a>),
+    Menu(Menu<'a>),
+    Comment(Comment<'a>),
+    Source(Source<'a>),
     VariableAssignment(VariableAssignment),
     FunctionCall(FunctionCall),
     Function(Function),
-    If(If),
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    If(If<'a>),
     MainMenu(MainMenu),
 }
 

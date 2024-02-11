@@ -15,17 +15,17 @@ use super::expression::{parse_if_attribute, Expression};
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Select {
+pub struct Select<'a> {
     pub symbol: String,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
-        serde(skip_serializing_if = "Option::is_none")
+        serde(skip_serializing_if = "Option::is_none", borrow)
     )]
-    pub r#if: Option<Expression>,
+    pub r#if: Option<Expression<'a>>,
 }
 
 #[cfg(feature = "display")]
-impl Display for Select {
+impl Display for Select<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.r#if {
             Some(i) => write!(f, "{} if {}", self.symbol, i),

@@ -54,19 +54,20 @@ pub use self::prompt::parse_prompt_value;
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum Attribute {
+pub enum Attribute<'a> {
     Help(String),
-    Prompt(Prompt),
+    #[cfg_attr(feature = "deserialize", serde(borrow))]
+    Prompt(Prompt<'a>),
     Modules,
-    Select(Select),
-    DependsOn(Expression),
+    Select(Select<'a>),
+    DependsOn(Expression<'a>),
     Optional,
-    Range(Range),
-    Visible(Option<Expression>),
-    Default(DefaultAttribute),
-    Imply(Imply),
-    Requires(Expression),
-    Type(ConfigType),
+    Range(Range<'a>),
+    Visible(Option<Expression<'a>>),
+    Default(DefaultAttribute<'a>),
+    Imply(Imply<'a>),
+    Requires(Expression<'a>),
+    Type(ConfigType<'a>),
     Option(OptionValues),
 }
 
@@ -93,7 +94,7 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
 #[cfg(feature = "display")]
 use std::fmt::Display;
 #[cfg(feature = "display")]
-impl Display for Attribute {
+impl Display for Attribute<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Attribute::Help(s) => write!(f, "help\n  {}", s),

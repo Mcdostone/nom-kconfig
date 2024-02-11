@@ -10,7 +10,8 @@
 //! fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let kconfig_file = KconfigFile::new(
 //!         PathBuf::from("/tmp/linux-6.4.9"),
-//!         PathBuf::from("/tmp/linux-6.4.9/Kconfig")
+//!         PathBuf::from("/tmp/linux-6.4.9/Kconfig"),
+//!         "config 64BIT bool".to_string()
 //!     );
 //!     let input = kconfig_file.read_to_string().unwrap();
 //!     let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
@@ -46,11 +47,12 @@ pub struct KconfigFile {
     root_dir: PathBuf,
     /// The path the the Kconfig you want to parse.
     file: PathBuf,
+    pub content: String,
 }
 
 impl KconfigFile {
-    pub fn new(root_dir: PathBuf, file: PathBuf) -> Self {
-        Self { root_dir, file }
+    pub fn new(root_dir: PathBuf, file: PathBuf, content: String) -> Self {
+        Self { root_dir, file, content }
     }
 
     pub fn full_path(&self) -> PathBuf {

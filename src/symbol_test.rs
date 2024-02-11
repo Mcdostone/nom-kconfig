@@ -9,15 +9,15 @@ fn test_parse_symbol() {
     assert_parsing_eq!(
         parse_symbol,
         input,
-        Ok(("", Symbol::NonConstant("\"hello\"".to_string())))
+        Ok(("", Symbol::NonConstant("\"hello\"")))
     )
 }
 
 #[test]
 fn test_symbol_to_string() {
-    assert_eq!(Symbol::Constant("KVM".to_string()).to_string(), "KVM");
+    assert_eq!(Symbol::Constant("KVM").to_string(), "KVM");
     assert_eq!(
-        Symbol::NonConstant("KVM".to_string()).to_string(),
+        Symbol::NonConstant("KVM").to_string(),
         r#""KVM""#
     );
 }

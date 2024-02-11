@@ -61,36 +61,37 @@ impl Display for CompareOperator {
 }
 
 // https://stackoverflow.com/questions/9509048/antlr-parser-for-and-or-logic-how-to-get-expressions-between-logic-operators
-pub type Expression = OrExpression;
+pub type Expression<'a> = OrExpression<'a>;
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 #[derive(Debug, PartialEq, Clone)]
-pub enum AndExpression {
-    #[cfg_attr(feature = "serialize", serde(rename = "AndTerm"))]
-    Term(Term),
+pub enum AndExpression<'a> {
+    #[cfg_attr(feature = "serialize", serde(rename = "AndTerm", borrow))]
+    Term(Term<'a>),
     #[cfg_attr(feature = "serialize", serde(rename = "And"))]
-    Expression(Vec<Term>),
+    Expression(Vec<Term<'a>>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum OrExpression {
-    #[cfg_attr(feature = "serialize", serde(rename = "OrTerm"))]
-    Term(AndExpression),
-    #[cfg_attr(feature = "serialize", serde(rename = "Or"))]
-    Expression(Vec<AndExpression>),
+pub enum OrExpression<'a> {
+    #[cfg_attr(feature = "serialize", serde(rename = "OrTerm", borrow))]
+    Term(AndExpression<'a>),
+    #[cfg_attr(feature = "serialize", serde(rename = "Or", borrow))]
+    Expression(Vec<AndExpression<'a>>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum Term {
-    Not(Atom),
-    Atom(Atom),
+pub enum Term<'a> {
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    Not(Atom<'a>),
+    Atom(Atom<'a>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -98,14 +99,15 @@ pub enum Term {
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 #[cfg_attr(feature = "serialize", serde(rename = "Compare"))]
-pub struct CompareExpression {
-    pub left: Symbol,
+pub struct CompareExpression<'a> {
+    pub left: Symbol<'a>,
     pub operator: CompareOperator,
-    pub right: Symbol,
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    pub right: Symbol<'a>,
 }
 
 #[cfg(feature = "display")]
-impl Display for CompareExpression {
+impl Display for CompareExpression<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{} {} {}", self.left, self.operator, self.right)
     }
@@ -115,17 +117,18 @@ impl Display for CompareExpression {
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum Atom {
-    Symbol(Symbol),
+pub enum Atom<'a> {
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    Symbol(Symbol<'a>),
     Number(i64),
-    Compare(CompareExpression),
+    Compare(CompareExpression<'a>),
     Function(FunctionCall),
-    Parenthesis(Box<Expression>),
+    Parenthesis(Box<Expression<'a>>),
     String(String),
 }
 
 #[cfg(feature = "display")]
-impl Display for AndExpression {
+impl Display for AndExpression<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Term(t) => write!(f, "{}", t),
@@ -142,7 +145,7 @@ impl Display for AndExpression {
 }
 
 #[cfg(feature = "display")]
-impl Display for OrExpression {
+impl Display for OrExpression<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Term(t) => write!(f, "{}", t),
@@ -159,7 +162,7 @@ impl Display for OrExpression {
 }
 
 #[cfg(feature = "display")]
-impl Display for Term {
+impl Display for Term<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Term::Not(atom) => write!(f, "!{}", atom),
@@ -169,7 +172,7 @@ impl Display for Term {
 }
 
 #[cfg(feature = "display")]
-impl Display for Atom {
+impl Display for Atom<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Atom::Symbol(s) => write!(f, "{}", s),
@@ -315,7 +318,7 @@ pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
 pub fn parse_number_or_symbol(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     let (input, sym) = parse_symbol(input)?;
     match sym.clone() {
-        Symbol::Constant(s) => match string_to_number(s.as_str()) {
+        Symbol::Constant(s) => match string_to_number(s) {
             Ok((_, i)) => Ok((input, Atom::Number(i))),
             Err(_) => Ok((input, Atom::Symbol(sym))),
         },
@@ -337,9 +340,18 @@ pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Express
     map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e)(input)
 }
 
-pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
+pub fn parse_number<'a>(input: KconfigInput) -> IResult<KconfigInput, i64> {
     map_res(
         recognize(pair(opt(char('-')), digit1)),
         |d: KconfigInput| FromStr::from_str(d.fragment()),
+    )(input)
+}
+
+
+
+pub fn parse_number_as_str<'a>(input: KconfigInput) -> IResult<KconfigInput, &str> {
+    map(
+        recognize(pair(opt(char('-')), digit1)),
+        |lol: KconfigInput| *lol.fragment(),
     )(input)
 }

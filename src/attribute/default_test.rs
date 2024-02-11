@@ -13,7 +13,7 @@ fn test_parse_default() {
             "",
             DefaultAttribute {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("0x1".to_string())
+                    Symbol::Constant("0x1")
                 )))),
                 r#if: None
             }
@@ -31,7 +31,7 @@ fn test_parse_default_constant_symbol_with_numbers() {
             "",
             DefaultAttribute {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("7.10.d".to_string())
+                    Symbol::Constant("7.10.d")
                 )))),
                 r#if: None
             }
@@ -51,7 +51,7 @@ fn test_parse_default_ambigus() {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string())
                     ))),
                 r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("CC_IS_GCC".to_string()))
+                    Atom::Symbol(Symbol::Constant("CC_IS_GCC"))
                 ))))
             }
         ))
@@ -73,7 +73,7 @@ fn test_default_attribute_to_string() {
         DefaultAttribute {
             expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64)))),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("NET".to_string()))
+                Atom::Symbol(Symbol::Constant("NET"))
             ))))
         }
         .to_string(),

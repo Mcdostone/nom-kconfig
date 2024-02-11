@@ -21,7 +21,7 @@ fn test_parse_menuconfig() {
                 symbol: "VIRTUALIZATION".to_string(),
                 attributes: vec!(Attribute::Type(ConfigType {
                     r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
-                        Atom::Symbol(Symbol::Constant("y".to_string()))
+                        Atom::Symbol(Symbol::Constant("y"))
                     )))),
                     r#if: None,
                 }))

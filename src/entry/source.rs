@@ -11,6 +11,10 @@ use nom::{
     IResult,
 };
 use regex::Regex;
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     kconfig::{parse_kconfig, Kconfig},
@@ -34,32 +38,60 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
         delimited(tag("\""), parse_filepath, tag("\"")),
         parse_filepath,
     )))(input)?;
-    let source_kconfig_file = KconfigFile::new(input.clone().extra.root_dir, PathBuf::from(file));
+
+    let source_kconfig_file = KconfigFile::new(
+        input.clone().extra.root_dir,
+        PathBuf::from(file),
+        "".to_string(),
+    );
     if is_dynamic_source(file) {
         return Ok((
             input,
             Source {
-                file: file.to_string(),
-                ..Default::default()
+                content: "".to_string().into(),
+                kconfig: Kconfig {
+                    file: file.to_string(),
+                    ..Default::default()
+                },
             },
         ));
     }
-    let source_content = source_kconfig_file
+    let content = Box::new(source_kconfig_file
         .read_to_string()
-        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?);
 
-    let binding = source_content.clone();
-    #[allow(clippy::let_and_return)]
-    let x = match cut(parse_kconfig)(KconfigInput::new_extra(
-        &binding,
+    let mut source = Source {
+        content: content,
+        kconfig: Kconfig {
+            file: file.to_string(),
+            entries: vec![],
+        },
+    };
+
+    let content = source.content;
+    let k = KconfigInput::new_extra(
+        &content,
         source_kconfig_file.clone(),
-    )) {
-        Ok((_, kconfig)) => Ok((input, kconfig)),
+    );
+
+    let x = match cut(parse_kconfig)(k) {
+        Ok((_, kconfig)) => {
+            source.content = "".to_string().into();
+            source.kconfig = kconfig;
+            return Ok(("".into(), Source {
+                content: "".to_string().into(),
+                kconfig: Kconfig {
+                    file: file.to_string(),
+                    entries: vec![],
+                },
+            }))
+        },
         Err(_e) => Err(nom::Err::Error(nom::error::Error::new(
             KconfigInput::new_extra("", source_kconfig_file),
             ErrorKind::Fail,
         ))),
     };
+
     x
 }
 
@@ -69,4 +101,13 @@ fn is_dynamic_source(file: &str) -> bool {
 }
 
 /// Entry that reads the specified configuration file. This file is always parsed.
-pub type Source = Kconfig;
+/// #[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[derive(PartialEq, Clone, Debug)]
+pub struct Source<'a> {
+    pub content: Box<String>,
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    pub kconfig: Kconfig<'a>,
+}

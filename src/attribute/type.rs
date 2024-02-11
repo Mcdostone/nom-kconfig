@@ -57,9 +57,13 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     any(feature = "serialize", feature = "deserialize"),
     serde(rename_all = "lowercase")
 )]
-pub enum Type {
-    DefBool(Expression),
-    DefTristate(Expression),
+pub enum Type<'a> {
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(borrow)
+    )]
+    DefBool(Expression<'a>),
+    DefTristate(Expression<'a>),
     Bool(Option<String>),
     Tristate(Option<String>),
     String(Option<String>),
@@ -72,17 +76,17 @@ pub enum Type {
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct ConfigType {
-    pub r#type: Type,
+pub struct ConfigType<'a> {
+    pub r#type: Type<'a>,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
-        serde(skip_serializing_if = "Option::is_none")
+        serde(skip_serializing_if = "Option::is_none", borrow)
     )]
-    pub r#if: Option<Expression>,
+    pub r#if: Option<Expression<'a>>,
 }
 
 #[cfg(feature = "display")]
-impl Display for ConfigType {
+impl Display for ConfigType<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.r#if {
             Some(i) => write!(f, "{} if {}", self.r#type, i),
@@ -92,7 +96,7 @@ impl Display for ConfigType {
 }
 
 #[cfg(feature = "display")]
-impl Display for Type {
+impl Display for Type<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Type::Bool(prompt) => fmt_type(f, "bool", prompt),

@@ -12,7 +12,7 @@ fn test_parse_imply() {
         Ok((
             "",
             Imply {
-                symbol: Symbol::Constant("PCI".to_string()),
+                symbol: Symbol::Constant("PCI"),
                 r#if: None
             }
         ))
@@ -23,7 +23,7 @@ fn test_parse_imply() {
 fn test_imply_to_string() {
     assert_eq!(
         Imply {
-            symbol: Symbol::Constant("PCI".to_string()),
+            symbol: Symbol::Constant("PCI"),
             r#if: None
         }
         .to_string(),
@@ -31,9 +31,9 @@ fn test_imply_to_string() {
     );
     assert_eq!(
         Imply {
-            symbol: Symbol::Constant("PCI".to_string()),
+            symbol: Symbol::Constant("PCI"),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("64BITS".to_string()))
+                Atom::Symbol(Symbol::Constant("64BITS"))
             ))))
         }
         .to_string(),

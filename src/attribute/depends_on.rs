@@ -32,7 +32,7 @@ use super::{expression::parse_expression, Attribute};
 ///     Ok((
 ///         "",
 ///         Attribute::DependsOn(Expression::Term(AndExpression::Term(
-///             Term::Atom(Atom::Symbol(Symbol::Constant("PCI".to_string())))
+///             Term::Atom(Atom::Symbol(Symbol::Constant("PCI")))
 ///         )))
 ///     ))
 /// )

@@ -18,25 +18,25 @@ use crate::{
     KconfigInput,
 };
 
-use super::expression::{parse_if_attribute, parse_number, Expression};
+use super::expression::{parse_if_attribute, parse_number_as_str, Expression};
 
 /// This attribute allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Range {
-    pub lower_bound: Symbol,
-    pub upper_bound: Symbol,
+pub struct Range<'a> {
+    pub lower_bound: Symbol<'a>,
+    pub upper_bound: Symbol<'a>,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
-        serde(skip_serializing_if = "Option::is_none")
+        serde(skip_serializing_if = "Option::is_none", borrow)
     )]
-    pub r#if: Option<Expression>,
+    pub r#if: Option<Expression<'a>>,
 }
 
 #[cfg(feature = "display")]
-impl Display for Range {
+impl Display for Range<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.r#if {
             Some(i) => write!(f, "{} {} if {}", self.lower_bound, self.upper_bound, i),
@@ -47,10 +47,10 @@ impl Display for Range {
 
 fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
     alt((
-        map(tuple((ws(parse_number), ws(parse_number))), |(l, r)| {
+        map(tuple((ws(parse_number_as_str), ws(parse_number_as_str))), |(l, r)| {
             (
-                Symbol::Constant(l.to_string()),
-                Symbol::Constant(r.to_string()),
+                Symbol::Constant(l),
+                Symbol::Constant(r),
             )
         }),
         tuple((ws(parse_symbol), ws(parse_symbol))),
@@ -72,8 +72,8 @@ fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> 
 ///     Ok((
 ///         "",
 ///         Range {
-///             lower_bound: Symbol::Constant("1".to_string()),
-///             upper_bound: Symbol::Constant("5".to_string()),
+///             lower_bound: Symbol::Constant("1"),
+///             upper_bound: Symbol::Constant("5"),
 ///             r#if: None
 ///         }
 ///     ))

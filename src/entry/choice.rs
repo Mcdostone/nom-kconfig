@@ -28,9 +28,10 @@ use super::parse_entry;
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Choice {
-    pub options: Vec<Attribute>,
-    pub entries: Vec<Entry>,
+pub struct Choice<'a> {
+    pub options: Vec<Attribute<'a>>,
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    pub entries: Vec<Entry<'a>>,
 }
 
 fn parse_choice_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {

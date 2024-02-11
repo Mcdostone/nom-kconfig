@@ -18,9 +18,9 @@ fn test_parse_requires() {
             "",
             Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
                 CompareExpression {
-                    left: Symbol::Constant("MTK_INFRACFG".to_string()),
+                    left: Symbol::Constant("MTK_INFRACFG"),
                     operator: CompareOperator::Equal,
-                    right: Symbol::Constant("y".to_string())
+                    right: Symbol::Constant("y")
                 }
             ))))
         ))
@@ -32,7 +32,7 @@ fn test_parse_requires() {
         Ok((
             "",
             Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                Symbol::Constant("KVM".to_string())
+                Symbol::Constant("KVM")
             ))))
         ))
     )

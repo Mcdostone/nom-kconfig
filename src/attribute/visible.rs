@@ -4,7 +4,7 @@ use super::{parse_if_attribute, Expression};
 use crate::{util::ws, KconfigInput};
 use nom::{bytes::complete::tag, sequence::preceded, IResult};
 
-pub type Visible = Option<Expression>;
+pub type Visible<'a> = Option<Expression<'a>>;
 /// Parses a `visible` attribute.
 /// # Example
 /// ```

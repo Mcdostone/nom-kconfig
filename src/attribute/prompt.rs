@@ -21,19 +21,19 @@ use serde::Serialize;
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Prompt {
+pub struct Prompt<'a> {
     pub prompt: String,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
-        serde(skip_serializing_if = "Option::is_none")
+        serde(skip_serializing_if = "Option::is_none", borrow)
     )]
-    pub r#if: Option<Expression>,
+    pub r#if: Option<Expression<'a>>,
 }
 
 #[cfg(feature = "display")]
 use std::fmt::Display;
 #[cfg(feature = "display")]
-impl Display for Prompt {
+impl Display for Prompt<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.r#if {
             Some(i) => write!(f, r#""{}" if {}"#, self.prompt, i),

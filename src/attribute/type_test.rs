@@ -74,10 +74,10 @@ fn test_parse_type_backslash() {
                 )),
                 r#if: Some(Expression::Expression(vec!(
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "ARCH_WANTS_FREEZER_CONTROL".to_string()
+                        "ARCH_WANTS_FREEZER_CONTROL"
                     )))),
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "BROKEN".to_string()
+                        "BROKEN"
                     ))),)
                 )))
             },)
@@ -94,7 +94,7 @@ fn test_parse_def_bool() {
             " ",
             Attribute::Type(ConfigType {
                 r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Not(
-                    Atom::Symbol(Symbol::Constant("PCI".to_string()))
+                    Atom::Symbol(Symbol::Constant("PCI"))
                 )))),
                 r#if: None
             })
@@ -111,10 +111,10 @@ fn test_parse_type_if() {
             "",
             Attribute::Type(ConfigType {
                 r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Not(
-                    Atom::Symbol(Symbol::Constant("PCI".to_string()))
+                    Atom::Symbol(Symbol::Constant("PCI"))
                 )))),
                 r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("NET".to_string()))
+                    Atom::Symbol(Symbol::Constant("NET"))
                 ))))
             })
         ))
@@ -162,7 +162,7 @@ fn test_parse_def_tristate() {
             "",
             Attribute::Type(ConfigType {
                 r#type: Type::DefTristate(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("m".to_string()))
+                    Atom::Symbol(Symbol::Constant("m"))
                 )))),
                 r#if: None
             })
@@ -183,14 +183,14 @@ fn test_type_to_string() {
     assert_eq!(
         "def_bool y",
         Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
-            Atom::Symbol(Symbol::Constant("y".to_string()))
+            Atom::Symbol(Symbol::Constant("y"))
         ))))
         .to_string()
     );
     assert_eq!(
         "def_tristate m",
         Type::DefTristate(Expression::Term(AndExpression::Term(Term::Atom(
-            Atom::Symbol(Symbol::Constant("m".to_string()))
+            Atom::Symbol(Symbol::Constant("m"))
         ))))
         .to_string()
     );
@@ -226,7 +226,7 @@ fn test_config_type_tostring() {
         ConfigType {
             r#type: Type::Bool(None),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("NET".to_string()))
+                Atom::Symbol(Symbol::Constant("NET"))
             ))))
         }
         .to_string(),

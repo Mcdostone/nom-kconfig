@@ -62,7 +62,7 @@ endif"#;
                     }),
                     Entry::If(If {
                         condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                            Symbol::Constant("PCI".to_string())
+                            Symbol::Constant("PCI")
                         )))),
                         entries: vec!()
                     })

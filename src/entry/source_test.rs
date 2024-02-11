@@ -12,8 +12,11 @@ fn test_parse_source() {
         Ok((
             "",
             Source {
-                file: "empty".to_string(),
-                entries: vec![],
+                content: Box::new("".into()),
+                kconfig: Kconfig {
+                    file: "empty".to_string(),
+                    entries: vec![],
+                }
             },
         )),
     )
@@ -27,8 +30,12 @@ fn test_parse_source_no_quote() {
         Ok((
             "",
             Source {
-                file: "empty".to_string(),
-                entries: vec![],
+
+                content: Box::new("".into()),
+                kconfig: Kconfig {
+                    file: "empty".to_string(),
+                    entries: vec![],
+                }
             },
         )),
     )
@@ -60,7 +67,7 @@ fn test_parse_source_fail_to_parse() {
 
 fn assert_parsing_source_eq(
     input: &str,
-    expected: Result<(&str, Kconfig), nom::Err<nom::error::Error<KconfigInput>>>,
+    expected: Result<(&str, Source), nom::Err<nom::error::Error<KconfigInput>>>,
 ) {
     let res = parse_source(KconfigInput::new_extra(
         input,

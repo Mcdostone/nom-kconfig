@@ -26,9 +26,11 @@ endmenu
 "#;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let kconfig_file = KconfigFile::new(PathBuf::from("/"), PathBuf::from("Kconfig"));
+    let kconfig_file = KconfigFile::new(PathBuf::from("/"), PathBuf::from("Kconfig"), INPUT.to_string());
+
+    let content = kconfig_file.content.to_owned();
     let (_remaining, kconfig) =
-        parse_kconfig(KconfigInput::new_extra(INPUT, kconfig_file)).unwrap();
+        parse_kconfig(KconfigInput::new_extra(&content, kconfig_file)).unwrap();
     println!("File '{}' contains the following entries:", kconfig.file);
     kconfig.entries.into_iter().for_each(print_entry);
     Ok(())

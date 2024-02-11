@@ -23,9 +23,10 @@ use crate::{
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Config {
+pub struct Config<'a> {
     pub symbol: String,
-    pub attributes: Vec<Attribute>,
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    pub attributes: Vec<Attribute<'a>>,
 }
 
 #[macro_export]

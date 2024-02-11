@@ -14,12 +14,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .strip_prefix(&kernel_directory)
             .unwrap_or(current_kconfig);
 
-        let kconfig_file = KconfigFile::new(kernel_directory.to_path_buf(), filename.to_path_buf());
-        let input = kconfig_file.read_to_string()?;
-        match parse_kconfig(KconfigInput::new_extra(&input, kconfig_file)) {
-            Ok((_, kconfig)) => kconfigs.push(kconfig),
-            Err(e) => return Err(Box::new(e.map_input(|f| (f.to_string().clone(), f.extra)))),
-        }
+        let kconfig_file = KconfigFile::new(kernel_directory.to_path_buf(), filename.to_path_buf(), "".to_string());
+        let input: String = kconfig_file.read_to_string()?;
+        //match parse_kconfig(KconfigInput::new_extra(&input, kconfig_file)) {
+        //    Ok((_, kconfig)) => kconfigs.push(kconfig),
+        //    Err(e) => return Err(Box::new(e.map_input(|f| (f.to_string().clone(), f.extra)))),
+        //}
     }
 
     println!("{} Kconfig file have been read", kconfigs.len());

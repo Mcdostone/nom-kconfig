@@ -21,9 +21,10 @@ use crate::{
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Kconfig {
+pub struct Kconfig<'a> {
     pub file: String,
-    pub entries: Vec<Entry>,
+    #[cfg_attr(feature = "deserialize", serde(borrow))]
+    pub entries: Vec<Entry<'a>>,
 }
 
 /// Parses a kconfig input.
@@ -32,7 +33,7 @@ pub struct Kconfig {
 /// use std::path::PathBuf;
 /// use nom_kconfig::{KconfigInput, KconfigFile, Entry, kconfig::parse_kconfig, Kconfig};
 ///
-/// let kconfig_file = KconfigFile::new(PathBuf::from("path/to/root/dir"), PathBuf::from("Kconfig"));
+/// let kconfig_file = KconfigFile::new(PathBuf::from("path/to/root/dir"), PathBuf::from("Kconfig"), "".to_string());
 /// let content = "";
 /// let input = KconfigInput::new_extra(content, kconfig_file);
 /// assert_eq!(parse_kconfig(input).unwrap().1, Kconfig {file: "Kconfig".to_string(), entries: vec!() })

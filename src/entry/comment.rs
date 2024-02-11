@@ -15,9 +15,10 @@ use crate::{
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Comment {
+pub struct Comment<'a> {
     pub prompt: String,
-    pub dependencies: Vec<Attribute>,
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    pub dependencies: Vec<Attribute<'a>>,
 }
 
 pub fn parse_comment(input: KconfigInput) -> IResult<KconfigInput, Comment> {

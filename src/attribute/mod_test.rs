@@ -18,7 +18,7 @@ fn test_parse_attribute() {
             "",
             Attribute::Default(DefaultAttribute {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("m".to_string())
+                    Symbol::Constant("m")
                 )))),
                 r#if: None
             })
@@ -30,7 +30,7 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("KVM".to_string()))
+                Atom::Symbol(Symbol::Constant("KVM"))
             ))))
         ))
     );
@@ -56,7 +56,7 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Imply(Imply {
-                symbol: Symbol::Constant("KVM".to_string()),
+                symbol: Symbol::Constant("KVM"),
                 r#if: None
             })
         ))
@@ -84,8 +84,8 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Range(Range {
-                lower_bound: Symbol::Constant("0".to_string()),
-                upper_bound: Symbol::Constant("512".to_string()),
+                lower_bound: Symbol::Constant("0"),
+                upper_bound: Symbol::Constant("512"),
                 r#if: None
             })
         ))
@@ -97,9 +97,9 @@ fn test_parse_attribute() {
             "",
             Attribute::Requires(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Compare(CompareExpression {
-                    left: Symbol::Constant("MTK_INFRACFG".to_string()),
+                    left: Symbol::Constant("MTK_INFRACFG"),
                     operator: CompareOperator::Equal,
-                    right: Symbol::Constant("y".to_string())
+                    right: Symbol::Constant("y")
                 })
             ))))
         ))
@@ -151,7 +151,7 @@ fn test_parse_attributes() {
 #[test]
 fn test_attributes_to_string() {
     let expression = Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-        Symbol::Constant("KVM".to_string()),
+        Symbol::Constant("KVM"),
     ))));
     assert_eq!(
         Attribute::Help("help please".to_string()).to_string(),
@@ -186,8 +186,8 @@ fn test_attributes_to_string() {
     );
     assert_eq!(
         Attribute::Range(Range {
-            lower_bound: Symbol::Constant("0".to_string()),
-            upper_bound: Symbol::Constant("15".to_string()),
+            lower_bound: Symbol::Constant("0"),
+            upper_bound: Symbol::Constant("15"),
             r#if: None
         })
         .to_string(),
@@ -203,7 +203,7 @@ fn test_attributes_to_string() {
     );
     assert_eq!(
         Attribute::Imply(Imply {
-            symbol: Symbol::Constant("DEBUGGER".to_string()),
+            symbol: Symbol::Constant("DEBUGGER"),
             r#if: None
         })
         .to_string(),

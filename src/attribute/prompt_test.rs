@@ -46,7 +46,7 @@ fn test_prompt_to_string() {
         Prompt {
             prompt: "Support of KVM".to_string(),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("KVM".to_string()))
+                Atom::Symbol(Symbol::Constant("KVM"))
             ))))
         }
         .to_string(),

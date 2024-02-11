@@ -13,7 +13,7 @@ fn test_parse_depends_on() {
         Ok((
             "",
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("PCI".to_string()))
+                Atom::Symbol(Symbol::Constant("PCI"))
             ))))
         ))
     )
@@ -28,7 +28,7 @@ fn test_parse_depends_on_weird_tab() {
         Ok((
             "",
             Attribute::DependsOn(OrExpression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("LIVEPATCH".to_string()))
+                Atom::Symbol(Symbol::Constant("LIVEPATCH"))
             ))))
         ))
     )
@@ -46,19 +46,19 @@ fn test_parse_depends_on_backslash() {
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Parenthesis(Box::new(Expression::Expression(vec!(
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "ARCH_LUBBOCK".to_string()
+                        "ARCH_LUBBOCK"
                     )))),
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "MACH_MAINSTONE".to_string()
+                        "MACH_MAINSTONE"
                     )))),
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "PXA_SHARPSL".to_string()
+                        "PXA_SHARPSL"
                     )))),
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "MACH_ARMCORE".to_string()
+                        "MACH_ARMCORE"
                     )))),
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "ARCH_PXA_PALM".to_string()
+                        "ARCH_PXA_PALM"
                     )))),
                 ))))
             ))))

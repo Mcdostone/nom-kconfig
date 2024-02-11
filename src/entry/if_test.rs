@@ -1,13 +1,9 @@
 use crate::{
-    assert_parsing_eq,
-    attribute::{
+    assert_parsing_eq, attribute::{
         r#type::{ConfigType, Type},
         select::Select,
         AndExpression, Atom, Expression, Term,
-    },
-    entry::{parse_if, Config, If, Source},
-    symbol::Symbol,
-    Attribute, Entry,
+    }, entry::{parse_if, Config, If, Source}, symbol::Symbol, Attribute, Entry, Kconfig
 };
 
 #[test]
@@ -20,11 +16,14 @@ fn test_parse_if_entry() {
             "",
             If {
                 condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("NET_VENDOR_AMD".to_string())
+                    Symbol::Constant("NET_VENDOR_AMD")
                 )))),
                 entries: vec!(Entry::Source(Source {
-                    file: "$(VAR)/Kconfig".to_string(),
-                    ..Default::default()
+                    content: Box::new("".into()),
+                    kconfig: Kconfig {
+                        file: "$(VAR)/Kconfig".to_string(),
+                        ..Default::default()
+                    }
                 }))
             }
         ))
@@ -47,7 +46,7 @@ fn test_parse_if_entry_with_config() {
             "",
             If {
                 condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("VIRTUALIZATION".to_string())
+                    Symbol::Constant("VIRTUALIZATION")
                 )))),
                 entries: vec!(Entry::Config(Config {
                     symbol: "KVM".to_string(),

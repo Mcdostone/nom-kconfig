@@ -23,9 +23,10 @@ use super::{parse_entry, Entry};
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct If {
-    pub condition: Expression,
-    pub entries: Vec<Entry>,
+pub struct If<'a> {
+    #[cfg_attr(feature = "deserialize", serde(borrow))]
+    pub condition: Expression<'a>,
+    pub entries: Vec<Entry<'a>>,
 }
 /// it parses a if block.
 ///
@@ -44,7 +45,7 @@ pub struct If {
 ///         "",
 ///         If {
 ///             condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-///                 Symbol::Constant("NET_VENDOR_AMD".to_string())
+///                 Symbol::Constant("NET_VENDOR_AMD")
 ///             )))),
 ///             entries: vec!(Entry::Comment(Comment { prompt: "Support of PCI".to_string(), dependencies: vec!() }))
 ///         }

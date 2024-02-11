@@ -26,23 +26,23 @@ use super::util::ws;
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum Symbol {
-    Constant(String),
-    NonConstant(String),
+pub enum Symbol<'a> {
+    Constant(&'a str),
+    NonConstant(&'a str),
 }
 
 pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
     alt((
         map(parse_constant_symbol, |c: &str| {
-            Symbol::Constant(c.to_string())
+            Symbol::Constant(c)
         }),
         map(
-            delimited(ws(char('"')), take_until("\""), char('"')),
-            |c: KconfigInput| Symbol::NonConstant(format!("\"{}\"", c)),
+            recognize(delimited(ws(char('"')), take_until("\""), char('"'))),
+            |c: KconfigInput| Symbol::NonConstant(c.fragment()),
         ),
         map(
-            delimited(ws(char('\'')), take_until("'"), char('\'')),
-            |c: KconfigInput| Symbol::NonConstant(format!("'{}'", c)),
+            recognize(delimited(ws(char('\'')), take_until("'"), char('\''))),
+            |c: KconfigInput| Symbol::NonConstant(c.fragment()),
         ),
     ))(input)
 }
@@ -57,7 +57,7 @@ pub fn parse_constant_symbol(input: KconfigInput) -> IResult<KconfigInput, &str>
 #[cfg(feature = "display")]
 use std::fmt::Display;
 #[cfg(feature = "display")]
-impl Display for Symbol {
+impl Display for Symbol<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Symbol::Constant(c) => write!(f, "{}", c),

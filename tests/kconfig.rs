@@ -20,6 +20,7 @@ fn test_parse() {
     let kconfig_file: KconfigFile = KconfigFile::new(
         input_file.parent().unwrap().to_path_buf(),
         input_file.clone(),
+        "".to_string()
     );
 
     let content = kconfig_file.read_to_string().unwrap();
@@ -35,9 +36,9 @@ fn test_parse() {
                     r#if: None
                 }),
                 Attribute::DependsOn(Expression::Term(AndExpression::Expression(vec!(
-                    Term::Atom(Atom::Symbol(Symbol::Constant("HAVE_KVM".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::Constant("HIGH_RES_TIMERS".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::Constant("X86_LOCAL_APIC".to_string())))
+                    Term::Atom(Atom::Symbol(Symbol::Constant("HAVE_KVM"))),
+                    Term::Atom(Atom::Symbol(Symbol::Constant("HIGH_RES_TIMERS"))),
+                    Term::Atom(Atom::Symbol(Symbol::Constant("X86_LOCAL_APIC")))
                 )))),
                 Attribute::Select(Select { symbol: "PREEMPT_NOTIFIERS".to_string(), r#if: None }),
                 Attribute::Select(Select { symbol: "MMU_NOTIFIER".to_string(), r#if: None }),

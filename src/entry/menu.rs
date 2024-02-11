@@ -27,15 +27,16 @@ use super::{parse_entry, Entry};
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub struct Menu {
+pub struct Menu<'a> {
     pub prompt: String,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
         serde(skip_serializing_if = "Option::is_none")
     )]
-    pub visible: Option<Visible>,
-    pub depends_on: Vec<Expression>,
-    pub entries: Vec<Entry>,
+    #[cfg_attr(feature = "serialize", serde(borrow))]
+    pub visible: Option<Visible<'a>>,
+    pub depends_on: Vec<Expression<'a>>,
+    pub entries: Vec<Entry<'a>>,
 }
 
 fn parse_menu_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
