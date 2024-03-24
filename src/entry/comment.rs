@@ -16,7 +16,7 @@ use crate::{
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Comment<'a> {
-    pub prompt: String,
+    pub prompt: &'a str,
     #[cfg_attr(feature = "serialize", serde(borrow))]
     pub dependencies: Vec<Attribute<'a>>,
 }
@@ -29,7 +29,7 @@ pub fn parse_comment(input: KconfigInput) -> IResult<KconfigInput, Comment> {
             many0(ws(parse_depends_on)),
         )),
         |(_, prompt, dependencies)| Comment {
-            prompt: prompt.to_string(),
+            prompt,
             dependencies,
         },
     )(input)

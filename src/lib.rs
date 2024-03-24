@@ -41,18 +41,20 @@ pub type KconfigInput<'a> = LocatedSpan<&'a str, KconfigFile>;
 
 /// Represents a Kconfig file.
 /// It stores the kernel root directory because we need this information when a [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#kconfig-syntax) keyword is met.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Hash, PartialEq, Eq)]
 pub struct KconfigFile {
     /// The absolute path of the kernel root directory. This field is necessary to parse [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#kconfig-syntax) entry.
     root_dir: PathBuf,
     /// The path the the Kconfig you want to parse.
     file: PathBuf,
-    pub content: String,
 }
 
 impl KconfigFile {
-    pub fn new(root_dir: PathBuf, file: PathBuf, content: String) -> Self {
-        Self { root_dir, file, content }
+    pub fn new(root_dir: PathBuf, file: PathBuf) -> Self {
+        Self {
+            root_dir,
+            file
+        }
     }
 
     pub fn full_path(&self) -> PathBuf {

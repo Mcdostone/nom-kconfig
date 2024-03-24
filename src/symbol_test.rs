@@ -16,8 +16,5 @@ fn test_parse_symbol() {
 #[test]
 fn test_symbol_to_string() {
     assert_eq!(Symbol::Constant("KVM").to_string(), "KVM");
-    assert_eq!(
-        Symbol::NonConstant("KVM").to_string(),
-        r#""KVM""#
-    );
+    assert_eq!(Symbol::NonConstant("KVM").to_string(), r#""KVM""#);
 }

@@ -54,7 +54,7 @@ endif"#;
                 file: "".to_string(),
                 entries: vec!(
                     Entry::Config(Config {
-                        symbol: "BLK_DEV_IDEDMA_SFF".to_string(),
+                        symbol: "BLK_DEV_IDEDMA_SFF",
                         attributes: vec!(Attribute::Type(ConfigType {
                             r#type: Type::Bool(None),
                             r#if: None
@@ -87,11 +87,11 @@ fn test_parse_config_without_attribute() {
                 file: "".to_string(),
                 entries: vec!(
                     Entry::Config(Config {
-                        symbol: "PPC_86xx".to_string(),
+                        symbol: "PPC_86xx",
                         attributes: vec!()
                     }),
                     Entry::MenuConfig(MenuConfig {
-                        symbol: "PPC_86xx".to_string(),
+                        symbol: "PPC_86xx",
                         attributes: vec!(Attribute::Type(ConfigType {
                             r#type: Type::Bool(Some("86xx-based boards".to_string())),
                             r#if: None
@@ -122,7 +122,7 @@ menuconfig GCC_PLUGINS
                 file: "".to_string(),
                 entries: vec!(
                     Entry::Config(Config {
-                        symbol: "PLUGIN_HOSTCC".to_string(),
+                        symbol: "PLUGIN_HOSTCC",
                         attributes: vec!(
                             Attribute::Type(ConfigType {
                                 r#type: Type::String(None),
@@ -132,7 +132,7 @@ menuconfig GCC_PLUGINS
                         )
                     }),
                     Entry::MenuConfig(MenuConfig {
-                        symbol: "GCC_PLUGINS".to_string(),
+                        symbol: "GCC_PLUGINS",
                         attributes: vec!(Attribute::Type(ConfigType {
                             r#type: Type::Bool(Some("GCC plugins".to_string())),
                             r#if: None

@@ -68,9 +68,7 @@ endchoice"#,
                             Atom::Parenthesis(Box::new(Expression::Term(
                                 AndExpression::Expression(vec!(
                                     Term::Atom(Atom::Symbol(Symbol::Constant("USB"))),
-                                    Term::Atom(Atom::Symbol(Symbol::Constant(
-                                        "USB_GADGET"
-                                    ))),
+                                    Term::Atom(Atom::Symbol(Symbol::Constant("USB_GADGET"))),
                                 ))
                             )))
                         ))))
@@ -78,15 +76,14 @@ endchoice"#,
                 ),
                 entries: vec!(
                     Entry::Config(Config {
-                        symbol: "USB_MTU3_HOST".to_string(),
+                        symbol: "USB_MTU3_HOST",
                         attributes: vec!(Attribute::Type(ConfigType {
                             r#type: Type::Bool(Some("Host only mode".to_string())),
                             r#if: None
                         }))
                     }),
                     Entry::Comment(Comment {
-                        prompt: "Gadget/Dual-role mode requires USB Gadget support to be enabled"
-                            .to_string(),
+                        prompt: "Gadget/Dual-role mode requires USB Gadget support to be enabled",
                         dependencies: vec!()
                     })
                 )

@@ -16,7 +16,7 @@ fn test_parse_source() {
                 kconfig: Kconfig {
                     file: "empty".to_string(),
                     entries: vec![],
-                }
+                },
             },
         )),
     )
@@ -30,12 +30,11 @@ fn test_parse_source_no_quote() {
         Ok((
             "",
             Source {
-
                 content: Box::new("".into()),
                 kconfig: Kconfig {
                     file: "empty".to_string(),
                     entries: vec![],
-                }
+                },
             },
         )),
     )

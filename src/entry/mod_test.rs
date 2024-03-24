@@ -17,14 +17,14 @@ fn test_parse_entries() {
             "",
             vec!(
                 Entry::Config(Config {
-                    symbol: "KVM".to_string(),
+                    symbol: "KVM",
                     attributes: vec!(Attribute::Type(ConfigType {
                         r#type: Type::Bool(None),
                         r#if: None
                     }))
                 }),
                 Entry::Comment(Comment {
-                    prompt: "some configs".to_string(),
+                    prompt: "some configs",
                     dependencies: vec!()
                 }),
             )

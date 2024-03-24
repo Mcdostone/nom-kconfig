@@ -21,7 +21,7 @@ fn test_parse_kconfig() {
             Kconfig {
                 file: "".to_string(),
                 entries: vec!(Entry::Config(Config {
-                    symbol: "SND_INTEL_NHLT".to_string(),
+                    symbol: "SND_INTEL_NHLT",
                     attributes: vec!(Attribute::Type(ConfigType {
                         r#type: Type::Tristate(None),
                         r#if: None
@@ -51,7 +51,7 @@ endchoice
                 entries: vec!(Entry::Choice(Choice {
                     options: vec!(),
                     entries: vec!(Entry::Config(Config {
-                        symbol: "RAPIDIO_ENUM_BASIC".to_string(),
+                        symbol: "RAPIDIO_ENUM_BASIC",
                         attributes: vec!(Attribute::Type(ConfigType {
                             r#type: Type::Tristate(None),
                             r#if: None

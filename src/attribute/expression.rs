@@ -340,16 +340,14 @@ pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Express
     map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e)(input)
 }
 
-pub fn parse_number<'a>(input: KconfigInput) -> IResult<KconfigInput, i64> {
+pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     map_res(
         recognize(pair(opt(char('-')), digit1)),
         |d: KconfigInput| FromStr::from_str(d.fragment()),
     )(input)
 }
 
-
-
-pub fn parse_number_as_str<'a>(input: KconfigInput) -> IResult<KconfigInput, &str> {
+pub fn parse_number_as_str(input: KconfigInput) -> IResult<KconfigInput, &str> {
     map(
         recognize(pair(opt(char('-')), digit1)),
         |lol: KconfigInput| *lol.fragment(),

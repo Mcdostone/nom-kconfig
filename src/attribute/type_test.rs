@@ -76,9 +76,7 @@ fn test_parse_type_backslash() {
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
                         "ARCH_WANTS_FREEZER_CONTROL"
                     )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "BROKEN"
-                    ))),)
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("BROKEN"))),)
                 )))
             },)
         ))

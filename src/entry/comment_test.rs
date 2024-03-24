@@ -13,7 +13,7 @@ fn test_parse_comment() {
         Ok((
             "",
             Comment {
-                prompt: "Default contiguous memory area size:".to_string(),
+                prompt: "Default contiguous memory area size:",
                 dependencies: vec!()
             }
         ))
@@ -29,7 +29,7 @@ fn test_parse_comment_with_dependencies() {
         Ok((
             "",
             Comment {
-                prompt: "Default contiguous memory area size:".to_string(),
+                prompt: "Default contiguous memory area size:",
                 dependencies: vec!(Attribute::DependsOn(Expression::Term(AndExpression::Term(
                     Term::Atom(Atom::Symbol(Symbol::Constant("JVM")))
                 ))))

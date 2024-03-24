@@ -16,7 +16,7 @@ use super::expression::{parse_if_attribute, Expression};
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Select<'a> {
-    pub symbol: String,
+    pub symbol: &'a str,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
         serde(skip_serializing_if = "Option::is_none", borrow)
@@ -60,7 +60,7 @@ pub fn parse_select(input: KconfigInput) -> IResult<KconfigInput, Select> {
             parse_if_attribute,
         )),
         |(_, s, i)| Select {
-            symbol: s.to_string(),
+            symbol: s,
             r#if: i,
         },
     )(input)

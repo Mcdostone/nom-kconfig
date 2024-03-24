@@ -24,7 +24,7 @@ use crate::{
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Config<'a> {
-    pub symbol: String,
+    pub symbol: &'a str,
     #[cfg_attr(feature = "serialize", serde(borrow))]
     pub attributes: Vec<Attribute<'a>>,
 }
@@ -42,7 +42,7 @@ macro_rules! generic_config_parser {
                 many0(ws(alt(($fn, parse_attribute)))),
             ),
             |(symbol, attributes)| $t {
-                symbol: symbol.to_string(),
+                symbol,
                 attributes,
             },
         )
@@ -63,7 +63,7 @@ pub fn parse_config(input: KconfigInput) -> IResult<KconfigInput, Config> {
             many0(ws(alt((parse_type, parse_attribute)))),
         ),
         |(symbol, attributes)| Config {
-            symbol: symbol.to_string(),
+            symbol,
             attributes,
         },
     )(input)

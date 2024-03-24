@@ -22,18 +22,18 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
         pair(
             ws(alt((
                 map(
-                    preceded(tag("boolean"), opt(parse_prompt_value)),
+                    preceded(tag("boolean"), opt(map(parse_prompt_value, |d| d.to_string()))),
                     Type::Bool,
                 ),
-                map(preceded(tag("bool"), opt(parse_prompt_value)), Type::Bool),
-                map(preceded(tag("hex"), opt(parse_prompt_value)), Type::Hex),
-                map(preceded(tag("int"), opt(parse_prompt_value)), Type::Int),
+                map(preceded(tag("bool"), opt(map(parse_prompt_value, |d| d.to_string()))), Type::Bool),
+                map(preceded(tag("hex"), opt(map(parse_prompt_value, |d| d.to_string()))), Type::Hex),
+                map(preceded(tag("int"), opt(map(parse_prompt_value, |d| d.to_string()))), Type::Int),
                 map(
-                    preceded(tag("string"), opt(parse_prompt_value)),
+                    preceded(tag("string"), opt(map(parse_prompt_value, |d| d.to_string()))),
                     Type::String,
                 ),
                 map(
-                    preceded(tag("tristate"), opt(parse_prompt_value)),
+                    preceded(tag("tristate"), opt(map(parse_prompt_value, |d| d.to_string()))),
                     Type::Tristate,
                 ),
                 map(preceded(tag("def_bool"), ws(parse_expression)), |e| {
@@ -58,10 +58,7 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     serde(rename_all = "lowercase")
 )]
 pub enum Type<'a> {
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(borrow)
-    )]
+    #[cfg_attr(any(feature = "serialize", feature = "deserialize"), serde(borrow))]
     DefBool(Expression<'a>),
     DefTristate(Expression<'a>),
     Bool(Option<String>),

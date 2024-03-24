@@ -1,5 +1,5 @@
-use nom_kconfig::{kconfig::parse_kconfig, Kconfig, KconfigFile, KconfigInput};
-use std::path::{Path, PathBuf};
+use nom_kconfig::{parse_kconfig, Kconfig, KconfigFile, KconfigInput};
+use std::{collections::HashMap, path::{Path, PathBuf}};
 use walkdir::WalkDir;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -8,18 +8,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .join("linux-6.4.10");
 
     let entries: Vec<PathBuf> = list_kconfig_files(&kernel_directory);
+    
     let mut kconfigs: Vec<Kconfig> = vec![];
+    let mut inputs = HashMap::new();
+    
+
     for current_kconfig in entries.iter() {
+        
         let filename = current_kconfig
             .strip_prefix(&kernel_directory)
             .unwrap_or(current_kconfig);
 
-        let kconfig_file = KconfigFile::new(kernel_directory.to_path_buf(), filename.to_path_buf(), "".to_string());
-        let input: String = kconfig_file.read_to_string()?;
-        //match parse_kconfig(KconfigInput::new_extra(&input, kconfig_file)) {
-        //    Ok((_, kconfig)) => kconfigs.push(kconfig),
-        //    Err(e) => return Err(Box::new(e.map_input(|f| (f.to_string().clone(), f.extra)))),
-        //}
+        let kconfig_file = KconfigFile::new(
+            kernel_directory.to_path_buf(),
+            filename.to_path_buf(),
+        );
+
+        let l = kconfig_file.read_to_string()?;
+        inputs.insert(kconfig_file, l);
+    }
+
+    for (k, v) in inputs.iter() {
+        let input = KconfigInput::new_extra(v.as_str(), k.clone());
+        match parse_kconfig(input) {
+            Ok((_, kconfig)) => kconfigs.push(kconfig),
+            Err(e) => return Err(Box::new(e.map_input(|f| (f.to_string().clone(), f.extra)))),
+        }
     }
 
     println!("{} Kconfig file have been read", kconfigs.len());

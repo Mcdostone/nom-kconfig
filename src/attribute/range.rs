@@ -47,12 +47,10 @@ impl Display for Range<'_> {
 
 fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
     alt((
-        map(tuple((ws(parse_number_as_str), ws(parse_number_as_str))), |(l, r)| {
-            (
-                Symbol::Constant(l),
-                Symbol::Constant(r),
-            )
-        }),
+        map(
+            tuple((ws(parse_number_as_str), ws(parse_number_as_str))),
+            |(l, r)| (Symbol::Constant(l), Symbol::Constant(r)),
+        ),
         tuple((ws(parse_symbol), ws(parse_symbol))),
     ))(input)
 }

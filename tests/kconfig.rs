@@ -20,7 +20,6 @@ fn test_parse() {
     let kconfig_file: KconfigFile = KconfigFile::new(
         input_file.parent().unwrap().to_path_buf(),
         input_file.clone(),
-        "".to_string()
     );
 
     let content = kconfig_file.read_to_string().unwrap();
@@ -29,7 +28,7 @@ fn test_parse() {
 
     assert_parsing!(result, Ok(("", Kconfig { file: input_file.display().to_string(), entries: vec!(Entry::Config(
         Config {
-            symbol: "KVM".to_string(),
+            symbol: "KVM",
             attributes: vec!(
                 Attribute::Type( ConfigType {
                     r#type: Type::Tristate(Some("Kernel-based Virtual Machine (KVM) support".to_string())),
@@ -40,10 +39,10 @@ fn test_parse() {
                     Term::Atom(Atom::Symbol(Symbol::Constant("HIGH_RES_TIMERS"))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("X86_LOCAL_APIC")))
                 )))),
-                Attribute::Select(Select { symbol: "PREEMPT_NOTIFIERS".to_string(), r#if: None }),
-                Attribute::Select(Select { symbol: "MMU_NOTIFIER".to_string(), r#if: None }),
-                Attribute::Select(Select { symbol: "HAVE_KVM_IRQCHIP".to_string(), r#if: None }),
-                Attribute::Select(Select { symbol: "HAVE_KVM_PFNCACHE".to_string(), r#if: None }),
+                Attribute::Select(Select { symbol: "PREEMPT_NOTIFIERS", r#if: None }),
+                Attribute::Select(Select { symbol: "MMU_NOTIFIER", r#if: None }),
+                Attribute::Select(Select { symbol: "HAVE_KVM_IRQCHIP", r#if: None }),
+                Attribute::Select(Select { symbol: "HAVE_KVM_PFNCACHE", r#if: None }),
                 Attribute::Help("Support hosting fully virtualized guest machines using hardware\nvirtualization extensions.  You will need a fairly recent\nprocessor equipped with virtualization extensions. You will also\nneed to select one or more of the processor modules below.".to_string()),
             )
         }))})))

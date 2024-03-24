@@ -1,9 +1,13 @@
 use crate::{
-    assert_parsing_eq, attribute::{
+    assert_parsing_eq,
+    attribute::{
         r#type::{ConfigType, Type},
         select::Select,
         AndExpression, Atom, Expression, Term,
-    }, entry::{parse_if, Config, If, Source}, symbol::Symbol, Attribute, Entry, Kconfig
+    },
+    entry::{parse_if, Config, If, Source},
+    symbol::Symbol,
+    Attribute, Entry, Kconfig,
 };
 
 #[test]
@@ -49,14 +53,14 @@ fn test_parse_if_entry_with_config() {
                     Symbol::Constant("VIRTUALIZATION")
                 )))),
                 entries: vec!(Entry::Config(Config {
-                    symbol: "KVM".to_string(),
+                    symbol: "KVM",
                     attributes: vec!(
                         Attribute::Type(ConfigType {
                             r#type: Type::Bool(None),
                             r#if: None
                         }),
                         Attribute::Select(Select {
-                            symbol: "KVM_MMIO".to_string(),
+                            symbol: "KVM_MMIO",
                             r#if: None
                         })
                     )

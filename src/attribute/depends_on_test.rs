@@ -45,18 +45,12 @@ fn test_parse_depends_on_backslash() {
             "",
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Parenthesis(Box::new(Expression::Expression(vec!(
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "ARCH_LUBBOCK"
-                    )))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("ARCH_LUBBOCK")))),
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
                         "MACH_MAINSTONE"
                     )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "PXA_SHARPSL"
-                    )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                        "MACH_ARMCORE"
-                    )))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("PXA_SHARPSL")))),
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("MACH_ARMCORE")))),
                     AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
                         "ARCH_PXA_PALM"
                     )))),

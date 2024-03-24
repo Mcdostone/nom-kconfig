@@ -10,7 +10,7 @@ fn test_parse_prompt() {
     assert_parsing_eq!(
         parse_prompt_value,
         input,
-        Ok(("", "scripts/Kconfig.include".to_string()))
+        Ok(("", "scripts/Kconfig.include"))
     )
 }
 
@@ -20,7 +20,7 @@ fn test_parse_prompt_1() {
     assert_parsing_eq!(
         parse_prompt_value,
         input,
-        Ok(("", "Support in-kernel module decompression".to_string()))
+        Ok(("", "Support in-kernel module decompression"))
     )
 }
 
@@ -28,14 +28,14 @@ fn test_parse_prompt_1() {
 #[test]
 fn test_parse_prompt_no_quote() {
     let input = " TCC8000";
-    assert_parsing_eq!(parse_prompt_value, input, Ok(("", "TCC8000".to_string())))
+    assert_parsing_eq!(parse_prompt_value, input, Ok(("", "TCC8000")))
 }
 
 #[test]
 fn test_prompt_to_string() {
     assert_eq!(
         Prompt {
-            prompt: "Support of KVM".to_string(),
+            prompt: "Support of KVM",
             r#if: None
         }
         .to_string(),
@@ -44,7 +44,7 @@ fn test_prompt_to_string() {
 
     assert_eq!(
         Prompt {
-            prompt: "Support of KVM".to_string(),
+            prompt: "Support of KVM",
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Symbol(Symbol::Constant("KVM"))
             ))))

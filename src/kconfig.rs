@@ -25,6 +25,7 @@ pub struct Kconfig<'a> {
     pub file: String,
     #[cfg_attr(feature = "deserialize", serde(borrow))]
     pub entries: Vec<Entry<'a>>,
+    pub input: &'a str,
 }
 
 /// Parses a kconfig input.
@@ -38,12 +39,14 @@ pub struct Kconfig<'a> {
 /// let input = KconfigInput::new_extra(content, kconfig_file);
 /// assert_eq!(parse_kconfig(input).unwrap().1, Kconfig {file: "Kconfig".to_string(), entries: vec!() })
 /// ```
-pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
+pub fn parse_kconfig(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, Kconfig<'_>> {
     let file: std::path::PathBuf = input.extra.file.clone();
+    let i = input.fragment();
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws(eof)), |d| {
         Kconfig {
             file: file.display().to_string(),
             entries: d,
+            input: i
         }
     })(input)?;
     Ok((input, result))

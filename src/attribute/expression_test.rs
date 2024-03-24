@@ -104,9 +104,7 @@ fn test_parse_depends_on_ambigus() {
         Ok((
             "",
             Expression::Expression(vec!(
-                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                    "ALPHA_MIATA"
-                )))),
+                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_MIATA")))),
                 AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164"))),
                     Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164"))),
@@ -317,12 +315,8 @@ fn test_expression_to_string() {
     assert_eq!(
         "KVM || NET",
         Expression::Expression(vec!(
-            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                "KVM"
-            )))),
-            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
-                "NET"
-            ))))
+            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("KVM")))),
+            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("NET"))))
         ))
         .to_string()
     );

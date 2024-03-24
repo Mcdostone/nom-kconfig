@@ -33,9 +33,7 @@ pub enum Symbol<'a> {
 
 pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
     alt((
-        map(parse_constant_symbol, |c: &str| {
-            Symbol::Constant(c)
-        }),
+        map(parse_constant_symbol, |c: &str| Symbol::Constant(c)),
         map(
             recognize(delimited(ws(char('"')), take_until("\""), char('"'))),
             |c: KconfigInput| Symbol::NonConstant(c.fragment()),

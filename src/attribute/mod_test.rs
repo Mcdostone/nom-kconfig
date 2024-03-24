@@ -40,7 +40,7 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Select(Select {
-                symbol: "MTK_INFRACFG".to_string(),
+                symbol: "MTK_INFRACFG",
                 r#if: None
             })
         ))
@@ -73,7 +73,7 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Prompt(Prompt {
-                prompt: "hello world".to_string(),
+                prompt: "hello world",
                 r#if: None
             })
         ))
@@ -110,7 +110,7 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Select(Select {
-                symbol: "KVM".to_string(),
+                symbol: "KVM",
                 r#if: None
             })
         ))
@@ -135,7 +135,7 @@ fn test_parse_attributes() {
             "",
             vec!(
                 Attribute::Select(Select {
-                    symbol: "KVM".to_string(),
+                    symbol: "KVM",
                     r#if: None
                 }),
                 Attribute::Modules,
@@ -159,7 +159,7 @@ fn test_attributes_to_string() {
     );
     assert_eq!(
         Attribute::Prompt(Prompt {
-            prompt: "a prompt".to_string(),
+            prompt: "a prompt",
             r#if: None
         })
         .to_string(),
@@ -174,7 +174,7 @@ fn test_attributes_to_string() {
     );
     assert_eq!(
         Attribute::Select(Select {
-            symbol: "NET".to_string(),
+            symbol: "NET",
             r#if: None
         })
         .to_string(),

@@ -13,7 +13,7 @@ fn test_parse_select() {
             "",
             Select {
                 r#if: None,
-                symbol: "MTK_INFRACFG".to_string()
+                symbol: "MTK_INFRACFG"
             }
         ))
     )
@@ -24,7 +24,7 @@ fn test_select_to_string() {
     assert_eq!(
         Select {
             r#if: None,
-            symbol: "MTK_INFRACFG".to_string()
+            symbol: "MTK_INFRACFG"
         }
         .to_string(),
         "MTK_INFRACFG"
@@ -35,7 +35,7 @@ fn test_select_to_string() {
             r#if: Some(Expression::Term(AndExpression::Term(Term::Not(
                 Atom::Symbol(Symbol::Constant("KVM"))
             )))),
-            symbol: "MTK_INFRACFG".to_string()
+            symbol: "MTK_INFRACFG"
         }
         .to_string(),
         "MTK_INFRACFG if !KVM"
@@ -52,7 +52,7 @@ fn test_parse_enable() {
             "",
             Select {
                 r#if: None,
-                symbol: "MTK_INFRACFG".to_string()
+                symbol: "MTK_INFRACFG"
             }
         ))
     )

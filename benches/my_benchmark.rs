@@ -7,12 +7,22 @@ use walkdir::WalkDir;
 fn parse_files(kernel_directory: &str, files: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
     let mut kconfigs: Vec<Kconfig> = vec![];
     let root_directory = Path::new(kernel_directory);
+    let mut inputs = vec!();
+
+    for current_kconfig in files.iter() {
+    }
+
+
     for current_kconfig in files.iter() {
         let kconfig_file = KconfigFile::new(
             root_directory.to_path_buf(),
             root_directory.join(current_kconfig),
         );
         let input = kconfig_file.read_to_string()?;
+        inputs.push(input);
+        
+
+        let input = inputs.get(inputs.len() -1).unwrap();
         match parse_kconfig(KconfigInput::new_extra(&input, kconfig_file)) {
             Ok((_, kconfig)) => kconfigs.push(kconfig),
             Err(e) => return Err(Box::new(e.map_input(|f| (f.to_string().clone(), f.extra)))),

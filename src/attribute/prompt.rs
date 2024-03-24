@@ -22,7 +22,7 @@ use serde::Serialize;
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Prompt<'a> {
-    pub prompt: String,
+    pub prompt: &'a str,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
         serde(skip_serializing_if = "Option::is_none", borrow)
@@ -46,7 +46,7 @@ pub fn parse_prompt(input: KconfigInput) -> IResult<KconfigInput, Prompt> {
     map(
         tuple((ws(tag("prompt")), parse_prompt_value, parse_if_attribute)),
         |(_, p, i)| Prompt {
-            prompt: p.to_string(),
+            prompt: p,
             r#if: i,
         },
     )(input)
@@ -59,7 +59,7 @@ pub fn parse_prompt(input: KconfigInput) -> IResult<KconfigInput, Prompt> {
 ///
 /// assert_parsing_eq!(parse_prompt_value, "scripts/Kconfig.include", Ok(("", "scripts/Kconfig.include".to_string())))
 /// ```
-pub fn parse_prompt_value(input: KconfigInput) -> IResult<KconfigInput, String> {
+pub fn parse_prompt_value(input: KconfigInput) -> IResult<KconfigInput, &str> {
     map(
         alt((
             delimited(
@@ -81,6 +81,6 @@ pub fn parse_prompt_value(input: KconfigInput) -> IResult<KconfigInput, String> 
                 |d: &KconfigInput| !d.trim().is_empty(),
             ),
         )),
-        |d: KconfigInput| d.fragment().to_owned().trim().to_string(),
+        |d: KconfigInput| d.fragment().to_owned().trim(),
     )(input)
 }

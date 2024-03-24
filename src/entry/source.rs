@@ -41,8 +41,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
 
     let source_kconfig_file = KconfigFile::new(
         input.clone().extra.root_dir,
-        PathBuf::from(file),
-        "".to_string(),
+        PathBuf::from(file)
     );
     if is_dynamic_source(file) {
         return Ok((
@@ -56,42 +55,45 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             },
         ));
     }
-    let content = Box::new(source_kconfig_file
-        .read_to_string()
-        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?);
+    
 
     let mut source = Source {
-        content: content,
+        content: Box::new("".to_string()),
         kconfig: Kconfig {
             file: file.to_string(),
             entries: vec![],
+            input: ""
         },
     };
 
-    let content = source.content;
-    let k = KconfigInput::new_extra(
-        &content,
-        source_kconfig_file.clone(),
-    );
+    let content =
+        Box::new(source_kconfig_file.read_to_string().map_err(|_| {
+            nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail))
+        })?);
+    let k = KconfigInput::new_extra(&content, source_kconfig_file.clone());
 
     let x = match cut(parse_kconfig)(k) {
         Ok((_, kconfig)) => {
-            source.content = "".to_string().into();
             source.kconfig = kconfig;
-            return Ok(("".into(), Source {
-                content: "".to_string().into(),
-                kconfig: Kconfig {
-                    file: file.to_string(),
-                    entries: vec![],
+            return Ok((
+                "".into(),
+                Source {
+                    content: "".to_string().into(),
+                    kconfig: Kconfig {
+                        file: file.to_string(),
+                        entries: vec![],
+                        input: ""
+                    },
                 },
-            }))
-        },
+            ));
+        }
         Err(_e) => Err(nom::Err::Error(nom::error::Error::new(
             KconfigInput::new_extra("", source_kconfig_file),
             ErrorKind::Fail,
         ))),
     };
 
+    #[allow(clippy::let_and_return)]
     x
 }
 
