@@ -2,7 +2,7 @@
   <br>
   <img
     alt="Tux, the pinguin"
-    src="./doc/tux.png"
+    src="./doc/tux.svg"
     width=100px
   />
   <h1>A Kconfig parser written in rust.</h1>
