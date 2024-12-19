@@ -120,6 +120,10 @@ fn parse_expression_token_parameter(input: KconfigInput) -> IResult<KconfigInput
             ExpressionToken::DoubleQuotes,
         ),
         map(
+            delimited(tag("("), take_until(")"), tag(")")),
+            |d: KconfigInput| ExpressionToken::Literal("(".to_string() + d.fragment() + ")"),
+        ),
+        map(
             delimited(tag("`"), take_until("`"), tag("`")),
             |d: KconfigInput| ExpressionToken::Backtick(d.to_string()),
         ),

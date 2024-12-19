@@ -3,7 +3,7 @@ use crate::{
     attribute::{
         expression::{AndExpression, Atom, Expression, Term},
         r#type::{ConfigType, Type},
-        DefaultAttribute,
+        DefaultAttribute, ExpressionToken, FunctionCall, Parameter,
     },
     entry::{config::Config, r#if::If, MenuConfig},
     kconfig::parse_kconfig,
@@ -139,6 +139,52 @@ menuconfig GCC_PLUGINS
                         }))
                     }),
                 )
+            },
+        ))
+    )
+}
+
+// https://github.com/Mcdostone/nom-kconfig/issues/57
+#[test]
+fn test_parse_config_issue_github() {
+    assert_parsing_eq!(
+        parse_kconfig,
+        r#"
+config AS_WRUSS
+	def_bool $(as-instr64,wrussq %rax$(comma)(%rbx))
+	help
+	  Supported by binutils
+"#,
+        Ok((
+            "",
+            Kconfig {
+                file: "".to_string(),
+                entries: vec!(Entry::Config(Config {
+                    symbol: "AS_WRUSS".to_string(),
+                    attributes: vec!(
+                        Attribute::Type(ConfigType {
+                            r#type: Type::DefBool(Expression::Term(AndExpression::Term(
+                                Term::Atom(Atom::Function(FunctionCall {
+                                    name: "as-instr64".to_string(),
+                                    parameters: vec!(Parameter {
+                                        tokens: vec!(
+                                            ExpressionToken::Literal("wrussq".to_string()),
+                                            ExpressionToken::Space,
+                                            ExpressionToken::Literal("%rax".to_string()),
+                                            ExpressionToken::Function(Box::new(FunctionCall {
+                                                name: "comma".to_string(),
+                                                parameters: vec!(),
+                                            })),
+                                            ExpressionToken::Literal("(%rbx)".to_string()),
+                                        )
+                                    })
+                                }))
+                            ))),
+                            r#if: None
+                        },),
+                        Attribute::Help("Supported by binutils".to_string())
+                    )
+                }),)
             },
         ))
     )
