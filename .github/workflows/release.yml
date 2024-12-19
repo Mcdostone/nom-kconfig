@@ -8,15 +8,15 @@ on:
         required: true
         description: new version to release
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN }}
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
