@@ -87,6 +87,25 @@ fn test_parse_function_call_expanded_variable() {
     )
 }
 
+// https://github.com/Mcdostone/nom-kconfig/issues/57
+#[test]
+fn test_parse_function_call_percent_symbol() {
+    let input = "$(hey (%rbx))";
+    assert_parsing_eq!(
+        parse_function_call,
+        input,
+        Ok((
+            "",
+            FunctionCall {
+                name: "hey".to_string(),
+                parameters: vec!(Parameter {
+                    tokens: vec!(ExpressionToken::Literal("(%rbx)".to_string()))
+                })
+            }
+        ))
+    )
+}
+
 #[test]
 fn test_parse_function_call_recursive_function() {
     let input = "$(warning,$(greeting,Hello,Jean-Louis))";

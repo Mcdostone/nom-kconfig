@@ -233,3 +233,27 @@ fn test_config_type_tostring() {
         "bool if NET".to_string()
     );
 }
+
+// https://github.com/Mcdostone/nom-kconfig/issues/57
+#[test]
+fn test_def_bool_with_function() {
+    let input = " 	def_bool $(hey (%rbx))";
+    assert_parsing_eq!(
+        parse_type,
+        input,
+        Ok((
+            "",
+            Attribute::Type(ConfigType {
+                r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Function(FunctionCall {
+                        name: "hey".to_string(),
+                        parameters: vec!(Parameter {
+                            tokens: vec!(ExpressionToken::Literal("(%rbx)".to_string()))
+                        })
+                    })
+                )))),
+                r#if: None
+            },)
+        ))
+    )
+}
