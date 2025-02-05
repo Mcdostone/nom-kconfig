@@ -49,7 +49,7 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
 
     // parse the raw text
     let (input, text) = parse_help_text(input)?;
-    return Ok((input, text));
+    Ok((input, text))
 }
 
 fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
@@ -77,7 +77,7 @@ fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
             // Parse the raw help line text.
             parse_full_help_line(remain)
         },
-        || String::new(),
+        String::new,
         |mut acc, line| {
             acc.push_str(&line);
             acc
