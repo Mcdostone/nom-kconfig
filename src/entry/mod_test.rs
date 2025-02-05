@@ -33,7 +33,7 @@ fn test_parse_entries() {
 }
 
 #[test]
-fn test_double_indented_entrys() {
+fn test_double_indented_entries() {
     let input = r#"mainmenu "MAIN"
 
     config A

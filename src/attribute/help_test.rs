@@ -26,7 +26,7 @@ fn test_parse_help_no_content() {
 
 // 3.2/drivers/net/ethernet/stmicro/stmmac/Kconfig
 #[test]
-fn test_parse_help_prefixed_by_hypen() {
+fn test_parse_help_prefixed_by_hyphen() {
     let input = "-- help\n hello world";
     assert_parsing_eq!(parse_help, input, Ok(("", "hello world".to_string())))
 }
