@@ -1,17 +1,26 @@
 name: Security
 
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: '--deny warnings'
+  MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
+
 on:
+  schedule:
+    - cron: "0 0 1 * *"
   pull_request:
     branches:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
-
-env:
-  RUST_BACKTRACE: 1
-  CARGO_TERM_COLOR: always
 
 jobs:
   dependencies:
@@ -19,17 +28,23 @@ jobs:
    steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
-      - name: Install cargo-outdated
-        run: cargo install cargo-outdated
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - name: Install cargo-edit
+        run: cargo install cargo-edit
       - name: Check for outdated dependencies
-        run: cargo outdated --exit-code 1
+        run: cargo upgrade --dry-run --locked
 
   audit:
    runs-on: ubuntu-latest
    steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
       - name: Install cargo-outdated
         run: cargo install cargo-audit
-      - name: Audit dependencies
+      - name: Cargo audit
         run: cargo audit
