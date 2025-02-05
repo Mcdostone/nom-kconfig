@@ -69,8 +69,7 @@ fn test_parse_help_indent_2() {
     marketed by the Digital Equipment Corporation of blessed memory, now
     Compaq.  Alpha Linux dates from 1995-1996 and was the first non-x86
     port. The Alpha Linux project has a home page at
-    <http://www.alphalinux.org/>.
-";
+    <http://www.alphalinux.org/>.";
     assert_parsing_eq!(
         parse_help,
         input,
@@ -96,3 +95,16 @@ The Alpha is a 64-bit general-purpose processor.";
     )
 }
 */
+
+#[test]
+fn test_parse_help_indentation_preservation() {
+    let input = "help\n    Lorem Ipsum\n        - Lorem Ipsum\n    Lorem Ipsum\n";
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok((
+            "",
+            "Lorem Ipsum\n    - Lorem Ipsum\nLorem Ipsum\n".to_string()
+        ))
+    )
+}
