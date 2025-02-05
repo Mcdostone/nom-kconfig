@@ -69,7 +69,7 @@ fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
             if indent_len < initial_indentation_len {
                 return Err(nom::Err::Error(nom::error::Error::new(
                     orig,
-                    nom::error::ErrorKind::Eof, // Stop parsing when indentation decreases
+                    nom::error::ErrorKind::Fail, // Stop parsing when indentation decreases
                 )));
             }
             // Consume the same base indentation.
