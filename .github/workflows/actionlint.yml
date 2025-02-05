@@ -1,0 +1,20 @@
+name: Actionlint
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:  
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: actionlint
+        uses: raven-actions/actionlint@v2.0.0
