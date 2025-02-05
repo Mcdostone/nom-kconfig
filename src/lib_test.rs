@@ -182,7 +182,7 @@ config AS_WRUSS
                             ))),
                             r#if: None
                         },),
-                        Attribute::Help("Supported by binutils".to_string())
+                        Attribute::Help("Supported by binutils\n".to_string())
                     )
                 }),)
             },
