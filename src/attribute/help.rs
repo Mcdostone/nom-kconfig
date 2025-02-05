@@ -1,23 +1,16 @@
+use nom::bytes::complete::take_while;
+use nom::multi::fold_many0;
 use nom::{
     branch::alt,
-    bytes::complete::tag,
-    character::complete::{line_ending, newline, not_line_ending, space1, tab},
+    bytes::complete::{tag, take},
+    character::complete::{line_ending, newline, not_line_ending, space1},
     combinator::{eof, map, opt, peek},
-    multi::{many0, many1},
-    sequence::{delimited, pair, preceded, terminated},
+    multi::many0,
+    sequence::{delimited, pair, preceded},
     IResult,
 };
 
 use crate::{util::ws, KconfigInput};
-
-fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, usize> {
-    let (input, _) = many0(newline)(input)?;
-    // TODO: something is wrong here with the indentation level calculation
-    // println!("{:?}", input.chars().next().unwrap());
-    map(peek(pair(many0(tab), many0(space1))), |(t, s)| {
-        s.len() + t.len()
-    })(input)
-}
 
 pub fn weirdo_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
     // TODO linux v-3.2, in file /drivers/net/ethernet/stmicro/stmmac/Kconfig
@@ -44,6 +37,7 @@ pub fn weirdo_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
 /// assert_parsing_eq!(parse_help, "help\n   hello world", Ok(("", "hello world".to_string())))
 /// ```
 pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
+    // parse out help tag
     let (input, _) = pair(
         alt((
             ws(tag("help")),
@@ -53,31 +47,81 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
         preceded(many0(space1), newline),
     )(input)?;
 
-    let (input, indent) = indentation_level(input)?;
-    if indent == 0 {
-        return Ok((input, "".to_string()));
-    }
-    // TODO see function indentation_level
-    //let indent = count(space1::<KconfigInput, _>, indent);
-    let indent = space1;
-
-    map(
-        many1(alt((
-            map(newline, |_| ""),
-            map(pair(indent, parse_line_help), |(_, line)| {
-                line.fragment().to_owned()
-            }),
-        ))),
-        |v| {
-            v.into_iter()
-                .map(|l| l.trim_end())
-                .filter(|e| !e.is_empty())
-                .collect::<Vec<&str>>()
-                .join("\n")
-        },
-    )(input)
+    // parse the raw text
+    let (input, text) = parse_help_text(input)?;
+    return Ok((input, text));
 }
 
-pub fn parse_line_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
-    terminated(not_line_ending, alt((line_ending, eof)))(input)
+fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
+    let (original, initial_indentation_len) = peek_indentation(input)?;
+    if initial_indentation_len == 0 {
+        return Ok((original, String::new()));
+    }
+
+    // Remove initial indentation and parse first line
+    let (input, _) = take(initial_indentation_len)(original)?;
+    let (remaining, first_line) = parse_full_help_line(input)?;
+
+    // Parse subsequent lines while maintaining indentation
+    let (remaining, mut help_text) = fold_many0(
+        |i| {
+            let (orig, indent_len) = peek_indentation(i)?;
+            if indent_len < initial_indentation_len {
+                return Err(nom::Err::Error(nom::error::Error::new(
+                    orig,
+                    nom::error::ErrorKind::Eof, // Stop parsing when indentation decreases
+                )));
+            }
+            // Consume the same base indentation.
+            let (remain, _) = take(initial_indentation_len)(orig)?;
+            // Parse the raw help line text.
+            parse_full_help_line(remain)
+        },
+        || String::new(),
+        |mut acc, line| {
+            acc.push_str(&line);
+            acc
+        },
+    )(remaining)?;
+
+    help_text.insert_str(0, &first_line);
+
+    Ok((remaining, help_text)) // Return remaining input and parsed text
+}
+
+fn parse_line_help(input: KconfigInput) -> IResult<KconfigInput, (KconfigInput, KconfigInput)> {
+    pair(not_line_ending, alt((line_ending, eof)))(input)
+}
+
+fn parse_full_help_line(input: KconfigInput) -> IResult<KconfigInput, String> {
+    let (input, (raw_text, line_end)) = parse_line_help(input)?;
+    let mut parsed_line = raw_text.to_string();
+    parsed_line.push_str(line_end.fragment());
+    Ok((input, parsed_line))
+}
+
+fn peek_til_newline(s: KconfigInput) -> IResult<KconfigInput, (KconfigInput, KconfigInput)> {
+    peek(parse_line_help)(s)
+}
+
+fn peek_indentation(s: KconfigInput) -> IResult<KconfigInput, usize> {
+    let (original, peeked) = peek_til_newline(s)?;
+    let (_, len) = indentation_level(peeked.0)?;
+    Ok((original, len))
+}
+
+fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, usize> {
+    // Assumes that tab and space usage is consistent across multi line text.
+    // E.g We don't know how much spaces a tab is.
+    //
+    // Example:
+    // help\n
+    //     Lorem Ipsum\n
+    // \t\tLorem Ipsum\n
+    //
+    // The above would consider the second text line to have less indentation( 4 white spaces vs 2 tabs as we only count chars) and thous only include the first line.
+    let (input, indent) = take_while(|c: char| c == ' ' || c == '\t')(input)?;
+    let len = indent.fragment().len();
+
+    Ok((input, (len)))
 }
