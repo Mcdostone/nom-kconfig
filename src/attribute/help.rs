@@ -91,7 +91,7 @@ fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
 
     help_text.insert_str(0, &first_line);
 
-    Ok((remaining, help_text)) // Return remaining input and parsed text
+    Ok((remaining, help_text.trim().to_string()))
 }
 
 fn parse_line_help(input: KconfigInput) -> IResult<KconfigInput, (KconfigInput, KconfigInput)> {
