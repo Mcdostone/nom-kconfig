@@ -104,7 +104,7 @@ fn test_parse_help_indentation_preservation() {
         input,
         Ok((
             "",
-            "Lorem Ipsum\n    - Lorem Ipsum\nLorem Ipsum\n".to_string()
+            "Lorem Ipsum\n    - Lorem Ipsum\nLorem Ipsum".to_string()
         ))
     )
 }
