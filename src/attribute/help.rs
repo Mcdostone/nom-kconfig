@@ -66,16 +66,21 @@ fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
     let (remaining, mut help_text) = fold_many0(
         |i| {
             let (orig, indent_len) = peek_indentation(i)?;
-            if indent_len < initial_indentation_len {
+
+            if (indent_len != 0) && (indent_len < initial_indentation_len) {
                 return Err(nom::Err::Error(nom::error::Error::new(
                     orig,
                     nom::error::ErrorKind::Fail, // Stop parsing when indentation decreases
                 )));
+            } else if indent_len == 0 {
+                // handle newlines between paragraph's
+                return parse_newline_only(orig);
+            } else {
+                // Consume the same base indentation.
+                let (remain, _) = take(initial_indentation_len)(orig)?;
+                // Parse the raw help line text.
+                return parse_full_help_line(remain);
             }
-            // Consume the same base indentation.
-            let (remain, _) = take(initial_indentation_len)(orig)?;
-            // Parse the raw help line text.
-            parse_full_help_line(remain)
         },
         String::new,
         |mut acc, line| {
@@ -100,6 +105,10 @@ fn parse_full_help_line(input: KconfigInput) -> IResult<KconfigInput, String> {
     Ok((input, parsed_line))
 }
 
+fn parse_newline_only(input: KconfigInput) -> IResult<KconfigInput, String> {
+    let (input, newline) = newline(input)?;
+    Ok((input, newline.to_string()))
+}
 fn peek_til_newline(s: KconfigInput) -> IResult<KconfigInput, (KconfigInput, KconfigInput)> {
     peek(parse_line_help)(s)
 }
