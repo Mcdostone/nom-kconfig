@@ -108,3 +108,17 @@ fn test_parse_help_indentation_preservation() {
         ))
     )
 }
+
+#[test]
+fn test_parse_help_double_newline() {
+    let input = r"help
+      bla 1
+        bla 2
+
+      bla 3";
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok(("", "bla 1\n  bla 2\n\nbla 3".to_string()))
+    )
+}
