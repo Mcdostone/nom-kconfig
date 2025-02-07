@@ -62,7 +62,7 @@ fn test_double_indented_entries() {
                             r#if: None
                         }),
                         Attribute::Help(
-                            "- Lorem ipsum dolor sit amet, consetetur sadipscing elitr.\n    - Lorem ipsum dolor sit amet, consetetur sadipscing elitr.\n".to_string()
+                            "- Lorem ipsum dolor sit amet, consetetur sadipscing elitr.\n    - Lorem ipsum dolor sit amet, consetetur sadipscing elitr.\n\n".to_string()
                         )
                     )
                 }),
