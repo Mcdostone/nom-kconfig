@@ -122,3 +122,22 @@ fn test_parse_help_double_newline() {
         Ok(("", "bla 1\n  bla 2\n\nbla 3".to_string()))
     )
 }
+
+// https://github.com/Mcdostone/nom-kconfig/issues/65
+// https://github.com/torvalds/linux/blob/92514ef226f511f2ca1fb1b8752966097518edc0/security/Kconfig#L236-L252
+#[test]
+fn test_parse_help_paragraph() {
+    let input = r#"help
+	  This choice is there only for converting CONFIG_DEFAULT_SECURITY
+	  in old kernel configs to CONFIG_LSM in new kernel configs. Don't
+	  change this choice unless you are creating a fresh kernel config,
+	  for this choice will be ignored after CONFIG_LSM has been set.
+
+	  Selects the legacy "major security module" that will be
+	  initialized first. Overridden by non-default CONFIG_LSM."#;
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok(("", "This choice is there only for converting CONFIG_DEFAULT_SECURITY\nin old kernel configs to CONFIG_LSM in new kernel configs. Don't\nchange this choice unless you are creating a fresh kernel config,\nfor this choice will be ignored after CONFIG_LSM has been set.\n\nSelects the legacy \"major security module\" that will be\ninitialized first. Overridden by non-default CONFIG_LSM.".to_string()))
+    )
+}
