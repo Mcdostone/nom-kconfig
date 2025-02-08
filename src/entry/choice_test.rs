@@ -13,7 +13,7 @@ use crate::{
 fn test_parse_choice_optional() {
     assert_parsing_eq!(
         parse_choice,
-        "choice\n optional endchoice",
+        "choice optional endchoice",
         Ok((
             "",
             Choice {
