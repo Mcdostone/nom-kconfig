@@ -13,7 +13,7 @@ use crate::{
 fn test_parse_choice_optional() {
     assert_parsing_eq!(
         parse_choice,
-        "choice optional endchoice",
+        "choice\n optional endchoice",
         Ok((
             "",
             Choice {
@@ -88,6 +88,43 @@ endchoice"#,
                         prompt: "Gadget/Dual-role mode requires USB Gadget support to be enabled"
                             .to_string(),
                         dependencies: vec!()
+                    })
+                )
+            }
+        ))
+    )
+}
+
+#[test]
+fn test_parse_choice_with_symbol() {
+    assert_parsing_eq!(
+        parse_choice,
+        r#"choice DRIVE
+
+            config WARP_DRIVE
+                bool "Warp drive"
+
+            config SUBLIGHT_DRIVE
+                bool "Sublight drive"
+            endchoice"#,
+        Ok((
+            "",
+            Choice {
+                options: vec!(),
+                entries: vec!(
+                    Entry::Config(Config {
+                        symbol: "WARP_DRIVE".to_string(),
+                        attributes: vec![Attribute::Type(ConfigType {
+                            r#type: Type::Bool(Some("Warp drive".to_string())),
+                            r#if: None
+                        })]
+                    }),
+                    Entry::Config(Config {
+                        symbol: "SUBLIGHT_DRIVE".to_string(),
+                        attributes: vec![Attribute::Type(ConfigType {
+                            r#type: Type::Bool(Some("Sublight drive".to_string())),
+                            r#if: None
+                        })]
                     })
                 )
             }
