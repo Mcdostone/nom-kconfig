@@ -1,6 +1,7 @@
 use crate::Attribute;
 use crate::{util::ws, KconfigInput};
 use nom::sequence::pair;
+use nom::Parser;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -46,7 +47,8 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
             parse_if_attribute,
         ),
         |(t, i)| Attribute::Type(ConfigType { r#type: t, r#if: i }),
-    )(input)
+    )
+    .parse(input)
 }
 
 #[derive(Debug, PartialEq, Clone)]

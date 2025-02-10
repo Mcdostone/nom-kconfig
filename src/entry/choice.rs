@@ -5,7 +5,7 @@ use nom::{
     combinator::{map, opt},
     multi::many0,
     sequence::{delimited, pair},
-    IResult,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -43,7 +43,8 @@ fn parse_choice_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Att
         parse_attribute,
         parse_type,
         map(ws(parse_optional), |_| Attribute::Optional),
-    ))))(input)
+    ))))
+    .parse(input)
 }
 
 pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
@@ -54,5 +55,6 @@ pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
             ws(tag("endchoice")),
         ),
         |(options, entries)| Choice { options, entries },
-    )(input)
+    )
+    .parse(input)
 }

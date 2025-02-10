@@ -2,7 +2,7 @@
 
 use super::{parse_if_attribute, Expression};
 use crate::{util::ws, KconfigInput};
-use nom::{bytes::complete::tag, sequence::preceded, IResult};
+use nom::{bytes::complete::tag, sequence::preceded, IResult, Parser};
 
 pub type Visible = Option<Expression>;
 /// Parses a `visible` attribute.
@@ -15,5 +15,5 @@ pub type Visible = Option<Expression>;
 /// assert_parsing_eq!(parse_visible, "visible", Ok(("", None)))
 /// ```
 pub fn parse_visible(input: KconfigInput) -> IResult<KconfigInput, Visible> {
-    preceded(ws(tag("visible")), parse_if_attribute)(input)
+    preceded(ws(tag("visible")), parse_if_attribute).parse(input)
 }

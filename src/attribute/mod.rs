@@ -17,7 +17,7 @@ pub mod select;
 pub mod r#type;
 pub mod visible;
 
-use nom::{branch::alt, combinator::map, multi::many0, IResult};
+use nom::{branch::alt, combinator::map, multi::many0, IResult, Parser};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -71,7 +71,7 @@ pub enum Attribute {
 }
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
-    ws(many0(parse_attribute))(input)
+    ws(many0(parse_attribute)).parse(input)
 }
 
 pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
@@ -87,7 +87,8 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_imply), Attribute::Imply),
         map(ws(parse_visible), Attribute::Visible),
         map(ws(parse_option), Attribute::Option),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 #[cfg(feature = "display")]
