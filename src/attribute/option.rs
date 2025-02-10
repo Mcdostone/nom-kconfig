@@ -2,8 +2,8 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     combinator::{map, value},
-    sequence::{delimited, tuple},
-    IResult,
+    sequence::delimited,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -46,10 +46,7 @@ impl Display for OptionValues {
 }
 
 pub fn parse_option(input: KconfigInput) -> IResult<KconfigInput, OptionValues> {
-    map(
-        tuple((ws(tag("option")), ws(parse_option_value))),
-        |(_, i)| i,
-    )(input)
+    map((ws(tag("option")), ws(parse_option_value)), |(_, i)| i).parse(input)
 }
 
 pub fn parse_option_value(input: KconfigInput) -> IResult<KconfigInput, OptionValues> {
@@ -58,12 +55,13 @@ pub fn parse_option_value(input: KconfigInput) -> IResult<KconfigInput, OptionVa
         value(OptionValues::Modules, ws(tag("modules"))),
         value(OptionValues::AllNoConfigY, ws(tag("allnoconfig_y"))),
         map(
-            tuple((
+            (
                 ws(tag("env")),
                 ws(tag("=")),
                 delimited(tag("\""), parse_constant_symbol, tag("\"")),
-            )),
+            ),
             |(_, _, env)| OptionValues::Env(env.to_string()),
         ),
-    ))(input)
+    ))
+    .parse(input)
 }

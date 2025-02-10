@@ -1,4 +1,4 @@
-use nom::{bytes::complete::tag, sequence::preceded, IResult};
+use nom::{bytes::complete::tag, sequence::preceded, IResult, Parser};
 
 use super::expression::{parse_expression, Expression};
 use crate::{util::ws, KconfigInput};
@@ -29,5 +29,5 @@ use crate::{util::ws, KconfigInput};
 /// )
 /// ```
 pub fn parse_requires(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    preceded(ws(tag("requires")), ws(parse_expression))(input)
+    preceded(ws(tag("requires")), ws(parse_expression)).parse(input)
 }

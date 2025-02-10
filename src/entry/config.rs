@@ -5,7 +5,7 @@ use nom::{
     combinator::{map, recognize},
     multi::{many0, many1},
     sequence::{pair, preceded},
-    IResult,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -52,7 +52,8 @@ pub fn parse_config_symbol(input: KconfigInput) -> IResult<KconfigInput, &str> {
     map(
         recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_"))))))),
         |d: KconfigInput| d.fragment().to_owned(),
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn parse_config(input: KconfigInput) -> IResult<KconfigInput, Config> {
@@ -65,5 +66,6 @@ pub fn parse_config(input: KconfigInput) -> IResult<KconfigInput, Config> {
             symbol: symbol.to_string(),
             attributes,
         },
-    )(input)
+    )
+    .parse(input)
 }

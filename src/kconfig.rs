@@ -2,7 +2,7 @@ use nom::{
     combinator::{eof, map},
     multi::many0,
     sequence::delimited,
-    IResult,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -44,6 +44,7 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
             file: file.display().to_string(),
             entries: d,
         }
-    })(input)?;
+    })
+    .parse(input)?;
     Ok((input, result))
 }
