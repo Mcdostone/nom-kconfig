@@ -13,10 +13,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::{
-    attribute::{
-        optional::parse_optional, parse_attribute, r#type::parse_type,
-        Attribute,
-    },
+    attribute::{optional::parse_optional, parse_attribute, r#type::parse_type, Attribute},
     symbol::parse_constant_symbol,
     util::ws,
     Entry, KconfigInput,
