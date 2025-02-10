@@ -1,8 +1,7 @@
 use nom::{
     bytes::complete::tag,
     combinator::{map, opt},
-    sequence::tuple,
-    IResult,
+    IResult, Parser,
 };
 
 use crate::{util::wsi, KconfigInput};
@@ -39,7 +38,8 @@ use super::{expression::parse_expression, Attribute};
 /// ```
 pub fn parse_depends_on(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     map(
-        tuple((tag("depends"), wsi(opt(tag("on"))), wsi(parse_expression))),
+        (tag("depends"), wsi(opt(tag("on"))), wsi(parse_expression)),
         |(_, _, e)| Attribute::DependsOn(e),
-    )(input)
+    )
+    .parse(input)
 }

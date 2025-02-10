@@ -2,8 +2,8 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     combinator::map,
-    sequence::{pair, preceded, tuple},
-    IResult,
+    sequence::{pair, preceded},
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -47,14 +47,15 @@ impl Display for Range {
 
 fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
     alt((
-        map(tuple((ws(parse_number), ws(parse_number))), |(l, r)| {
+        map((ws(parse_number), ws(parse_number)), |(l, r)| {
             (
                 Symbol::Constant(l.to_string()),
                 Symbol::Constant(r.to_string()),
             )
         }),
-        tuple((ws(parse_symbol), ws(parse_symbol))),
-    ))(input)
+        (ws(parse_symbol), ws(parse_symbol)),
+    ))
+    .parse(input)
 }
 
 /// Parses the `range` attribute.
@@ -87,5 +88,6 @@ pub fn parse_range(input: KconfigInput) -> IResult<KconfigInput, Range> {
             upper_bound: r,
             r#if: i,
         },
-    )(input)
+    )
+    .parse(input)
 }

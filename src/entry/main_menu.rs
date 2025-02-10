@@ -1,4 +1,4 @@
-use nom::{bytes::complete::tag, combinator::map, sequence::pair, IResult};
+use nom::{bytes::complete::tag, combinator::map, sequence::pair, IResult, Parser};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -12,7 +12,8 @@ pub fn parse_main_menu(input: KconfigInput) -> IResult<KconfigInput, MainMenu> {
         |(_, prompt)| MainMenu {
             prompt: prompt.to_string(),
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 /// This sets the config program's title bar if the config program chooses to use it. It should be placed at the top of the configuration, before any other statement.

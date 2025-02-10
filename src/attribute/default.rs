@@ -1,4 +1,4 @@
-use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
+use nom::{bytes::complete::tag, combinator::map, IResult, Parser};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -68,10 +68,11 @@ impl Display for DefaultAttribute {
 /// ```
 pub fn parse_default(input: KconfigInput) -> IResult<KconfigInput, DefaultAttribute> {
     map(
-        tuple((ws(tag("default")), ws(parse_expression), parse_if_attribute)),
+        (ws(tag("default")), ws(parse_expression), parse_if_attribute),
         |(_, e, i)| DefaultAttribute {
             expression: e,
             r#if: i,
         },
-    )(input)
+    )
+    .parse(input)
 }

@@ -1,7 +1,7 @@
 //! Module defining the different Kconfig entries.
 //! Most entries define a config option; all other entries help to organize them. [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries)
 
-use nom::{branch::alt, combinator::map, multi::many0, sequence::delimited, IResult};
+use nom::{branch::alt, combinator::map, multi::many0, sequence::delimited, IResult, Parser};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -69,11 +69,12 @@ pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
         map(ws(parse_source), Entry::Source),
         map(ws(parse_variable_assignment), Entry::VariableAssignment),
         map(ws(parse_function_call), Entry::FunctionCall),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_entries(input: KconfigInput) -> IResult<KconfigInput, Vec<Entry>> {
-    delimited(ws_comment, many0(parse_entry), ws_comment)(input)
+    delimited(ws_comment, many0(parse_entry), ws_comment).parse(input)
 }
 
 #[cfg(test)]

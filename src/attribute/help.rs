@@ -1,5 +1,6 @@
 use nom::bytes::complete::take_while;
 use nom::multi::fold_many0;
+use nom::Parser;
 use nom::{
     branch::alt,
     bytes::complete::{tag, take},
@@ -22,7 +23,8 @@ pub fn weirdo_help(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
             opt(many0(alt((tag("-"), space1)))),
         ),
         |d| d,
-    )(input)
+    )
+    .parse(input)
 }
 
 /// This parses a help text. The end of the help text is determined by the indentation level, this means it ends at the first line which has a smaller indentation than the first line of the help text.
@@ -45,7 +47,8 @@ pub fn parse_help(input: KconfigInput) -> IResult<KconfigInput, String> {
             weirdo_help,
         )),
         preceded(many0(space1), newline),
-    )(input)?;
+    )
+    .parse(input)?;
 
     // parse the raw text
     let (input, text) = parse_help_text(input)?;
@@ -87,7 +90,8 @@ fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
             acc.push_str(&line);
             acc
         },
-    )(remaining)?;
+    )
+    .parse(remaining)?;
 
     help_text.insert_str(0, &first_line);
 
@@ -95,7 +99,7 @@ fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
 }
 
 fn parse_line_help(input: KconfigInput) -> IResult<KconfigInput, (KconfigInput, KconfigInput)> {
-    pair(not_line_ending, alt((line_ending, eof)))(input)
+    pair(not_line_ending, alt((line_ending, eof))).parse(input)
 }
 
 fn parse_full_help_line(input: KconfigInput) -> IResult<KconfigInput, String> {
@@ -110,7 +114,7 @@ fn parse_newline_only(input: KconfigInput) -> IResult<KconfigInput, String> {
     Ok((input, newline.to_string()))
 }
 fn peek_til_newline(s: KconfigInput) -> IResult<KconfigInput, (KconfigInput, KconfigInput)> {
-    peek(parse_line_help)(s)
+    peek(parse_line_help).parse(s)
 }
 
 fn peek_indentation(s: KconfigInput) -> IResult<KconfigInput, usize> {

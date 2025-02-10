@@ -9,8 +9,8 @@ use nom::{
     combinator::{all_consuming, map, map_res, opt, recognize, value},
     error::{Error, ErrorKind, ParseError},
     multi::many0,
-    sequence::{delimited, pair, preceded, tuple},
-    IResult, InputTake,
+    sequence::{delimited, pair, preceded},
+    IResult, Input, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -184,10 +184,10 @@ impl Display for Atom {
 
 pub fn parse_or_expression(input: KconfigInput) -> IResult<KconfigInput, OrExpression> {
     map(
-        tuple((
+        (
             wsi(parse_and_expression),
             many0(preceded(wsi(tag("||")), wsi(parse_and_expression))),
-        )),
+        ),
         |(l, ee)| {
             if ee.is_empty() {
                 OrExpression::Term(l)
@@ -197,15 +197,16 @@ pub fn parse_or_expression(input: KconfigInput) -> IResult<KconfigInput, OrExpre
                 OrExpression::Expression(ll)
             }
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn parse_and_expression(input: KconfigInput) -> IResult<KconfigInput, AndExpression> {
     map(
-        tuple((
+        (
             wsi(parse_term),
             many0(preceded(wsi(tag("&&")), wsi(parse_term))),
-        )),
+        ),
         |(l, ee)| {
             if ee.is_empty() {
                 AndExpression::Term(l)
@@ -215,14 +216,16 @@ pub fn parse_and_expression(input: KconfigInput) -> IResult<KconfigInput, AndExp
                 AndExpression::Expression(ll)
             }
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn parse_term(input: KconfigInput) -> IResult<KconfigInput, Term> {
     alt((
         map(preceded(wsi(tag("!")), parse_atom), Term::Not),
         map(parse_atom, Term::Atom),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
@@ -237,14 +240,16 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
         parse_number_or_symbol,
         // needed to parse negative numbers, see test_parse_expression_number() in expression_test.rs
         map(parse_number, Atom::Number),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_string(input: KconfigInput) -> IResult<KconfigInput, String> {
     map(
         delimited(tag("\""), take_until_unbalanced('"'), tag("\"")),
         |d| d.fragment().to_string(),
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn take_until_unbalanced(
@@ -291,16 +296,17 @@ pub fn parse_compare_operator(input: KconfigInput) -> IResult<KconfigInput, Comp
         value(CompareOperator::LowerThan, tag("<")),
         value(CompareOperator::Equal, tag("=")),
         value(CompareOperator::NotEqual, tag("!=")),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     map(
-        tuple((
+        (
             wsi(parse_symbol),
             wsi(parse_compare_operator),
             wsi(parse_symbol),
-        )),
+        ),
         |(l, o, r)| {
             Atom::Compare(CompareExpression {
                 left: l,
@@ -308,7 +314,8 @@ pub fn parse_compare(input: KconfigInput) -> IResult<KconfigInput, Atom> {
                 right: r,
             })
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 // TODO ugly
@@ -326,20 +333,22 @@ pub fn parse_number_or_symbol(input: KconfigInput) -> IResult<KconfigInput, Atom
 pub fn string_to_number(input: &str) -> IResult<&str, i64> {
     all_consuming(map_res(recognize(pair(opt(char('-')), digit1)), |d| {
         FromStr::from_str(d)
-    }))(input)
+    }))
+    .parse(input)
 }
 
 pub fn parse_if_attribute(input: KconfigInput) -> IResult<KconfigInput, Option<Expression>> {
-    opt(parse_if_expression)(input)
+    opt(parse_if_expression).parse(input)
 }
 
 pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
-    map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e)(input)
+    map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e).parse(input)
 }
 
 pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     map_res(
         recognize(pair(opt(char('-')), digit1)),
         |d: KconfigInput| FromStr::from_str(d.fragment()),
-    )(input)
+    )
+    .parse(input)
 }

@@ -1,4 +1,4 @@
-use nom::{branch::alt, bytes::complete::tag, combinator::map, sequence::tuple, IResult};
+use nom::{branch::alt, bytes::complete::tag, combinator::map, IResult, Parser};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -54,14 +54,15 @@ impl Display for Select {
 /// ```
 pub fn parse_select(input: KconfigInput) -> IResult<KconfigInput, Select> {
     map(
-        tuple((
+        (
             ws(alt((tag("select"), tag("enable")))),
             ws(parse_constant_symbol),
             parse_if_attribute,
-        )),
+        ),
         |(_, s, i)| Select {
             symbol: s.to_string(),
             r#if: i,
         },
-    )(input)
+    )
+    .parse(input)
 }
