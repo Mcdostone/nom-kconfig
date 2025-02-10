@@ -26,7 +26,7 @@ fn test_parse_help_no_content() {
 
 // 3.2/drivers/net/ethernet/stmicro/stmmac/Kconfig
 #[test]
-fn test_parse_help_prefixed_by_hypen() {
+fn test_parse_help_prefixed_by_hyphen() {
     let input = "-- help\n hello world";
     assert_parsing_eq!(parse_help, input, Ok(("", "hello world".to_string())))
 }
@@ -69,8 +69,7 @@ fn test_parse_help_indent_2() {
     marketed by the Digital Equipment Corporation of blessed memory, now
     Compaq.  Alpha Linux dates from 1995-1996 and was the first non-x86
     port. The Alpha Linux project has a home page at
-    <http://www.alphalinux.org/>.
-";
+    <http://www.alphalinux.org/>.";
     assert_parsing_eq!(
         parse_help,
         input,
@@ -96,3 +95,49 @@ The Alpha is a 64-bit general-purpose processor.";
     )
 }
 */
+
+#[test]
+fn test_parse_help_indentation_preservation() {
+    let input = "help\n    Lorem Ipsum\n        - Lorem Ipsum\n    Lorem Ipsum\n";
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok((
+            "",
+            "Lorem Ipsum\n    - Lorem Ipsum\nLorem Ipsum".to_string()
+        ))
+    )
+}
+
+#[test]
+fn test_parse_help_double_newline() {
+    let input = r"help
+      bla 1
+        bla 2
+
+      bla 3";
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok(("", "bla 1\n  bla 2\n\nbla 3".to_string()))
+    )
+}
+
+// https://github.com/Mcdostone/nom-kconfig/issues/65
+// https://github.com/torvalds/linux/blob/92514ef226f511f2ca1fb1b8752966097518edc0/security/Kconfig#L236-L252
+#[test]
+fn test_parse_help_paragraph() {
+    let input = r#"help
+	  This choice is there only for converting CONFIG_DEFAULT_SECURITY
+	  in old kernel configs to CONFIG_LSM in new kernel configs. Don't
+	  change this choice unless you are creating a fresh kernel config,
+	  for this choice will be ignored after CONFIG_LSM has been set.
+
+	  Selects the legacy "major security module" that will be
+	  initialized first. Overridden by non-default CONFIG_LSM."#;
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok(("", "This choice is there only for converting CONFIG_DEFAULT_SECURITY\nin old kernel configs to CONFIG_LSM in new kernel configs. Don't\nchange this choice unless you are creating a fresh kernel config,\nfor this choice will be ignored after CONFIG_LSM has been set.\n\nSelects the legacy \"major security module\" that will be\ninitialized first. Overridden by non-default CONFIG_LSM.".to_string()))
+    )
+}

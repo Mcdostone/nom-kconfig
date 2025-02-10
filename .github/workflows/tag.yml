@@ -1,0 +1,62 @@
+name: Tag
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: '--deny warnings'
+  MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
+
+permissions:
+  contents: write
+  actions: write
+  packages: write
+  attestations: write
+  id-token: write
+  pull-requests: write
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - CHANGELOG.md
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      created: ${{ steps.tag.outputs.created }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get tags
+        run: git fetch --tags origin
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Configure git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git config --global push.autoSetupRemote true
+      - name: Get the version
+        id: current
+        run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
+      - name: Create git tag
+        id: tag
+        run:  |
+          if git tag -a "v${{ steps.current.outputs.version }}" -m "${{ steps.current.outputs.version }}"; then
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice title=Git tag:: The version ${{ steps.current.outputs.version }} already exists. The \`publish\` workflow won't be executed."
+            echo "created=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: tag
+    if: ${{ needs.tag.outputs.created == 'true' }}
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit
