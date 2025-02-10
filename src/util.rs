@@ -1,5 +1,3 @@
-use std::ops::{Range, RangeFrom, RangeTo};
-
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -8,7 +6,7 @@ use nom::{
     error::ParseError,
     multi::many0,
     sequence::{preceded, terminated},
-    AsChar, Compare, IResult, InputIter, InputLength, InputTake, InputTakeAtPosition, Slice,
+    AsChar, Compare, IResult, Input, Parser,
 };
 
 use crate::KconfigInput;
@@ -27,15 +25,9 @@ use crate::KconfigInput;
 /// ```
 pub fn ws_comment<I, E: ParseError<I>>(input: I) -> IResult<I, (), E>
 where
-    I: Clone + InputLength + InputTake,
-    I: InputTakeAtPosition,
-    <I as InputTakeAtPosition>::Item: AsChar + Clone,
-    <I as InputIter>::Item: Clone,
-    I: Slice<Range<usize>> + Slice<RangeFrom<usize>> + Slice<RangeTo<usize>>,
-    I: InputIter + InputLength,
+    I: Clone + Input,
     I: Compare<&'static str>,
-    <I as InputIter>::Item: AsChar,
-    <I as InputIter>::Item: AsChar,
+    <I as Input>::Item: AsChar,
 {
     value(
         (),
@@ -49,7 +41,8 @@ where
             // TODO linux v3.2, in file /drivers/dma/Kconfig
             tag(" "),
         ))),
-    )(input)
+    )
+    .parse(input)
 }
 /// Gets rid of comments, spaces, tabs and newlines.
 ///
@@ -62,20 +55,12 @@ where
 /// hello"#;
 /// assert_eq!(ws(tag::<&str, &str, ()>("hello"))(input), Ok(("", "hello")))
 /// ```
-pub fn ws<I, F, O, E: ParseError<I>>(inner: F) -> impl FnMut(I) -> IResult<I, O, E>
+pub fn ws<I, F, O, E: ParseError<I>>(inner: F) -> impl Parser<I, Output = O, Error = E>
 where
-    I: Clone + InputLength + InputTake,
-    <I as InputIter>::Item: Clone,
-    I: InputTakeAtPosition,
-    <I as InputTakeAtPosition>::Item: AsChar + Clone,
-    I: InputTakeAtPosition,
-    <I as InputTakeAtPosition>::Item: AsChar,
-    I: Slice<Range<usize>> + Slice<RangeFrom<usize>> + Slice<RangeTo<usize>>,
-    I: InputIter + InputLength,
+    I: Clone + Input,
     I: Compare<&'static str>,
-    <I as InputIter>::Item: AsChar,
-    <I as InputIter>::Item: AsChar,
-    F: FnMut(I) -> IResult<I, O, E>,
+    <I as Input>::Item: AsChar,
+    F: Parser<I, Output = O, Error = E>,
 {
     preceded(ws_comment, inner)
 }
@@ -95,7 +80,7 @@ where
 /// ```
 ///
 pub fn parse_until_eol(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
-    terminated(not_line_ending, alt((line_ending, eof)))(input)
+    terminated(not_line_ending, alt((line_ending, eof))).parse(input)
 }
 
 /// Gets rid of spaces, tabs and backslash + newline.
@@ -107,20 +92,12 @@ pub fn parse_until_eol(input: KconfigInput) -> IResult<KconfigInput, KconfigInpu
 /// hello"#;
 /// assert_eq!(wsi(tag::<&str, &str, ()>("hello"))(input), Ok(("", "hello")))
 /// ```
-pub fn wsi<I, F, O, E: ParseError<I>>(inner: F) -> impl FnMut(I) -> IResult<I, O, E>
+pub fn wsi<I, F, O, E: ParseError<I>>(inner: F) -> impl Parser<I, Output = O, Error = E>
 where
-    I: Clone + InputLength + InputTake,
-    <I as InputIter>::Item: Clone,
-    I: InputTakeAtPosition,
-    <I as InputTakeAtPosition>::Item: AsChar + Clone,
-    I: InputTakeAtPosition,
-    <I as InputTakeAtPosition>::Item: AsChar,
-    I: Slice<Range<usize>> + Slice<RangeFrom<usize>> + Slice<RangeTo<usize>>,
-    I: InputIter + InputLength,
+    I: Clone + Input,
     I: Compare<&'static str>,
-    <I as InputIter>::Item: AsChar,
-    <I as InputIter>::Item: AsChar,
-    F: FnMut(I) -> IResult<I, O, E>,
+    <I as Input>::Item: AsChar,
+    F: Parser<I, Output = O, Error = E>,
 {
     preceded(
         value((), many0(alt((preceded(tag("\\"), line_ending), space1)))),

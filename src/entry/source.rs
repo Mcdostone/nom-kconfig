@@ -8,7 +8,7 @@ use nom::{
     error::{Error, ErrorKind, ParseError},
     multi::many1,
     sequence::delimited,
-    IResult,
+    IResult, Parser,
 };
 use regex::Regex;
 
@@ -25,15 +25,17 @@ pub fn parse_filepath(input: KconfigInput) -> IResult<KconfigInput, &str> {
             recognize(one_of(".$()-_$/")),
         ))))),
         |d| d.fragment().to_owned(),
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
-    let (input, _) = ws(tag("source"))(input)?;
+    let (input, _) = ws(tag("source")).parse(input)?;
     let (input, file) = wsi(alt((
         delimited(tag("\""), parse_filepath, tag("\"")),
         parse_filepath,
-    )))(input)?;
+    )))
+    .parse(input)?;
     let source_kconfig_file = KconfigFile::new(input.clone().extra.root_dir, PathBuf::from(file));
     if is_dynamic_source(file) {
         return Ok((
@@ -50,7 +52,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
 
     let binding = source_content.clone();
     #[allow(clippy::let_and_return)]
-    let x = match cut(parse_kconfig)(KconfigInput::new_extra(
+    let x = match cut(parse_kconfig).parse(KconfigInput::new_extra(
         &binding,
         source_kconfig_file.clone(),
     )) {

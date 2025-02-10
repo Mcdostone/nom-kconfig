@@ -6,8 +6,8 @@ use nom::{
     character::complete::{alphanumeric1, char, one_of, space1},
     combinator::{map, opt, recognize},
     multi::{many1, separated_list0},
-    sequence::{delimited, preceded, terminated, tuple},
-    IResult,
+    sequence::{delimited, preceded, terminated},
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -107,7 +107,8 @@ pub fn parse_expression_token_variable_parameter(
             tag(")"),
         ),
         |d: KconfigInput| ExpressionToken::Variable(d.fragment().to_string()),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_expression_token_parameter(input: KconfigInput) -> IResult<KconfigInput, ExpressionToken> {
@@ -140,25 +141,28 @@ fn parse_expression_token_parameter(input: KconfigInput) -> IResult<KconfigInput
         map(parse_function_call, |f| {
             ExpressionToken::Function(Box::new(f))
         }),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 fn parse_instruction_parameter(input: KconfigInput) -> IResult<KconfigInput, String> {
     map(
-        tuple((
+        (
             tag("%"),
             recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_"))))))),
             delimited(tag("("), alphanumeric1, tag(")")),
-        )),
+        ),
         |(_a, b, c)| format!("%{}({})", b, c),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_env_variable_parameter(input: KconfigInput) -> IResult<KconfigInput, ExpressionToken> {
     map(
         ws(preceded(tag("$"), recognize(many1(alphanumeric1)))),
         |d| ExpressionToken::Literal(format!("${}", d)),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_literal_parameter(input: KconfigInput) -> IResult<KconfigInput, ExpressionToken> {
@@ -173,41 +177,45 @@ fn parse_literal_parameter(input: KconfigInput) -> IResult<KconfigInput, Express
             ))))),
             |d: KconfigInput| ExpressionToken::Literal(d.fragment().to_string()),
         ),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_expression_parameter(
     input: KconfigInput,
 ) -> IResult<KconfigInput, Vec<ExpressionToken>> {
-    alt((many1(parse_expression_token_parameter),))(input)
+    alt((many1(parse_expression_token_parameter),)).parse(input)
 }
 
 pub fn parse_parameter(input: KconfigInput) -> IResult<KconfigInput, Parameter> {
     map(alt((parse_expression_parameter,)), |d| Parameter {
         tokens: d,
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_function_name(input: KconfigInput) -> IResult<KconfigInput, &str> {
     map(
         recognize(ws(many1(alt((alphanumeric1, recognize(one_of("=-"))))))),
         |d: KconfigInput| d.fragment().to_owned(),
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn parse_function_call(input: KconfigInput) -> IResult<KconfigInput, FunctionCall> {
     map(
         delimited(
             tag("$("),
-            tuple((
+            (
                 terminated(parse_function_name, opt(ws(tag(",")))),
                 separated_list0(ws(tag(",")), ws(parse_parameter)),
-            )),
+            ),
             ws(tag(")")),
         ),
         |(name, parameters)| FunctionCall {
             name: name.to_string(),
             parameters,
         },
-    )(input)
+    )
+    .parse(input)
 }

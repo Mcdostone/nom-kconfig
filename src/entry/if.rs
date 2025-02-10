@@ -3,7 +3,7 @@ use nom::{
     combinator::{cut, map},
     multi::many0,
     sequence::{pair, terminated},
-    IResult,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -58,5 +58,6 @@ pub fn parse_if(input: KconfigInput) -> IResult<KconfigInput, If> {
             cut(terminated(many0(parse_entry), ws(tag("endif")))),
         ),
         |(condition, entries)| If { condition, entries },
-    )(input)
+    )
+    .parse(input)
 }

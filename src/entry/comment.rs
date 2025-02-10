@@ -1,4 +1,4 @@
-use nom::{bytes::complete::tag, combinator::map, multi::many0, sequence::tuple, IResult};
+use nom::{bytes::complete::tag, combinator::map, multi::many0, IResult, Parser};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -22,14 +22,15 @@ pub struct Comment {
 
 pub fn parse_comment(input: KconfigInput) -> IResult<KconfigInput, Comment> {
     map(
-        tuple((
+        (
             ws(tag("comment")),
             ws(parse_prompt_value),
             many0(ws(parse_depends_on)),
-        )),
+        ),
         |(_, prompt, dependencies)| Comment {
             prompt: prompt.to_string(),
             dependencies,
         },
-    )(input)
+    )
+    .parse(input)
 }

@@ -3,12 +3,11 @@ use crate::{util::ws, KconfigInput};
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::char,
-    character::complete::{alphanumeric1, line_ending, multispace1, not_line_ending, one_of},
+    character::complete::{alphanumeric1, char, line_ending, multispace1, not_line_ending, one_of},
     combinator::{eof, map, recognize, verify},
     multi::many1,
-    sequence::{delimited, terminated, tuple},
-    IResult,
+    sequence::{delimited, terminated},
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -44,12 +43,13 @@ impl Display for Prompt {
 
 pub fn parse_prompt(input: KconfigInput) -> IResult<KconfigInput, Prompt> {
     map(
-        tuple((ws(tag("prompt")), parse_prompt_value, parse_if_attribute)),
+        (ws(tag("prompt")), parse_prompt_value, parse_if_attribute),
         |(_, p, i)| Prompt {
             prompt: p.to_string(),
             r#if: i,
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 /// Parses a `prompt` attribute.
@@ -82,5 +82,6 @@ pub fn parse_prompt_value(input: KconfigInput) -> IResult<KconfigInput, String> 
             ),
         )),
         |d: KconfigInput| d.fragment().to_owned().trim().to_string(),
-    )(input)
+    )
+    .parse(input)
 }

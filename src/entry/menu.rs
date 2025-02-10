@@ -4,7 +4,7 @@ use nom::{
     combinator::{cut, map},
     multi::many0,
     sequence::{pair, preceded, terminated},
-    IResult,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -42,7 +42,8 @@ fn parse_menu_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attri
     many0(alt((
         ws(parse_depends_on),
         map(ws(parse_visible), Attribute::Visible),
-    )))(input)
+    )))
+    .parse(input)
 }
 
 pub fn parse_menu(input: KconfigInput) -> IResult<KconfigInput, Menu> {
@@ -65,9 +66,11 @@ pub fn parse_menu(input: KconfigInput) -> IResult<KconfigInput, Menu> {
             }
             menu
         },
-    )(input)?;
+    )
+    .parse(input)?;
 
-    let (input, entries) = cut(terminated(many0(ws(parse_entry)), ws(tag("endmenu"))))(input)?;
+    let (input, entries) =
+        cut(terminated(many0(ws(parse_entry)), ws(tag("endmenu")))).parse(input)?;
     menu.entries = entries;
     Ok((input, menu))
 }

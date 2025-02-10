@@ -1,4 +1,4 @@
-use nom::{bytes::complete::tag, combinator::value, IResult};
+use nom::{bytes::complete::tag, combinator::value, IResult, Parser};
 
 use crate::{util::ws, KconfigInput};
 
@@ -11,5 +11,5 @@ use crate::{util::ws, KconfigInput};
 /// assert_parsing_eq!(parse_optional, "optional", Ok(("", ())))
 /// ```
 pub fn parse_optional(input: KconfigInput) -> IResult<KconfigInput, ()> {
-    value((), ws(tag("optional")))(input)
+    value((), ws(tag("optional"))).parse(input)
 }

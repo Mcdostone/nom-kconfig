@@ -4,8 +4,7 @@ use nom::{
     character::complete::{alphanumeric1, one_of},
     combinator::{map, recognize},
     multi::many1,
-    sequence::tuple,
-    IResult,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -49,7 +48,8 @@ pub enum Value {
 pub fn parse_value(input: KconfigInput) -> IResult<KconfigInput, Value> {
     map(parse_until_eol, |d| {
         Value::Literal(d.fragment().trim().to_string())
-    })(input)
+    })
+    .parse(input)
 }
 
 pub fn parse_variable_identifier(input: KconfigInput) -> IResult<KconfigInput, VariableIdentifier> {
@@ -61,26 +61,29 @@ pub fn parse_variable_identifier(input: KconfigInput) -> IResult<KconfigInput, V
         map(many1(parse_expression_token_variable_parameter), |v| {
             VariableIdentifier::VariableRef(v)
         }),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_variable_assignment(input: KconfigInput) -> IResult<KconfigInput, VariableAssignment> {
     map(
-        tuple((
+        (
             ws(parse_variable_identifier),
             ws(parse_assign),
             ws(parse_value),
-        )),
+        ),
         |(l, o, r)| VariableAssignment {
             identifier: l,
             operator: o.to_string(),
             right: r,
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn parse_assign(input: KconfigInput) -> IResult<KconfigInput, &str> {
     map(alt((tag("="), tag(":="), tag("+="))), |d: KconfigInput| {
         d.fragment().to_owned()
-    })(input)
+    })
+    .parse(input)
 }

@@ -1,12 +1,11 @@
 use nom::{
     branch::alt,
     bytes::complete::take_until,
-    character::complete::char,
-    character::complete::{alphanumeric1, one_of},
+    character::complete::{alphanumeric1, char, one_of},
     combinator::{map, recognize},
     multi::many1,
     sequence::delimited,
-    IResult,
+    IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
@@ -44,14 +43,16 @@ pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
             delimited(ws(char('\'')), take_until("'"), char('\'')),
             |c: KconfigInput| Symbol::NonConstant(format!("'{}'", c)),
         ),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_constant_symbol(input: KconfigInput) -> IResult<KconfigInput, &str> {
     map(
         recognize(ws(many1(alt((alphanumeric1, recognize(one_of("._"))))))),
         |c: KconfigInput| c.trim(),
-    )(input)
+    )
+    .parse(input)
 }
 
 #[cfg(feature = "display")]

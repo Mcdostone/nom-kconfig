@@ -1,4 +1,4 @@
-use nom::{bytes::complete::tag, combinator::map, sequence::tuple, IResult};
+use nom::{bytes::complete::tag, combinator::map, IResult, Parser};
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -61,7 +61,8 @@ impl Display for Imply {
 /// ```
 pub fn parse_imply(input: KconfigInput) -> IResult<KconfigInput, Imply> {
     map(
-        tuple((ws(tag("imply")), ws(parse_symbol), parse_if_attribute)),
+        (ws(tag("imply")), ws(parse_symbol), parse_if_attribute),
         |(_, s, i)| Imply { symbol: s, r#if: i },
-    )(input)
+    )
+    .parse(input)
 }
