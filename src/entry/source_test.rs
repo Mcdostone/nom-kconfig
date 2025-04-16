@@ -1,7 +1,7 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 use crate::{
-    entry::{parse_source, Source},
+    entry::{parse_source, source::apply_vars, Source},
     Kconfig, KconfigFile, KconfigInput,
 };
 
@@ -71,4 +71,21 @@ fn assert_parsing_source_eq(
     ))
     .map(|r| (r.0.fragment().to_owned(), r.1));
     assert_eq!(res, expected)
+}
+
+fn assert_apply_env_vars(s: &str, extra_vars: &[(&str, &str)], expected: Option<&str>) {
+    let extra_vars: HashMap<String, String> = extra_vars
+        .into_iter()
+        .map(|(s1, s2)| (s1.to_string(), s2.to_string())).collect();
+    assert_eq!(apply_vars(s, &extra_vars), expected.map(String::from));
+}
+
+#[test]
+fn test_apply_env_vars() {
+    assert_apply_env_vars("123 $(NON_EXISTENT_VAR) 456", &[], None);
+    assert_apply_env_vars("123 $(NON_EXISTENT_VAR) 456", &[("USELESS_VAR", "789")], None);
+    assert_apply_env_vars("123", &[], Some("123"));
+    assert_apply_env_vars("123", &[("USELESS_VAR", "789")], Some("123"));
+    assert_apply_env_vars("123 $(GOOD_VAR) 456", &[("GOOD_VAR", "Bingo")], Some("123 Bingo 456"));
+    assert_apply_env_vars("123 $(GOOD_VAR) 456 $(GOOD_VAR)", &[("GOOD_VAR", "Bingo")], Some("123 Bingo 456 Bingo"));
 }

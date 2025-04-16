@@ -23,6 +23,7 @@ use nom_locate::LocatedSpan;
 
 use std::path::PathBuf;
 use std::{fs, io};
+use std::collections::HashMap;
 
 pub mod attribute;
 pub mod entry;
@@ -46,11 +47,17 @@ pub struct KconfigFile {
     root_dir: PathBuf,
     /// The path the the Kconfig you want to parse.
     file: PathBuf,
+    /// Externally-specified variables to use when including child source files
+    vars: HashMap<String, String>,
 }
 
 impl KconfigFile {
     pub fn new(root_dir: PathBuf, file: PathBuf) -> Self {
-        Self { root_dir, file }
+        Self { root_dir, file, vars: HashMap::new() }
+    }
+
+    pub fn new_with_vars<S: AsRef<str>>(root_dir: PathBuf, file: PathBuf, vars: &HashMap<S, S>) -> Self {
+        Self { root_dir, file, vars: vars.into_iter().map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string())).collect() }
     }
 
     pub fn full_path(&self) -> PathBuf {
@@ -59,6 +66,10 @@ impl KconfigFile {
 
     pub fn read_to_string(&self) -> io::Result<String> {
         fs::read_to_string(self.full_path())
+    }
+
+    pub fn set_vars<S: AsRef<str>>(&mut self, vars: &[(S, S)]) {
+        self.vars = vars.into_iter().map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string())).collect();
     }
 }
 
