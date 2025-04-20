@@ -176,9 +176,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: lycheeverse/lychee-action@v2
         name: Link Checker
-        # https://github.com/lycheeverse/lychee/issues/1405
-        with:
-          args: --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/*.md' --exclude-path ./docs/url-templates/README.md --exclude-path ./docs/schema-registry/README.md  --exclude 'https://docs.rs'
 
   typos:
     name: Typos
