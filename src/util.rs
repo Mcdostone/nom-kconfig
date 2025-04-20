@@ -49,11 +49,12 @@ where
 /// # Example
 /// ```
 /// use nom::bytes::complete::tag;
+/// use nom::Parser;
 /// use nom_kconfig::util::ws;
 /// let input = r#"# a comment#   \
 ///
 /// hello"#;
-/// assert_eq!(ws(tag::<&str, &str, ()>("hello"))(input), Ok(("", "hello")))
+/// assert_eq!(ws(tag::<&str, &str, ()>("hello")).parse(input), Ok(("", "hello")))
 /// ```
 pub fn ws<I, F, O, E: ParseError<I>>(inner: F) -> impl Parser<I, Output = O, Error = E>
 where
@@ -87,10 +88,11 @@ pub fn parse_until_eol(input: KconfigInput) -> IResult<KconfigInput, KconfigInpu
 /// # Example
 /// ```
 /// use nom::bytes::complete::tag;
+/// use nom::Parser;
 /// use nom_kconfig::util::wsi;
 /// let input = r#"   \
 /// hello"#;
-/// assert_eq!(wsi(tag::<&str, &str, ()>("hello"))(input), Ok(("", "hello")))
+/// assert_eq!(wsi(tag::<&str, &str, ()>("hello")).parse(input), Ok(("", "hello")))
 /// ```
 pub fn wsi<I, F, O, E: ParseError<I>>(inner: F) -> impl Parser<I, Output = O, Error = E>
 where

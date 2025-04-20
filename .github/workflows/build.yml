@@ -54,41 +54,6 @@ jobs:
       - name: Run cargo build
         run: cargo build
 
-  build-for-targets:
-    name: Build for targets
-    needs: check
-    runs-on: ${{ matrix.platforms.os }}
-    continue-on-error: true
-    strategy:
-      matrix:
-        platforms:
-          - os: macOS-latest
-            target: aarch64-apple-darwin
-            features: ""
-          - os: macos-latest-large
-            target: x86_64-apple-darwin
-            features: ""
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            features: ""
-          - os: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-gnu
-            features: ""
-          - os: windows-latest
-            target: x86_64-pc-windows-gnu
-            features: "--no-default-features"
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            features: "--no-default-features --features ssl-vendored"
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: houseabsolute/actions-rust-cross@v1
-        with:
-          target: ${{ matrix.platforms.target }}
-          args: "--locked ${{ matrix.platforms.features }}"
-          strip: true
-
   clippy:
     needs: check
     name: Clippy
