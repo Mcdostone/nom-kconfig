@@ -60,9 +60,15 @@ jobs:
   publish-to-registry:
     runs-on: ubuntu-latest
     name: Publish to registry
+    needs: [create-release]
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
       - name: Publish the crate
         run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
