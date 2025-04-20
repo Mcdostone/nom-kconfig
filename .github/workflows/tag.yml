@@ -44,7 +44,7 @@ jobs:
           git config --global push.autoSetupRemote true
       - name: Get the version
         id: current
-        run: echo "version=$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(cargo pkgid | cut -d '#' -f2)" >> "$GITHUB_OUTPUT"
       - name: Create git tag
         id: tag
         run:  |

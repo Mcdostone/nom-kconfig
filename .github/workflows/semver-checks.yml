@@ -55,8 +55,8 @@ jobs:
       - name: Delete old cargo-semver-checks comments
         continue-on-error: true
         run: |
-          gh pr view "${{ github.event.number }}" --json comments --jq '.comments[] | select(.author.login == "github-actions") | .url' | grep -E 'issuecomment-(.+)' | cut -d '-' -f2 > comments.txt
-          xargs -I {} gh api -X DELETE "/repos/MAIF/yozefu/issues/comments/{}" < comments.txt
+          gh pr view "${{ github.event.number }}" --json comments --jq '.comments[] | select(.author.login == "github-actions") | .url' | grep -oE 'issuecomment-(.+)' | cut -d '-' -f2 > comments.txt
+          xargs -I {} gh api -X DELETE "/repos/Mcdostone/nom-kconfig/issues/comments/{}" < comments.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: dtolnay/rust-toolchain@master
@@ -68,7 +68,7 @@ jobs:
         run: echo "version=$(git tag --sort=-creatordate | head -n 1)" >> "$GITHUB_OUTPUT"
       - name: Get next version
         id: next
-        run: echo "version=v$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
+        run: echo "version=v$(cargo pkgid | cut -d '#' -f2)" >> "$GITHUB_OUTPUT"
       - name: Compute next step
         id: nextStep
         if: ${{ steps.current.outputs.version == steps.next.outputs.version }}
@@ -112,7 +112,7 @@ jobs:
         run: |
           printf "\`cargo-semver-checks\` has detected some issues: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" > report.md
           printf '```bash' >> report.md
-          cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "${{ steps.semver.outputs.release }}" 2>&1 | tee -a report.md
+          cargo semver-checks --color never --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "${{ steps.semver.outputs.release }}" 2>&1 | tee -a report.md
           if [[ "${PIPESTATUS[0]}" != "0" ]]; then
             printf '```' >> report.md
             exit 1
@@ -156,7 +156,7 @@ jobs:
           b="major"
           for t in patch minor; do
             echo "Checking whether the next version is $t"
-            if cargo semver-checks --color never --package yozefu-lib --package yozefu-app --package yozefu-wasm-types --package yozefu-command --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "$t"; then
+            if cargo semver-checks --color never --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "$t"; then
               b="$t"
               break
             fi
@@ -175,7 +175,6 @@ jobs:
             echo "cargo release ${{ steps.bump.outputs.bump }} --no-push --no-tag --no-publish --no-confirm --execute"
             echo "git push"
             echo '```'
-            echo "More details at https://github.com/MAIF/yozefu/blob/main/docs/release/README.md"
           } >> report.md
           gh pr comment ${{ github.event.number }} --body-file ./report.md
         env:

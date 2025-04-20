@@ -45,3 +45,9 @@ display = []
 hash = []
 serialize = ["dep:serde"]
 deserialize = ["dep:serde"]
+
+
+[package.metadata.typos]
+files.extend-exclude = [
+    "benches/linux-6.4.10"
+]
