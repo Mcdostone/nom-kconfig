@@ -25,7 +25,8 @@ pub fn parse_filepath(input: KconfigInput) -> IResult<KconfigInput, &str> {
             recognize(one_of(".$()-_$/")),
         ))))),
         |d| d.fragment().to_owned(),
-    ).parse(input)
+    )
+    .parse(input)
 }
 
 pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
@@ -33,10 +34,14 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     let (input, file) = wsi(alt((
         delimited(tag("\""), parse_filepath, tag("\"")),
         parse_filepath,
-    ))).parse(input)?;
+    )))
+    .parse(input)?;
     if let Some(file) = apply_vars(file, &input.extra.vars) {
         let source_kconfig_file = KconfigFile::new_with_vars(
-            input.clone().extra.root_dir, PathBuf::from(file), &input.extra.vars);
+            input.clone().extra.root_dir,
+            PathBuf::from(file),
+            &input.extra.vars,
+        );
         let source_content = source_kconfig_file
             .read_to_string()
             .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
@@ -65,19 +70,19 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     }
 }
 
-pub fn apply_vars(file: &str, extra_vars: &std::collections::HashMap<String, String>) -> Option<String> {
+pub fn apply_vars(
+    file: &str,
+    extra_vars: &std::collections::HashMap<String, String>,
+) -> Option<String> {
     let re = Regex::new(r"\$\((\S+)\)").unwrap();
     let mut file_copy = String::from(file);
-    for (var_name, var_value) in re
-        .captures_iter(file)
-        .map(|cap| {
-            let ex: (&str, [&str; 1]) = cap.extract();
-            let var = ex.1[0];
-            (var, extra_vars.get(var))
-        })
-    {
+    for (var_name, var_value) in re.captures_iter(file).map(|cap| {
+        let ex: (&str, [&str; 1]) = cap.extract();
+        let var = ex.1[0];
+        (var, extra_vars.get(var))
+    }) {
         if let Some(var_value) = var_value {
-            file_copy = file_copy.replace(&format!("$({var_name})"), &var_value);
+            file_copy = file_copy.replace(&format!("$({var_name})"), var_value);
         } else {
             return None;
         }
