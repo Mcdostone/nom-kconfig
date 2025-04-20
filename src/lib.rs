@@ -1,3 +1,5 @@
+#![allow(clippy::result_large_err)]
+
 //! # nom-kconfig
 //!
 //! A parser for kconfig files. The parsing is done with [nom](https://github.com/rust-bakery/nom).
@@ -21,9 +23,9 @@
 
 use nom_locate::LocatedSpan;
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::{fs, io};
-use std::collections::HashMap;
 
 pub mod attribute;
 pub mod entry;
@@ -53,11 +55,26 @@ pub struct KconfigFile {
 
 impl KconfigFile {
     pub fn new(root_dir: PathBuf, file: PathBuf) -> Self {
-        Self { root_dir, file, vars: HashMap::new() }
+        Self {
+            root_dir,
+            file,
+            vars: HashMap::new(),
+        }
     }
 
-    pub fn new_with_vars<S: AsRef<str>>(root_dir: PathBuf, file: PathBuf, vars: &HashMap<S, S>) -> Self {
-        Self { root_dir, file, vars: vars.into_iter().map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string())).collect() }
+    pub fn new_with_vars<S: AsRef<str>>(
+        root_dir: PathBuf,
+        file: PathBuf,
+        vars: &HashMap<S, S>,
+    ) -> Self {
+        Self {
+            root_dir,
+            file,
+            vars: vars
+                .iter()
+                .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
+                .collect(),
+        }
     }
 
     pub fn full_path(&self) -> PathBuf {
@@ -69,7 +86,10 @@ impl KconfigFile {
     }
 
     pub fn set_vars<S: AsRef<str>>(&mut self, vars: &[(S, S)]) {
-        self.vars = vars.into_iter().map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string())).collect();
+        self.vars = vars
+            .iter()
+            .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
+            .collect();
     }
 }
 

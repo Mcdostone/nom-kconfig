@@ -15,26 +15,25 @@ env:
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: '--deny warnings'
-  MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
+  MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+
   check:
     name: Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Run cargo check
-        run: cargo check --all-features --locked --release --all
-        env: 
-          CARGO_NET_GIT_FETCH_WITH_CLI: true
+    - uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
+    - uses: Swatinem/rust-cache@v2
+    - name: Run cargo check
+      run: cargo check --all-features --locked --release --all
 
   build:
     name: Build w/o features
@@ -72,27 +71,23 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             features: ""
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-            features: "--no-default-features"
+            features: ""
           - os: windows-latest
             target: x86_64-pc-windows-gnu
             features: "--no-default-features"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            features: "--no-default-features"
+            features: "--no-default-features --features ssl-vendored"
 
     steps:
       - uses: actions/checkout@v4
       - uses: houseabsolute/actions-rust-cross@v1
-        # if: (github.event.pull_request.base.ref  == 'main' && matrix.platforms.os == 'macos-latest-large') == false
         with:
           target: ${{ matrix.platforms.target }}
           args: "--locked ${{ matrix.platforms.features }}"
-        env:
-          KRB5_CV_ATTR_CONSTRUCTOR_DESTRUCTOR: yes
-          AC_CV_FUNC_REGCOMP: yes
-          AC_CV_PRINTF_POSITIONAL: yes
+          strip: true
 
   clippy:
     needs: check
@@ -107,6 +102,21 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Run cargo clippy
         run: cargo clippy --all-targets --all-features -- --deny warnings
+
+  license:
+    needs: check
+    name: License
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install git-cliff
+        run: cargo install cargo-deny
+      - name: Run cargo deny
+        run: cargo deny check licenses
 
   format:
     needs: check
@@ -131,9 +141,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: bnjbvr/cargo-machete@main
 
-  code-coverage:
-    name: Code coverage
+  tests:
     needs: check
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -141,14 +151,8 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
-      - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin
-      - name: Run cargo tarpaulin
-        run: cargo tarpaulin --all-features --out Xml
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+      - run: cargo test
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           CI: "true"
 
   doc:
@@ -172,6 +176,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: lycheeverse/lychee-action@v2
         name: Link Checker
+        # https://github.com/lycheeverse/lychee/issues/1405
+        with:
+          args: --exclude-loopback README.md './crates/app/README.md' './crates/command/README.md' './crates/lib/README.md' './crates/wasm-types/README.md' './crates/bin/src/**' './crates/app/src/**' './crates/command/src/**' './crates/lib/src/**' './crates/wasm-types/src/**' './docs/*.md' --exclude-path ./docs/url-templates/README.md --exclude-path ./docs/schema-registry/README.md  --exclude 'https://docs.rs'
 
   typos:
     name: Typos
@@ -180,10 +187,8 @@ jobs:
     steps:
     - name: Checkout Actions Repository
       uses: actions/checkout@v4
-    - name: Install typos-cli
-      run: cargo install typos-cli
-    - name: Run typos-cli
-      run: typos --exclude ./benches/*
+    - name: Check spelling of the project
+      uses: crate-ci/typos@master
 
   cargo-deny:
     name: Cargo deny
