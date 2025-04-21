@@ -9,7 +9,7 @@
 * test: add another unit test for `parse_help` by @Mcdostone
 * trim newline around the parsed help text by @Vollbrecht
 * modify test to reflect multi newline possibility by @Vollbrecht
-* fix helptext parsing accross paragraph's by @Vollbrecht
+* fix helptext parsing across paragraph's by @Vollbrecht
 * ci: improve the CI by @Mcdostone
 * fix: change type of error when parsing `help` by @Mcdostone
 * fix: update dependencies by @Mcdostone
@@ -80,7 +80,7 @@
 * remove macros by @Mcdostone
 * trying to stabilize the API by @Mcdostone
 * more unit tests by @Mcdostone
-* attemps to improve code coverage by @Mcdostone
+* attempts to improve code coverage by @Mcdostone
 * ok by @Mcdostone
 * ok by @Mcdostone
 * ok by @Mcdostone
