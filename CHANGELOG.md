@@ -1,4 +1,7 @@
 ## What's Changed in v0.3.0
+
+* @garikello3d made their first contribution
+
 * ci: fix GA workflow by @Mcdostone
 * Develop by @Mcdostone in [#64](https://github.com/Mcdostone/nom-kconfig/pull/64)
 * ci: configure typos by @Mcdostone
