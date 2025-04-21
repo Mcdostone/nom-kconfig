@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::{
     assert_parsing_eq,
     attribute::{
@@ -8,7 +10,7 @@ use crate::{
     entry::{config::Config, r#if::If, MenuConfig},
     kconfig::parse_kconfig,
     symbol::Symbol,
-    Attribute, Entry, Kconfig,
+    Attribute, Entry, Kconfig, KconfigFile,
 };
 
 #[macro_export]
@@ -188,4 +190,11 @@ config AS_WRUSS
             },
         ))
     )
+}
+
+#[test]
+fn test_set_envs() {
+    let mut file = KconfigFile::new(PathBuf::from("."), PathBuf::from("Kconfig"));
+    file.set_vars(&[("ARCH", "ARCH_64")]);
+    assert_eq!(file.vars.get("ARCH"), Some(&"ARCH_64".to_string()));
 }
