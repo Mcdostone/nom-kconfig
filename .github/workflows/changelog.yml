@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-tags: 'true'
           fetch-depth: 0
@@ -54,7 +54,7 @@ jobs:
           git commit -m "chore: Update changelog"
           git push origin "changelog/${{ steps.release.outputs.version }}" --force
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: "changelog/${{ steps.release.outputs.version }}"
       - name: Create pull request for changelog
