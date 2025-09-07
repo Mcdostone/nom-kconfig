@@ -1,6 +1,6 @@
 [package]
 name = "nom-kconfig"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 authors = ["yann Prono"]
 repository = "https://github.com/Mcdostone/nom-kconfig"
@@ -51,3 +51,10 @@ deserialize = ["dep:serde"]
 files.extend-exclude = [
     "benches/linux-6.4.10"
 ]
+
+
+[workspace.metadata.release]
+shared-version = true
+tag-message = "chore: Release version v{{version}}"
+pre-release-commit-message = "chore: Release version v{{version}}"
+tag-name = "{{version}}"
