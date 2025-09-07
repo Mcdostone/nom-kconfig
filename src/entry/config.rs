@@ -48,7 +48,7 @@ macro_rules! generic_config_parser {
     }};
 }
 
-pub fn parse_config_symbol(input: KconfigInput) -> IResult<KconfigInput, &str> {
+pub fn parse_config_symbol(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
         recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_"))))))),
         |d: KconfigInput| d.fragment().to_owned(),

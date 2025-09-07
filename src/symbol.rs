@@ -47,7 +47,7 @@ pub fn parse_symbol(input: KconfigInput) -> IResult<KconfigInput, Symbol> {
     .parse(input)
 }
 
-pub fn parse_constant_symbol(input: KconfigInput) -> IResult<KconfigInput, &str> {
+pub fn parse_constant_symbol(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
         recognize(ws(many1(alt((alphanumeric1, recognize(one_of("._"))))))),
         |c: KconfigInput| c.trim(),

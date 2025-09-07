@@ -81,7 +81,7 @@ pub fn parse_variable_assignment(input: KconfigInput) -> IResult<KconfigInput, V
     .parse(input)
 }
 
-pub fn parse_assign(input: KconfigInput) -> IResult<KconfigInput, &str> {
+pub fn parse_assign(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(alt((tag("="), tag(":="), tag("+="))), |d: KconfigInput| {
         d.fragment().to_owned()
     })

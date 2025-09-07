@@ -97,6 +97,23 @@ jobs:
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
 
+  lockfile:
+    name: Lockfile
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check lockfile is updated
+        run: cargo update --locked
+
   unused-dependencies:
     needs: check
     name: Unused dependencies

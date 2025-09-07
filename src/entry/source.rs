@@ -18,7 +18,7 @@ use crate::{
     KconfigFile, KconfigInput,
 };
 
-pub fn parse_filepath(input: KconfigInput) -> IResult<KconfigInput, &str> {
+pub fn parse_filepath(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
         recognize(ws(many1(alt((
             alphanumeric1::<KconfigInput, _>,
