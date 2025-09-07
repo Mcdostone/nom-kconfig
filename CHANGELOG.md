@@ -1,3 +1,20 @@
+## What's Changed in v0.4.0
+* test: unit tests for `depends on` for menu, unit tests for `set_vars`… by @Mcdostone in [#78](https://github.com/Mcdostone/nom-kconfig/pull/78)
+* build: update dependencies by @Mcdostone
+* build(deps): bump criterion from 0.5.1 to 0.7.0 by @dependabot[bot]
+* build(deps): bump afl from 0.15.17 to 0.15.20 by @dependabot[bot]
+* build(deps): bump raven-actions/actionlint from 2.0.0 to 2.0.1 by @dependabot[bot]
+* build(deps): bump actions/checkout from 4 to 5 by @dependabot[bot]
+* docs: example of how to specify variables when parsing kconfig files by @Mcdostone
+* fix: typos in CHANGELOG.md by @Mcdostone
+* test: unit tests for `depends on` for menu, unit tests for `set_vars` method by @Mcdostone
+* Changelog for v by @github-actions[bot] in [#77](https://github.com/Mcdostone/nom-kconfig/pull/77)
+
+## New Contributors
+* @github-actions[bot] made their first contribution in [#77](https://github.com/Mcdostone/nom-kconfig/pull/77)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.3.0...v0.4.0
+
 ## What's Changed in v0.3.0
 
 * @garikello3d made their first contribution
