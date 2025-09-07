@@ -194,7 +194,7 @@ pub fn parse_parameter(input: KconfigInput) -> IResult<KconfigInput, Parameter> 
     .parse(input)
 }
 
-fn parse_function_name(input: KconfigInput) -> IResult<KconfigInput, &str> {
+fn parse_function_name(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
         recognize(ws(many1(alt((alphanumeric1, recognize(one_of("=-"))))))),
         |d: KconfigInput| d.fragment().to_owned(),

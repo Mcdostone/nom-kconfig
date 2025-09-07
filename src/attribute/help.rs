@@ -77,12 +77,12 @@ fn parse_help_text(input: KconfigInput) -> IResult<KconfigInput, String> {
                 )));
             } else if indent_len == 0 {
                 // handle newlines between paragraph's
-                return parse_newline_only(orig);
+                parse_newline_only(orig)
             } else {
                 // Consume the same base indentation.
                 let (remain, _) = take(initial_indentation_len)(orig)?;
                 // Parse the raw help line text.
-                return parse_full_help_line(remain);
+                parse_full_help_line(remain)
             }
         },
         String::new,
