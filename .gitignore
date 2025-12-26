@@ -11,3 +11,5 @@ cobertura.xml
 fuzzing/out
 fuzzing/in
 **/*.DS_Store
+*.tar.xz
+linux-*
