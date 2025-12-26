@@ -141,3 +141,62 @@ fn test_parse_help_paragraph() {
         Ok(("", "This choice is there only for converting CONFIG_DEFAULT_SECURITY\nin old kernel configs to CONFIG_LSM in new kernel configs. Don't\nchange this choice unless you are creating a fresh kernel config,\nfor this choice will be ignored after CONFIG_LSM has been set.\n\nSelects the legacy \"major security module\" that will be\ninitialized first. Overridden by non-default CONFIG_LSM.".to_string()))
     )
 }
+
+// https://github.com/Mcdostone/nom-kconfig/issues/101
+#[test]
+fn test_parse_help_inconsistent_identation_with_space_and_tab() {
+    let input = r#"
+       help
+         An architecture selects this if it sorts the mcount_loc section
+	 at build time."#;
+
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok((
+            "",
+            "An architecture selects this if it sorts the mcount_loc section\nat build time."
+                .to_string()
+        ))
+    )
+}
+
+// https://github.com/torvalds/linux/blob/master/init/Kconfig#L493-L503
+#[test]
+fn test_parse_help_first_line_is_empty() {
+    let input = r#"help
+
+	  This is a general notification queue for the kernel to pass events to
+	  userspace by splicing them into pipes.  It can be used in conjunction
+	  with watches for key/keyring change notifications and device
+	  notifications.
+
+	  See Documentation/core-api/watch_queue.rst
+"#;
+
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok(("", "\nThis is a general notification queue for the kernel to pass events to\nuserspace by splicing them into pipes.  It can be used in conjunction\nwith watches for key/keyring change notifications and device\nnotifications.\n\nSee Documentation/core-api/watch_queue.rst".to_string()))
+    )
+}
+
+// https://github.com/Mcdostone/nom-kconfig/issues/103
+// https://github.com/torvalds/linux/blob/master/drivers/crypto/caam/Kconfig
+#[test]
+fn test_parse_help_pouet() {
+    let input = r#"
+	help
+	  Select size of Job Rings as a power of 2, within the
+	  range 2-9 (ring size 4-512).
+	  Examples:
+		2 => 4
+"#;
+
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok(("",
+            "Select size of Job Rings as a power of 2, within the\nrange 2-9 (ring size 4-512).\nExamples:\n2 => 4".to_string()))
+    )
+}
