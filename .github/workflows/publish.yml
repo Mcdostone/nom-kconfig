@@ -33,7 +33,7 @@ jobs:
     outputs:
       version: ${{ steps.release.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
@@ -45,7 +45,7 @@ jobs:
     name: Create release
     needs: version
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Create github release
         run: gh release create "v${{ needs.version.outputs.version }}" --generate-notes
         env:
@@ -66,7 +66,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
