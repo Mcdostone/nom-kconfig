@@ -89,11 +89,11 @@ fn parse_kconfig_files(linux_source: &PathBuf) -> std::io::Result<()> {
             .map(|ext| ext.eq("Kconfig"))
             .unwrap_or(false)
         {
+            eprintln!("Parsing file '{}'", path.display());
+
             let mut file = File::open(path)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
-
-            println!("Opening: {}", path.display());
 
             let path_no_root = path.strip_prefix(linux_source).unwrap();
 
@@ -109,7 +109,7 @@ fn parse_kconfig_files(linux_source: &PathBuf) -> std::io::Result<()> {
                     path_no_root, e
                 );
             }
-            println!("Parsed: {:?}", kconfig_parse_result.unwrap().0);
+            println!("Parsed: {:#?}", kconfig_parse_result.unwrap().1);
         }
     }
 

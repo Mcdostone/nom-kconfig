@@ -144,7 +144,7 @@ fn test_parse_help_paragraph() {
 
 // https://github.com/Mcdostone/nom-kconfig/issues/101
 #[test]
-fn test_parse_help_inconsistent_identation_with_space_and_tab() {
+fn test_parse_help_inconsistent_indentation_with_space_and_tab() {
     let input = r#"
        help
          An architecture selects this if it sorts the mcount_loc section
@@ -184,7 +184,7 @@ fn test_parse_help_first_line_is_empty() {
 // https://github.com/Mcdostone/nom-kconfig/issues/103
 // https://github.com/torvalds/linux/blob/master/drivers/crypto/caam/Kconfig
 #[test]
-fn test_parse_help_pouet() {
+fn test_parse_help_1() {
     let input = r#"
 	help
 	  Select size of Job Rings as a power of 2, within the
@@ -198,5 +198,25 @@ fn test_parse_help_pouet() {
         input,
         Ok(("",
             "Select size of Job Rings as a power of 2, within the\nrange 2-9 (ring size 4-512).\nExamples:\n2 => 4".to_string()))
+    )
+}
+
+// https://github.com/torvalds/linux/blob/master/drivers/parisc/Kconfig
+#[test]
+fn test_parse_help_2() {
+    let input = r#"help
+	  Say Y here if you want to enable support for the Heartbeat,
+	  Disk/Network activities LEDs on some PA-RISC machines,
+	  or support for the LCD that can be found on recent material.
+	
+	  This has nothing to do with LED State support for A and E class.
+	
+	  If unsure, say Y."#;
+
+    assert_parsing_eq!(
+        parse_help,
+        input,
+        Ok(("",
+            "Say Y here if you want to enable support for the Heartbeat,\nDisk/Network activities LEDs on some PA-RISC machines,\nor support for the LCD that can be found on recent material.\n\nThis has nothing to do with LED State support for A and E class.\n\nIf unsure, say Y.".to_string()))
     )
 }

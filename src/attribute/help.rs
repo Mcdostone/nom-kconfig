@@ -164,8 +164,8 @@ fn parse_full_help_line(input: KconfigInput) -> IResult<KconfigInput, String> {
 }
 
 fn parse_newline_only(input: KconfigInput) -> IResult<KconfigInput, String> {
-    let (input, newline) = newline(input)?;
-    Ok((input, newline.to_string()))
+    let (input, _newline) = recognize(terminated(space0, line_ending)).parse(input)?;
+    Ok((input, "\n".to_string()))
 }
 fn peek_til_newline(s: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
     peek(parse_line_help).parse(s)
@@ -197,7 +197,7 @@ fn peek_indentation(s: KconfigInput) -> IResult<KconfigInput, IndentationLevel> 
     Ok((original, len))
 }
 
-/// Inspired from https://github.com/movidius/kconfig-frontends/blob/44b2a3287ebd5be5b49e51feaafb9c54c9f0fe41/libs/parser/lconf.l#L204-L250
+/// Inspired from <https://github.com/movidius/kconfig-frontends/blob/44b2a3287ebd5be5b49e51feaafb9c54c9f0fe41/libs/parser/lconf.l#L204-L250>
 fn indentation_level(input: KconfigInput) -> IResult<KconfigInput, IndentationLevel> {
     // Assumes that tab and space usage is consistent across multi line text.
     // E.g We don't know how much spaces a tab is.
@@ -337,4 +337,9 @@ fn test_peek_first_non_empty_line() {
         .unwrap();
     assert_eq!(remaining.fragment(), &input);
     assert_eq!(line.fragment(), &"  hello");
+}
+
+#[test]
+fn test_parse_newline_only() {
+    assert_parsing_eq!(parse_newline_only, "    \t\n", Ok(("", "\n".to_string())));
 }
