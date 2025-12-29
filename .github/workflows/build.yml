@@ -35,6 +35,23 @@ jobs:
     - name: Run cargo check
       run: cargo check --all-features --locked --release --all
 
+  hack:
+    name: Cargo hack
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2  
+      - uses: taiki-e/install-action@cargo-hack
+      - run: cargo hack check --feature-powerset --no-dev-deps
+
   build:
     name: Build w/o features
     needs: check
