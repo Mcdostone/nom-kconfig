@@ -14,6 +14,7 @@ pub mod prompt;
 pub mod range;
 pub mod requires;
 pub mod select;
+pub mod transitional;
 pub mod r#type;
 pub mod visible;
 
@@ -23,7 +24,7 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
-use crate::{util::ws, KconfigInput};
+use crate::{attribute::transitional::parse_transitional, util::ws, KconfigInput};
 
 use self::r#type::ConfigType;
 pub use self::{
@@ -68,6 +69,7 @@ pub enum Attribute {
     Requires(Expression),
     Type(ConfigType),
     Option(OptionValues),
+    Transitional,
 }
 
 pub fn parse_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
@@ -87,6 +89,8 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
         map(ws(parse_imply), Attribute::Imply),
         map(ws(parse_visible), Attribute::Visible),
         map(ws(parse_option), Attribute::Option),
+        map(ws(parse_optional), |_| Attribute::Optional),
+        map(ws(parse_transitional), |_| Attribute::Transitional),
     ))
     .parse(input)
 }
@@ -113,6 +117,7 @@ impl Display for Attribute {
             Attribute::Requires(r) => write!(f, "requires {r}"),
             Attribute::Type(t) => write!(f, "{t}"),
             Attribute::Option(o) => write!(f, "option {o}"),
+            Attribute::Transitional => write!(f, "transitional"),
         }
     }
 }
@@ -145,6 +150,8 @@ mod range_test;
 mod requires_test;
 #[cfg(test)]
 mod select_test;
+#[cfg(test)]
+mod transitional_test;
 #[cfg(test)]
 mod type_test;
 #[cfg(test)]
