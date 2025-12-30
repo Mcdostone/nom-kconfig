@@ -1,3 +1,13 @@
+## What's Changed in 0.5.0
+* Develop by @Mcdostone in [#102](https://github.com/Mcdostone/nom-kconfig/pull/102)
+* build: update dependencies by @Mcdostone
+* feat: new attribute 'transitional' by @Mcdostone
+* fix: Parsing the help attribute is more complex that I thought #101 by @Mcdostone
+* update GA checkout by @Mcdostone
+* Changelog for v by @github-actions[bot] in [#87](https://github.com/Mcdostone/nom-kconfig/pull/87)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.4.0...v0.5.0
+
 ## What's Changed in v0.4.0
 * test: unit tests for `depends on` for menu, unit tests for `set_vars`… by @Mcdostone in [#78](https://github.com/Mcdostone/nom-kconfig/pull/78)
 * build: update dependencies by @Mcdostone
