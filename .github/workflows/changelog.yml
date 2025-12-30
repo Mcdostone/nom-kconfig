@@ -3,14 +3,7 @@ name: Changelog
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
-  RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: '--deny warnings'
-
-permissions:
-  id-token: write
-  packages: write
-  contents: write
-  pull-requests: write
 
 on:
   workflow_dispatch:
@@ -20,19 +13,25 @@ jobs:
   changelog:
     name: Create changelog
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      packages: write
+      contents: write
+      pull-requests: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
+          persist-credentials: 'true' # needed to push the new changelog
           fetch-tags: 'true'
           fetch-depth: 0
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - id: release
-        run: echo "version=v$(cargo pkgid --manifest-path crates/bin/Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
+        run: echo "version=v$(cargo pkgid --manifest-path Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
       - name: Install git-cliff
-        run: cargo install git-cliff
+        run: cargo install --locked git-cliff
       - name: Generate a changelog
         run: |
           if [ -f CHANGELOG.md ]; then
@@ -46,23 +45,31 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit changelog
         run: |
-          git checkout -b "changelog/${{ steps.release.outputs.version }}"
-          git config user.name 'github-actions[bot]'
+          git checkout -b "changelog/${VERSION}"
+          git config user.name "github-actions[bot]"
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           set +e
           git add CHANGELOG.md
           git commit -m "chore: Update changelog"
-          git push origin "changelog/${{ steps.release.outputs.version }}" --force
+          git push origin "changelog/${VERSION}" --force
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check out repository
         uses: actions/checkout@v6
         with:
-          ref: "changelog/${{ steps.release.outputs.version }}"
+          ref: "changelog/${{ env.VERSION }}"
+          persist-credentials: false
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
       - name: Create pull request for changelog
         run: |
-          alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/${{ steps.release.outputs.version }}") | any')
+          alreadyExists=$(gh pr list --json headRefName | jq '.[] | select(.headRefName == "changelog/${VERSION}") | any')
           if [[ "$alreadyExists" == "" ]]; then
             branch=$(git branch --show-current)
-            gh pr create --head "$branch" --title "Changelog for ${{ steps.release.outputs.version }}" --body "This PR updates the changelog for version ${{ steps.release.outputs.version }}."
+            gh pr create --head "$branch" --title "Changelog for ${VERSION}" --body "This PR updates the changelog for version ${VERSION}."
           fi
         env: 
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.release.outputs.version }}
