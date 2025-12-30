@@ -13,6 +13,12 @@ use crate::symbol::Symbol;
 fn test_parse_attribute() {
     assert_parsing_eq!(
         parse_attribute,
+        "    transitional",
+        Ok(("", Attribute::Transitional))
+    );
+
+    assert_parsing_eq!(
+        parse_attribute,
         "    default  m",
         Ok((
             "",
@@ -183,6 +189,10 @@ fn test_attributes_to_string() {
     assert_eq!(
         Attribute::DependsOn(expression.clone()).to_string(),
         "depends on KVM".to_string()
+    );
+    assert_eq!(
+        Attribute::Transitional.to_string(),
+        "transitional".to_string()
     );
     assert_eq!(
         Attribute::Range(Range {
