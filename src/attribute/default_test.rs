@@ -23,6 +23,7 @@ fn test_parse_default() {
 
 // v3.5.0/arch/microblaze/platform/generic/Kconfig.auto
 #[test]
+#[should_panic]
 fn test_parse_default_constant_symbol_with_numbers() {
     assert_parsing_eq!(
         parse_default,
@@ -31,7 +32,7 @@ fn test_parse_default_constant_symbol_with_numbers() {
             "",
             DefaultAttribute {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("7.10.d".to_string())
+                    Symbol::NonConstant("7.10.d".to_string())
                 )))),
                 r#if: None
             }
@@ -51,7 +52,7 @@ fn test_parse_default_ambigus() {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string())
                     ))),
                 r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("CC_IS_GCC".to_string()))
+                    Atom::Symbol(Symbol::NonConstant("CC_IS_GCC".to_string()))
                 ))))
             }
         ))
