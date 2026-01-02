@@ -33,7 +33,7 @@ fn test_parse_menu_visible() {
             Menu {
                 prompt: "BPF subsystem".to_string(),
                 visible: Some(Some(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("EXPERT".to_string()))
+                    Atom::Symbol(Symbol::NonConstant("EXPERT".to_string()))
                 ))))),
                 ..Default::default()
             }
@@ -59,7 +59,7 @@ fn test_parse_menu_depends_on() {
                 prompt: "BPF subsystem".to_string(),
                 visible: None,
                 depends_on: vec!(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("MODULES".to_string()))
+                    Atom::Symbol(Symbol::NonConstant("MODULES".to_string()))
                 )))),
                 ..Default::default()
             }

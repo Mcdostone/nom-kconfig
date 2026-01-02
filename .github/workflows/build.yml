@@ -15,6 +15,7 @@ env:
   RUST_BACKTRACE: 1
   RUSTDOCFLAGS: "--deny warnings"
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
+  LINUX_VERSION: 6.18.4
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -170,6 +171,22 @@ jobs:
         env:
           RUST_BACKTRACE: full
           CI: "true"
+
+  integration-tests:
+    needs: check
+    name: Integration tests
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo run --example=download_and_parse ${{ env.LINUX_VERSION }}
+        env:
+          RUST_BACKTRACE: full
 
   doc:
     needs: check

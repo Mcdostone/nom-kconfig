@@ -3,7 +3,6 @@
 
 pub mod default;
 pub mod depends_on;
-pub mod expression;
 pub mod function;
 pub mod help;
 pub mod imply;
@@ -14,9 +13,12 @@ pub mod prompt;
 pub mod range;
 pub mod requires;
 pub mod select;
+pub mod string;
 pub mod transitional;
 pub mod r#type;
 pub mod visible;
+//pub mod expressiondd;
+pub mod expression;
 
 use nom::{branch::alt, combinator::map, multi::many0, IResult, Parser};
 #[cfg(feature = "deserialize")]
@@ -126,8 +128,6 @@ impl Display for Attribute {
 mod default_test;
 #[cfg(test)]
 mod depends_on_test;
-#[cfg(test)]
-mod expression_test;
 #[cfg(test)]
 mod function_test;
 #[cfg(test)]

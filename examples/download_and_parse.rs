@@ -1,4 +1,8 @@
-use std::{fs::File, io::Read, path::PathBuf};
+use std::{
+    fs::{self, File},
+    io::Read,
+    path::{self, PathBuf},
+};
 
 use nom_kconfig::{parse_kconfig, KconfigFile, KconfigInput};
 
@@ -76,12 +80,30 @@ fn download_and_extract_linux(version: &str) -> std::io::Result<PathBuf> {
 }
 
 fn parse_kconfig_files(linux_source: &PathBuf) -> std::io::Result<()> {
-    for entry in walkdir::WalkDir::new(linux_source)
+    let linux_source = fs::canonicalize(linux_source)?;
+    #[allow(clippy::incompatible_msrv)]
+    let linux_source = path::absolute(linux_source)?;
+    for entry in walkdir::WalkDir::new(&linux_source)
         .into_iter()
         .filter_map(Result::ok)
         .filter(|e| e.file_type().is_file())
     {
         let path = entry.path();
+        #[allow(clippy::incompatible_msrv)]
+        let path = path::absolute(path)?;
+
+        if path.starts_with(linux_source.join("scripts"))
+            || path.starts_with(
+                linux_source
+                    .join("tools")
+                    .join("verification")
+                    .join("rvgen")
+                    .join("rvgen")
+                    .join("templates"),
+            )
+        {
+            continue;
+        }
 
         if path
             .file_name()
@@ -91,11 +113,11 @@ fn parse_kconfig_files(linux_source: &PathBuf) -> std::io::Result<()> {
         {
             eprintln!("Parsing file '{}'", path.display());
 
-            let mut file = File::open(path)?;
+            let mut file = File::open(&path)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
 
-            let path_no_root = path.strip_prefix(linux_source).unwrap();
+            let path_no_root = path.strip_prefix(&linux_source).unwrap();
 
             let cur_kconfig_file =
                 KconfigFile::new(linux_source.clone(), PathBuf::from(path_no_root));

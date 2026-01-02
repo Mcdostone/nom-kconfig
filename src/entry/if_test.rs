@@ -20,7 +20,7 @@ fn test_parse_if_entry() {
             "",
             If {
                 condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("NET_VENDOR_AMD".to_string())
+                    Symbol::NonConstant("NET_VENDOR_AMD".to_string())
                 )))),
                 entries: vec!(Entry::Source(Source {
                     file: "$(VAR)/Kconfig".to_string(),
@@ -47,7 +47,7 @@ fn test_parse_if_entry_with_config() {
             "",
             If {
                 condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("VIRTUALIZATION".to_string())
+                    Symbol::NonConstant("VIRTUALIZATION".to_string())
                 )))),
                 entries: vec!(Entry::Config(Config {
                     symbol: "KVM".to_string(),

@@ -17,13 +17,13 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
+use super::function::{parse_function_call, FunctionCall};
+use crate::number::parse_number;
 use crate::{
     symbol::{parse_symbol, Symbol},
     util::wsi,
     KconfigInput,
 };
-
-use super::function::{parse_function_call, FunctionCall};
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
@@ -236,10 +236,10 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
             delimited(wsi(tag("(")), parse_expression, wsi(tag(")"))),
             |expr: Expression| Atom::Parenthesis(Box::new(expr)),
         ),
-        map(parse_string, Atom::String),
         parse_number_or_symbol,
-        // needed to parse negative numbers, see test_parse_expression_number() in expression_test.rs
+        // needed to parse negative numbers, see test_parse_expression_number() in mod_test
         map(parse_number, Atom::Number),
+        map(parse_string, Atom::String),
     ))
     .parse(input)
 }
@@ -343,12 +343,4 @@ pub fn parse_if_attribute(input: KconfigInput) -> IResult<KconfigInput, Option<E
 
 pub fn parse_if_expression(input: KconfigInput) -> IResult<KconfigInput, Expression> {
     map(pair(wsi(tag("if")), wsi(parse_expression)), |(_, e)| e).parse(input)
-}
-
-pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
-    map_res(
-        recognize(pair(opt(char('-')), digit1)),
-        |d: KconfigInput| FromStr::from_str(d.fragment()),
-    )
-    .parse(input)
 }

@@ -62,13 +62,15 @@ endchoice"#,
                     }),
                     Attribute::Default(DefaultAttribute {
                         expression: Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Symbol(Symbol::Constant("USB_MTU3_DUAL_ROLE".to_string()))
+                            Atom::Symbol(Symbol::NonConstant("USB_MTU3_DUAL_ROLE".to_string()))
                         ))),
                         r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                             Atom::Parenthesis(Box::new(Expression::Term(
                                 AndExpression::Expression(vec!(
-                                    Term::Atom(Atom::Symbol(Symbol::Constant("USB".to_string()))),
-                                    Term::Atom(Atom::Symbol(Symbol::Constant(
+                                    Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                                        "USB".to_string()
+                                    ))),
+                                    Term::Atom(Atom::Symbol(Symbol::NonConstant(
                                         "USB_GADGET".to_string()
                                     ))),
                                 ))
