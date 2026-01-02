@@ -101,6 +101,7 @@ impl KconfigFile {
 pub mod kconfig_test;
 #[cfg(test)]
 pub mod lib_test;
+mod number;
 #[cfg(test)]
 pub mod symbol_test;
 #[cfg(test)]

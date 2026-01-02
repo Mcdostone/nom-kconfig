@@ -35,9 +35,9 @@ fn test_parse() {
                     r#if: None
                 }),
                 Attribute::DependsOn(Expression::Term(AndExpression::Expression(vec!(
-                    Term::Atom(Atom::Symbol(Symbol::Constant("HAVE_KVM".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::Constant("HIGH_RES_TIMERS".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::Constant("X86_LOCAL_APIC".to_string())))
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("HAVE_KVM".to_string()))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("HIGH_RES_TIMERS".to_string()))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("X86_LOCAL_APIC".to_string())))
                 )))),
                 Attribute::Select(Select { symbol: "PREEMPT_NOTIFIERS".to_string(), r#if: None }),
                 Attribute::Select(Select { symbol: "MMU_NOTIFIER".to_string(), r#if: None }),

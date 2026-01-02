@@ -47,7 +47,7 @@ fn test_parse_config_no_type() {
                             Atom::Number(18)
                         ))),
                         r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Symbol(Symbol::Constant("64BIT".to_string()))
+                            Atom::Symbol(Symbol::NonConstant("64BIT".to_string()))
                         ))))
                     }),
                     Attribute::Default(DefaultAttribute {
@@ -99,28 +99,30 @@ fn test_parse_config_def_bool_multiline_expression() {
                 symbol: "SH_CLK_CPG_LEGACY".to_string(),
                 attributes: vec!(
                     Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                        Atom::Symbol(Symbol::Constant("SH_CLK_CPG".to_string()))
+                        Atom::Symbol(Symbol::NonConstant("SH_CLK_CPG".to_string()))
                     )))),
                     Attribute::Type(ConfigType {
                         r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
                             Atom::Symbol(Symbol::Constant("y".to_string()))
                         )))),
                         r#if: Some(Expression::Term(AndExpression::Expression(vec!(
-                            Term::Not(Atom::Symbol(Symbol::Constant(
+                            Term::Not(Atom::Symbol(Symbol::NonConstant(
                                 "CPU_SUBTYPE_SH7785".to_string()
                             ))),
-                            Term::Not(Atom::Symbol(Symbol::Constant("ARCH_SHMOBILE".to_string()))),
-                            Term::Not(Atom::Symbol(Symbol::Constant("CPU_SHX3".to_string()))),
-                            Term::Not(Atom::Symbol(Symbol::Constant(
+                            Term::Not(Atom::Symbol(Symbol::NonConstant(
+                                "ARCH_SHMOBILE".to_string()
+                            ))),
+                            Term::Not(Atom::Symbol(Symbol::NonConstant("CPU_SHX3".to_string()))),
+                            Term::Not(Atom::Symbol(Symbol::NonConstant(
                                 "CPU_SUBTYPE_SH7757".to_string()
                             ))),
-                            Term::Not(Atom::Symbol(Symbol::Constant(
+                            Term::Not(Atom::Symbol(Symbol::NonConstant(
                                 "CPU_SUBTYPE_SH7734".to_string()
                             ))),
-                            Term::Not(Atom::Symbol(Symbol::Constant(
+                            Term::Not(Atom::Symbol(Symbol::NonConstant(
                                 "CPU_SUBTYPE_SH7264".to_string()
                             ))),
-                            Term::Not(Atom::Symbol(Symbol::Constant(
+                            Term::Not(Atom::Symbol(Symbol::NonConstant(
                                 "CPU_SUBTYPE_SH7269".to_string()
                             ))),
                         ))))

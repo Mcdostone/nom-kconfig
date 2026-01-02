@@ -29,7 +29,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - id: release
-        run: echo "version=v$(cargo pkgid --manifest-path Cargo.toml | cut -d '@' -f2)" >> "$GITHUB_OUTPUT"
+        run: echo "version=v$(cargo pkgid --manifest-path Cargo.toml | cut -d '#' -f2)" >> "$GITHUB_OUTPUT"
       - name: Install git-cliff
         run: cargo install --locked git-cliff
       - name: Generate a changelog

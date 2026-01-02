@@ -36,7 +36,7 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("KVM".to_string()))
+                Atom::Symbol(Symbol::NonConstant("KVM".to_string()))
             ))))
         ))
     );
@@ -62,7 +62,7 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Imply(Imply {
-                symbol: Symbol::Constant("KVM".to_string()),
+                symbol: Symbol::NonConstant("KVM".to_string()),
                 r#if: None
             })
         ))
@@ -103,7 +103,7 @@ fn test_parse_attribute() {
             "",
             Attribute::Requires(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Compare(CompareExpression {
-                    left: Symbol::Constant("MTK_INFRACFG".to_string()),
+                    left: Symbol::NonConstant("MTK_INFRACFG".to_string()),
                     operator: CompareOperator::Equal,
                     right: Symbol::Constant("y".to_string())
                 })

@@ -64,7 +64,7 @@ endif"#;
                     }),
                     Entry::If(If {
                         condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                            Symbol::Constant("PCI".to_string())
+                            Symbol::NonConstant("PCI".to_string())
                         )))),
                         entries: vec!()
                     })
@@ -130,7 +130,45 @@ menuconfig GCC_PLUGINS
                                 r#type: Type::String(None),
                                 r#if: None
                             }),
-                            Attribute::Default(DefaultAttribute { expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string())))), r#if: None })
+                            Attribute::Default(DefaultAttribute {
+                                expression: Expression::Term(AndExpression::Term(Term::Atom(
+                                    Atom::Function(FunctionCall {
+                                        name: "shell".to_string(),
+                                        parameters: vec!(Parameter {
+                                            tokens: vec!(
+                                                ExpressionToken::Function(Box::new(FunctionCall {
+                                                    name: "srctree".to_string(),
+                                                    parameters: vec![]
+                                                })),
+                                                ExpressionToken::Literal(
+                                                    "/scripts/gcc-plugin.sh".to_string()
+                                                ),
+                                                ExpressionToken::Space,
+                                                ExpressionToken::DoubleQuotes(vec![
+                                                    ExpressionToken::Function(Box::new(
+                                                        FunctionCall {
+                                                            name: "preferred-plugin-hostcc"
+                                                                .to_string(),
+                                                            parameters: vec![]
+                                                        }
+                                                    )),
+                                                ]),
+                                                ExpressionToken::Space,
+                                                ExpressionToken::DoubleQuotes(vec![
+                                                    ExpressionToken::Variable(
+                                                        "HOSTCXX".to_string()
+                                                    )
+                                                ]),
+                                                ExpressionToken::Space,
+                                                ExpressionToken::DoubleQuotes(vec![
+                                                    ExpressionToken::Variable("CC".to_string())
+                                                ])
+                                            )
+                                        })
+                                    })
+                                ))),
+                                r#if: None
+                            })
                         )
                     }),
                     Entry::MenuConfig(MenuConfig {

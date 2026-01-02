@@ -53,7 +53,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             source_kconfig_file.clone(),
         )) {
             Ok((_, kconfig)) => Ok((input, kconfig)),
-            Err(_e) => Err(nom::Err::Error(nom::error::Error::new(
+            Err(_e) => Err(nom::Err::Error(Error::new(
                 KconfigInput::new_extra("", source_kconfig_file),
                 ErrorKind::Fail,
             ))),
