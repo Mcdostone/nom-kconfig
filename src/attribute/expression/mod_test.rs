@@ -30,7 +30,7 @@ fn test_parse_term() {
         Ok((
             "",
             Expression::Term(AndExpression::Term(Term::Not(Atom::Symbol(
-                Symbol::Constant("KVM".to_string())
+                Symbol::NonConstant("KVM".to_string())
             ))))
         ))
     )
@@ -44,8 +44,8 @@ fn test_parse_depends_on_and() {
         Ok((
             "",
             Expression::Term(AndExpression::Expression(vec!(
-                Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_MIATA".to_string()))),
-                Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_MIATA".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_LX164".to_string()))),
             )))
         ))
     )
@@ -59,11 +59,10 @@ fn test_parse_number_or_symbol() {
         Ok((
             "",
             Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                Symbol::Constant("64BITS".to_string()),
+                Symbol::NonConstant("64BITS".to_string()),
             ))))
         ))
     );
-
     assert_parsing_eq!(
         parse_expression,
         "64",
@@ -78,9 +77,7 @@ fn test_parse_number_or_symbol() {
         "\"64\"",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
-                "64".to_string()
-            ))))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64))))
         ))
     );
 
@@ -89,9 +86,7 @@ fn test_parse_number_or_symbol() {
         "'64'",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                Symbol::NonConstant("'64'".to_string())
-            )),))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64))))
         ))
     );
 }
@@ -104,12 +99,12 @@ fn test_parse_depends_on_ambigus() {
         Ok((
             "",
             Expression::Expression(vec!(
-                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                     "ALPHA_MIATA".to_string()
                 )))),
                 AndExpression::Expression(vec!(
-                    Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_LX164".to_string()))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_SX164".to_string()))),
                 ))
             ))
         ))
@@ -119,14 +114,6 @@ fn test_parse_depends_on_ambigus() {
 // 5.0/scripts/gcc-plugins/Kconfig
 #[test]
 fn test_parse_string() {
-    assert_parsing_eq!(
-        parse_string,
-        r#""$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")""#,
-        Ok((
-            "",
-            r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string()),
-        ));
-
     assert_parsing_eq!(
         parse_string,
         r#""hello "world"" if NET"#,
@@ -149,15 +136,15 @@ fn test_parse_depends_on_optimization() {
         "ALPHA_MIATA || ALPHA_LX164 && ALPHA_SX164 && (HELLO = world) || ALPHA_SX164 && (HELLO = world)",
         Ok(("", Expression::Expression(
             vec!(
-                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_MIATA".to_string())))),
+                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_MIATA".to_string())))),
                 AndExpression::Expression(vec!(
-                    Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string()) }))))))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_LX164".to_string()))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_SX164".to_string()))),
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::NonConstant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::NonConstant("world".to_string()) }))))))),
                 )),
                 AndExpression::Expression(vec!(
-                    Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::Constant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::Constant("world".to_string())})))))))
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_SX164".to_string()))),
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::NonConstant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::NonConstant("world".to_string())})))))))
                 )
             )
         )))))
@@ -209,8 +196,8 @@ fn test_parse_expression_start_like_number_but_symbol() {
         Ok((
             "",
             Expression::Term(AndExpression::Expression(vec!(
-                Term::Atom(Atom::Symbol(Symbol::Constant("8xx".to_string()))),
-                Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("8xx".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("MTD_CFI".to_string()))),
             )))
         ))
     )
@@ -225,7 +212,7 @@ fn test_parse_expression_number_and() {
             "",
             Expression::Term(AndExpression::Expression(vec!(
                 Term::Atom(Atom::Number(8500)),
-                Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("MTD_CFI".to_string()))),
             )))
         ))
     )
@@ -356,4 +343,24 @@ fn test_expression_to_string() {
         ))))
         .to_string()
     );
+}
+
+// https://github.com/Mcdostone/nom-kconfig/issues/107#issuecomment-3703986206
+
+#[test]
+fn test_expression_constant_and_non_constant() {
+    assert_parsing_eq!(
+        parse_expression,
+        "MTD!=n",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+                CompareExpression {
+                    left: Symbol::NonConstant("MTD".to_string()),
+                    operator: CompareOperator::NotEqual,
+                    right: Symbol::Constant("n".to_string())
+                }
+            ))))
+        ))
+    )
 }

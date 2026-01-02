@@ -73,10 +73,10 @@ fn test_parse_type_backslash() {
                     "Enable freezer for suspend to RAM/standby".to_string()
                 )),
                 r#if: Some(Expression::Expression(vec!(
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                         "ARCH_WANTS_FREEZER_CONTROL".to_string()
                     )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                         "BROKEN".to_string()
                     ))),)
                 )))
@@ -94,7 +94,7 @@ fn test_parse_def_bool() {
             " ",
             Attribute::Type(ConfigType {
                 r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Not(
-                    Atom::Symbol(Symbol::Constant("PCI".to_string()))
+                    Atom::Symbol(Symbol::NonConstant("PCI".to_string()))
                 )))),
                 r#if: None
             })
@@ -111,10 +111,10 @@ fn test_parse_type_if() {
             "",
             Attribute::Type(ConfigType {
                 r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Not(
-                    Atom::Symbol(Symbol::Constant("PCI".to_string()))
+                    Atom::Symbol(Symbol::NonConstant("PCI".to_string()))
                 )))),
                 r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("NET".to_string()))
+                    Atom::Symbol(Symbol::NonConstant("NET".to_string()))
                 ))))
             })
         ))

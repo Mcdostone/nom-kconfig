@@ -6,9 +6,9 @@ use serde::Serialize;
 #[cfg(feature = "display")]
 use std::fmt::Display;
 
-use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
-
 use super::expression::{parse_if_attribute, Expression};
+use crate::symbol::parse_non_constant_symbol;
+use crate::{util::ws, KconfigInput};
 
 /// While normal dependencies reduce the upper limit of a symbol, reverse dependencies can be used to force a lower limit of another symbol. The value of the current menu symbol is used as the minimal value [symbol](crate::Symbol) can be set to. If [symbol](crate::Symbol) is selected multiple times, the limit is set to the largest selection. Reverse dependencies can only be used with boolean or tristate symbols.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -56,7 +56,7 @@ pub fn parse_select(input: KconfigInput) -> IResult<KconfigInput, Select> {
     map(
         (
             ws(alt((tag("select"), tag("enable")))),
-            ws(parse_constant_symbol),
+            ws(parse_non_constant_symbol),
             parse_if_attribute,
         ),
         |(_, s, i)| Select {

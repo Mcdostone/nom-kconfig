@@ -12,13 +12,13 @@ use serde::Serialize;
 #[cfg(feature = "display")]
 use std::fmt::Display;
 
+use super::expression::{parse_if_attribute, Expression};
+use crate::number::parse_number;
 use crate::{
     symbol::{parse_symbol, Symbol},
     util::ws,
     KconfigInput,
 };
-
-use super::expression::{parse_if_attribute, parse_number, Expression};
 
 /// This attribute allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
 #[derive(Debug, Clone, PartialEq)]

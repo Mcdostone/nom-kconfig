@@ -203,6 +203,14 @@ fn parse_function_name(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &st
 }
 
 pub fn parse_function_call(input: KconfigInput) -> IResult<KconfigInput, FunctionCall> {
+    ws(alt((
+        parse_function_call_inner,
+        delimited(char('"'), parse_function_call_inner, char('"')),
+    )))
+    .parse(input)
+}
+
+fn parse_function_call_inner(input: KconfigInput) -> IResult<KconfigInput, FunctionCall> {
     map(
         delimited(
             tag("$("),

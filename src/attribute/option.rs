@@ -10,7 +10,7 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
-use crate::{symbol::parse_constant_symbol, util::ws, KconfigInput};
+use crate::{util::ws, KconfigInput};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "hash", derive(Hash))]
@@ -31,8 +31,10 @@ pub enum OptionValues {
     Env(String),
 }
 
+use nom::bytes::complete::take_while1;
 #[cfg(feature = "display")]
 use std::fmt::Display;
+
 #[cfg(feature = "display")]
 impl Display for OptionValues {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -45,6 +47,7 @@ impl Display for OptionValues {
     }
 }
 
+/// <https://kernel.org/doc/Documentation/kbuild/kconfig-language.txt>
 pub fn parse_option(input: KconfigInput) -> IResult<KconfigInput, OptionValues> {
     map((ws(tag("option")), ws(parse_option_value)), |(_, i)| i).parse(input)
 }
@@ -56,9 +59,13 @@ pub fn parse_option_value(input: KconfigInput) -> IResult<KconfigInput, OptionVa
         value(OptionValues::AllNoConfigY, ws(tag("allnoconfig_y"))),
         map(
             (
-                ws(tag("env")),
+                ws(tag::<&str, KconfigInput, _>("env")),
                 ws(tag("=")),
-                delimited(tag("\""), parse_constant_symbol, tag("\"")),
+                delimited(
+                    tag("\""),
+                    take_while1(|c: char| c.is_alphanumeric() || c == '_'),
+                    tag("\""),
+                ),
             ),
             |(_, _, env)| OptionValues::Env(env.to_string()),
         ),

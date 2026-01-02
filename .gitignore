@@ -13,3 +13,4 @@ fuzzing/in
 **/*.DS_Store
 *.tar.xz
 linux-*
+linux-6.18.4

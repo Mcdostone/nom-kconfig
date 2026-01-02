@@ -288,3 +288,43 @@ fn test_expression_token_to_string() {
         "$(warning)"
     );
 }
+
+// 4.18/arch/Kconfig
+#[test]
+fn test_parse_config_string_with_double_quotes() {
+    assert_parsing_eq!(
+        parse_function_call,
+        r#"
+        "$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")""#,
+        Ok((
+            "",
+            FunctionCall {
+                name: "shell".to_string(),
+                parameters: vec!(Parameter {
+                    tokens: vec!(
+                        ExpressionToken::Function(Box::new(FunctionCall {
+                            name: "srctree".to_string(),
+                            parameters: vec![]
+                        })),
+                        ExpressionToken::Literal("/scripts/gcc-plugin.sh".to_string()),
+                        ExpressionToken::Space,
+                        ExpressionToken::DoubleQuotes(vec![ExpressionToken::Function(Box::new(
+                            FunctionCall {
+                                name: "preferred-plugin-hostcc".to_string(),
+                                parameters: vec![]
+                            }
+                        )),]),
+                        ExpressionToken::Space,
+                        ExpressionToken::DoubleQuotes(vec![ExpressionToken::Variable(
+                            "HOSTCXX".to_string()
+                        )]),
+                        ExpressionToken::Space,
+                        ExpressionToken::DoubleQuotes(vec![ExpressionToken::Variable(
+                            "CC".to_string()
+                        )])
+                    )
+                })
+            }
+        ))
+    )
+}

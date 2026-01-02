@@ -1,3 +1,4 @@
+use crate::attribute::{ExpressionToken, FunctionCall, Parameter};
 use crate::{
     assert_parsing_eq,
     attribute::{parse_default, AndExpression, Atom, DefaultAttribute, Expression, Term},
@@ -31,7 +32,7 @@ fn test_parse_default_constant_symbol_with_numbers() {
             "",
             DefaultAttribute {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("7.10.d".to_string())
+                    Symbol::NonConstant("7.10.d".to_string())
                 )))),
                 r#if: None
             }
@@ -39,7 +40,7 @@ fn test_parse_default_constant_symbol_with_numbers() {
     )
 }
 
-// 5.0/scripts/gcc-plugins/Kconfig
+// 5.0 /scripts/gcc-plugins/Kconfig
 #[test]
 fn test_parse_default_ambigus() {
     assert_parsing_eq!(
@@ -48,10 +49,37 @@ fn test_parse_default_ambigus() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::String(r#"$(shell,$(srctree)/scripts/gcc-plugin.sh "$(preferred-plugin-hostcc)" "$(HOSTCXX)" "$(CC)")"#.to_string())
-                    ))),
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Function(
+                    FunctionCall {
+                        name: "shell".to_string(),
+                        parameters: vec!(Parameter {
+                            tokens: vec!(
+                                ExpressionToken::Function(Box::new(FunctionCall {
+                                    name: "srctree".to_string(),
+                                    parameters: vec![]
+                                })),
+                                ExpressionToken::Literal("/scripts/gcc-plugin.sh".to_string()),
+                                ExpressionToken::Space,
+                                ExpressionToken::DoubleQuotes(vec![ExpressionToken::Function(
+                                    Box::new(FunctionCall {
+                                        name: "preferred-plugin-hostcc".to_string(),
+                                        parameters: vec![]
+                                    })
+                                ),]),
+                                ExpressionToken::Space,
+                                ExpressionToken::DoubleQuotes(vec![ExpressionToken::Variable(
+                                    "HOSTCXX".to_string()
+                                )]),
+                                ExpressionToken::Space,
+                                ExpressionToken::DoubleQuotes(vec![ExpressionToken::Variable(
+                                    "CC".to_string()
+                                )])
+                            )
+                        })
+                    }
+                )))),
                 r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("CC_IS_GCC".to_string()))
+                    Atom::Symbol(Symbol::NonConstant("CC_IS_GCC".to_string()))
                 ))))
             }
         ))
@@ -78,5 +106,21 @@ fn test_default_attribute_to_string() {
         }
         .to_string(),
         "64 if NET"
+    )
+}
+
+#[test]
+/// https://github.com/torvalds/linux/blob/master/init/Kconfig#L22-L25
+fn test_default_attribute_number() {
+    assert_parsing_eq!(
+        parse_default,
+        "default 0",
+        Ok((
+            "",
+            DefaultAttribute {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(0)))),
+                r#if: None
+            }
+        ))
     )
 }
