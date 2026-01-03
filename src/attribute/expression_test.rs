@@ -30,7 +30,7 @@ fn test_parse_term() {
         Ok((
             "",
             Expression::Term(AndExpression::Term(Term::Not(Atom::Symbol(
-                Symbol::Constant("KVM".to_string())
+                Symbol::NonConstant("KVM".to_string())
             ))))
         ))
     )
@@ -44,8 +44,8 @@ fn test_parse_depends_on_and() {
         Ok((
             "",
             Expression::Term(AndExpression::Expression(vec!(
-                Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_MIATA".to_string()))),
-                Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_MIATA".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_LX164".to_string()))),
             )))
         ))
     )
@@ -59,7 +59,7 @@ fn test_parse_number_or_symbol() {
         Ok((
             "",
             Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                Symbol::Constant("64BITS".to_string()),
+                Symbol::NonConstant("64BITS".to_string()),
             ))))
         ))
     );
@@ -104,12 +104,12 @@ fn test_parse_depends_on_ambigus() {
         Ok((
             "",
             Expression::Expression(vec!(
-                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                     "ALPHA_MIATA".to_string()
                 )))),
                 AndExpression::Expression(vec!(
-                    Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_LX164".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::Constant("ALPHA_SX164".to_string()))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_LX164".to_string()))),
+                    Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_SX164".to_string()))),
                 ))
             ))
         ))
@@ -209,8 +209,8 @@ fn test_parse_expression_start_like_number_but_symbol() {
         Ok((
             "",
             Expression::Term(AndExpression::Expression(vec!(
-                Term::Atom(Atom::Symbol(Symbol::Constant("8xx".to_string()))),
-                Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("8xx".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("MTD_CFI".to_string()))),
             )))
         ))
     )
@@ -225,7 +225,7 @@ fn test_parse_expression_number_and() {
             "",
             Expression::Term(AndExpression::Expression(vec!(
                 Term::Atom(Atom::Number(8500)),
-                Term::Atom(Atom::Symbol(Symbol::Constant("MTD_CFI".to_string()))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("MTD_CFI".to_string()))),
             )))
         ))
     )
@@ -356,4 +356,24 @@ fn test_expression_to_string() {
         ))))
         .to_string()
     );
+}
+
+// https://github.com/Mcdostone/nom-kconfig/issues/107#issuecomment-3703986206
+
+#[test]
+fn test_expression_constant_and_non_constant() {
+    assert_parsing_eq!(
+        parse_expression,
+        "MTD!=n",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+                CompareExpression {
+                    left: Symbol::NonConstant("MTD".to_string()),
+                    operator: CompareOperator::NotEqual,
+                    right: Symbol::Constant("n".to_string())
+                }
+            ))))
+        ))
+    )
 }

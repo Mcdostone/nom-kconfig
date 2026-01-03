@@ -13,7 +13,7 @@ fn test_parse_depends_on() {
         Ok((
             "",
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("PCI".to_string()))
+                Atom::Symbol(Symbol::NonConstant("PCI".to_string()))
             ))))
         ))
     )
@@ -28,7 +28,7 @@ fn test_parse_depends_on_weird_tab() {
         Ok((
             "",
             Attribute::DependsOn(OrExpression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("LIVEPATCH".to_string()))
+                Atom::Symbol(Symbol::NonConstant("LIVEPATCH".to_string()))
             ))))
         ))
     )
@@ -45,19 +45,19 @@ fn test_parse_depends_on_backslash() {
             "",
             Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Parenthesis(Box::new(Expression::Expression(vec!(
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                         "ARCH_LUBBOCK".to_string()
                     )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                         "MACH_MAINSTONE".to_string()
                     )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                         "PXA_SHARPSL".to_string()
                     )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                         "MACH_ARMCORE".to_string()
                     )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                         "ARCH_PXA_PALM".to_string()
                     )))),
                 ))))
