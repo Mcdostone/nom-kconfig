@@ -53,7 +53,7 @@ impl Display for Imply {
 ///     Ok((
 ///         "",
 ///         Imply {
-///             symbol: Symbol::Constant("PCI".to_string()),
+///             symbol: Symbol::NonConstant("PCI".to_string()),
 ///             r#if: None
 ///         }
 ///     ))
