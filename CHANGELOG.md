@@ -1,3 +1,13 @@
+## What's Changed in 0.6.0
+* Develop by @Mcdostone in [#111](https://github.com/Mcdostone/nom-kconfig/pull/111)
+* chore: Release version v0.6.0 by @Mcdostone
+* fix: constant and non-constant symbols were wrong by @Mcdostone
+* build(deps): bump raven-actions/actionlint from 2.0.1 to 2.1.0 by @dependabot[bot]
+* ci: fix changelog.yml by @Mcdostone
+* Changelog for v by @github-actions[bot] in [#106](https://github.com/Mcdostone/nom-kconfig/pull/106)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.5.0...v0.6.0
+
 ## What's Changed in 0.5.0
 * Develop by @Mcdostone in [#102](https://github.com/Mcdostone/nom-kconfig/pull/102)
 * build: update dependencies by @Mcdostone
