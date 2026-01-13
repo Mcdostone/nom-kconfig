@@ -6,7 +6,7 @@ use crate::{util::ws, KconfigInput};
 ///
 /// # Example
 /// ```
-/// use nom_kconfig::{assert_parsing_eq, attribute::parse_transitional};
+/// use nom_kconfig::{assert_parsing_eq, attribute::transitional::parse_transitional};
 ///
 /// assert_parsing_eq!(parse_transitional, "transitional", Ok(("", ())))
 /// ```

@@ -23,7 +23,7 @@ use crate::{util::ws, KconfigInput};
 ///     Ok((
 ///         "",
 ///         Expression::Term(AndExpression::Term(Term::Atom(
-///             Atom::Symbol(Symbol::Constant("KVM".to_string())
+///             Atom::Symbol(Symbol::NonConstant("KVM".to_string())
 ///         ))))
 ///     ))
 /// )

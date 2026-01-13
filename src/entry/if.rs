@@ -44,7 +44,7 @@ pub struct If {
 ///         "",
 ///         If {
 ///             condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-///                 Symbol::Constant("NET_VENDOR_AMD".to_string())
+///                 Symbol::NonConstant("NET_VENDOR_AMD".to_string())
 ///             )))),
 ///             entries: vec!(Entry::Comment(Comment { prompt: "Support of PCI".to_string(), dependencies: vec!() }))
 ///         }
