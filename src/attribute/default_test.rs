@@ -1,4 +1,4 @@
-use crate::attribute::{ExpressionToken, FunctionCall, Parameter};
+use crate::attribute::{parse_expression, ExpressionToken, FunctionCall, Parameter};
 use crate::{
     assert_parsing_eq,
     attribute::{parse_default, AndExpression, Atom, DefaultAttribute, Expression, Term},
@@ -121,6 +121,36 @@ fn test_default_attribute_number() {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(0)))),
                 r#if: None
             }
+        ))
+    )
+}
+
+#[test]
+/// https://github.com/torvalds/linux/blob/master/init/Kconfig#L22-L25
+fn test_default_attribute_number_2() {
+    assert_parsing_eq!(
+        parse_default,
+        "default \"845\"",
+        Ok((
+            "",
+            DefaultAttribute {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(845)))),
+                r#if: None
+            }
+        ))
+    )
+}
+
+#[test]
+fn test_default_attribute_number_3() {
+    assert_parsing_eq!(
+        parse_expression,
+        "'console=ttyS0,19200'",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
+                "console=ttyS0,19200".to_string()
+            ))))
         ))
     )
 }

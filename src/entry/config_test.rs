@@ -132,3 +132,36 @@ fn test_parse_config_def_bool_multiline_expression() {
         ))
     )
 }
+
+#[test]
+fn test_parse_config_bootparam_string() {
+    let input = "config BOOTPARAM_STRING
+	string 'Kernel Boot Parameter'
+	default 'console=ttyS0,19200'
+	depends on BOOTPARAM";
+    assert_parsing_eq!(
+        parse_config,
+        input,
+        Ok((
+            "",
+            Config {
+                symbol: "BOOTPARAM_STRING".to_string(),
+                attributes: vec!(
+                    Attribute::Type(ConfigType {
+                        r#type: Type::String(Some("Kernel Boot Parameter".to_string())),
+                        r#if: None
+                    }),
+                    Attribute::Default(DefaultAttribute {
+                        expression: Expression::Term(AndExpression::Term(Term::Atom(
+                            Atom::String("console=ttyS0,19200".to_string())
+                        ))),
+                        r#if: None
+                    }),
+                    Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
+                        Atom::Symbol(Symbol::NonConstant("BOOTPARAM".to_string()))
+                    )))),
+                )
+            }
+        ))
+    )
+}
