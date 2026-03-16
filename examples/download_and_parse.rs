@@ -34,8 +34,12 @@ fn download_and_extract_linux(version: &str) -> std::io::Result<PathBuf> {
         return Ok(linux_path);
     }
 
+    let major_number = version.split('.').next().unwrap_or("6");
     let tarball = format!("linux-{}.tar.xz", version);
-    let url = format!("https://cdn.kernel.org/pub/linux/kernel/v6.x/{}", tarball);
+    let url = format!(
+        "https://cdn.kernel.org/pub/linux/kernel/v{}.x/{}",
+        major_number, tarball
+    );
 
     println!("Downloading Linux kernel {} from {}", version, url);
 
