@@ -68,7 +68,10 @@ pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
 
 pub fn parse_string(input: KconfigInput) -> IResult<KconfigInput, String> {
     map(
-        delimited(tag("\""), take_until_unbalanced('"'), tag("\"")),
+        alt((
+            delimited(tag("'"), take_until_unbalanced('\''), tag("'")),
+            delimited(tag("\""), take_until_unbalanced('"'), tag("\"")),
+        )),
         |d| d.fragment().to_string(),
     )
     .parse(input)
