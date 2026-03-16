@@ -1,3 +1,12 @@
+## What's Changed in 0.7.0
+* develop by @Mcdostone in [#113](https://github.com/Mcdostone/nom-kconfig/pull/113)
+* fix: strings are delimited by single or double quotes by @Mcdostone
+* test: fix doc-tests by @Mcdostone
+* build(deps): bump raven-actions/actionlint from 2.1.0 to 2.1.1 by @dependabot[bot] in [#114](https://github.com/Mcdostone/nom-kconfig/pull/114)
+* Changelog for v0.6.0 by @github-actions[bot] in [#112](https://github.com/Mcdostone/nom-kconfig/pull/112)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.6.0...v0.7.0
+
 ## What's Changed in 0.6.0
 * Develop by @Mcdostone in [#111](https://github.com/Mcdostone/nom-kconfig/pull/111)
 * chore: Release version v0.6.0 by @Mcdostone
