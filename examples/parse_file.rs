@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf};
+use std::{env, fs, path::PathBuf};
 
 use nom_kconfig::{parse_kconfig, KconfigFile, KconfigInput};
 
@@ -12,7 +12,12 @@ fn main() -> std::io::Result<()> {
 
     let path = PathBuf::from(&args[1]);
 
-    let kconfig_file = KconfigFile::new(env::current_dir().unwrap(), path.clone());
+    let mut root_dir = env::current_dir().unwrap();
+    if args.len() == 3 {
+        root_dir = fs::canonicalize(PathBuf::from(&args[2]))?;
+    }
+
+    let kconfig_file = KconfigFile::new(root_dir, path.clone());
     let input = kconfig_file.read_to_string().unwrap();
     let parsing_result = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
     if let Err(e) = parsing_result {
