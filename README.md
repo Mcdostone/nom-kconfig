@@ -8,7 +8,6 @@
   <h1>A Kconfig parser written in rust.</h1>
 </div>
 
-[![Build status](https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml/badge.svg)](https://github.com/Mcdostone/nom-kconfig/actions/workflows/build.yml)
 [![Code coverage](https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C)](https://codecov.io/gh/Mcdostone/nom-kconfig)
 [![Minimum supported rust version: 1.65.0 or plus](https://img.shields.io/badge/MSRV-1.65.0+-lightgray.svg?logo=rust)](https://github.com/rust-bakery/nom#rust-version-requirements-msrv)
 [![crates.io Version](https://img.shields.io/crates/v/nom-kconfig.svg?logo=crate)](https://crates.io/crates/nom-kconfig)

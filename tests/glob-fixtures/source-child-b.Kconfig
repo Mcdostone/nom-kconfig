@@ -1,0 +1,2 @@
+config GLOB_CHILD_B
+    bool "glob child b"
