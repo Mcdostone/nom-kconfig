@@ -6,6 +6,7 @@ env:
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
+  RUST_CHANNEL: stable
 
 on:
   schedule:
@@ -24,26 +25,38 @@ permissions:
 
 jobs:
   dependencies:
-   runs-on: ubuntu-latest
-   steps:
-      - uses: actions/checkout@v6
-      - uses: Swatinem/rust-cache@v2
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
-          toolchain: stable
+          persist-credentials: false
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - name: Install cargo-edit
         run: cargo install cargo-edit
       - name: Check for outdated dependencies
         run: cargo upgrade --dry-run --locked
 
   audit:
-   runs-on: ubuntu-latest
-   steps:
-      - uses: actions/checkout@v6
-      - uses: Swatinem/rust-cache@v2
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
-          toolchain: stable
+          persist-credentials: false
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - name: Install cargo-outdated
         run: cargo install cargo-audit
       - name: Cargo audit

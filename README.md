@@ -8,7 +8,7 @@
   <h1>A Kconfig parser written in rust.</h1>
 </div>
 
-[![Code coverage](https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C)](https://codecov.io/gh/Mcdostone/nom-kconfig)
+[![codecov](https://codecov.io/gh/Mcdostone/nom-kconfig/branch/main/graph/badge.svg?token=QF0CRBCO2C)](https://codecov.io/gh/Mcdostone/nom-kconfig)
 [![Minimum supported rust version: 1.65.0 or plus](https://img.shields.io/badge/MSRV-1.65.0+-lightgray.svg?logo=rust)](https://github.com/rust-bakery/nom#rust-version-requirements-msrv)
 [![crates.io Version](https://img.shields.io/crates/v/nom-kconfig.svg?logo=crate)](https://crates.io/crates/nom-kconfig)
 
@@ -45,6 +45,7 @@ There are plenty of other keywords in the Kconfig language, check out [the offic
  - When [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries) is met, it reads and parses the specified configuration file.
  - This library uses `clone()` a lot. Do not expect amazing performances.
  - This parser has been tested on the Linux kernel repository from [2.6.11](https://cdn.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.xz) to [6.4.9](https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz) (3733 versions).
+ - There is a cargo feature `coreboot` that adds support for some coreboot-specific syntax.
  
 
 ## Getting started

@@ -6,6 +6,7 @@ env:
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
+  RUST_CHANNEL: stable
 
 permissions:
   packages: write
@@ -49,7 +50,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Delete old cargo-semver-checks comments
@@ -59,10 +60,14 @@ jobs:
           xargs -I % gh api -X DELETE "/repos/${{ github.repository }}/issues/comments/%" < comments.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
       - name: List the releases on GitHub
         id: current
         run: echo "version=$(git tag --sort=-creatordate | head -n 1)" >> "$GITHUB_OUTPUT"
@@ -73,11 +78,14 @@ jobs:
         id: nextStep
         if: ${{ steps.current.outputs.version == steps.next.outputs.version }}
         run: |
-          if [[ "${{ steps.current.outputs.version }}" == "${{ steps.next.outputs.version }}" ]]; then
+          if [[ "${VERSION}" == "${NEXT_VERSION}" ]]; then
             echo "nextStep=compute" >> "$GITHUB_OUTPUT"
           else
             echo "nextStep=nope" >> "$GITHUB_OUTPUT"
           fi
+        env:
+          VERSION: ${{ steps.current.outputs.version }}
+          NEXT_VERSION: ${{ steps.next.outputs.version }}
 
   cargo-semver-checks:
     needs: setup
@@ -87,19 +95,27 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.setup.outputs.nextStep != 'compute' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
       - name: Install cargo-semver-checks
         run: cargo install cargo-semver-checks
       - name: Show release type
         id: semver
         run: |
-          echo "release=$(bash ./.github/workflows/semver.sh diff ${{ needs.setup.outputs.currentVersion }} ${{ needs.setup.outputs.nextVersion }})" >> "$GITHUB_OUTPUT"
+          echo "release=$(bash ./.github/workflows/semver.sh diff ${VERSION} ${NEXT_VERSION})" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ needs.setup.outputs.currentVersion }}
+          NEXT_VERSION: ${{ needs.setup.outputs.nextVersion }}
+
       - name: Prepare report.md
         run: |
           {
@@ -140,13 +156,17 @@ jobs:
     if: ${{ needs.setup.outputs.nextStep == 'compute' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
       - name: Install cargo-semver-checks
         run: cargo install cargo-semver-checks
       - name: Determine the next version
@@ -156,19 +176,22 @@ jobs:
           b="major"
           for t in patch minor; do
             echo "Checking whether the next version is $t"
-            if cargo semver-checks --color never --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "$t"; then
+            if cargo semver-checks --color never --baseline-rev "${CURRENT_VERSION}" --release-type "$t"; then
               b="$t"
               break
             fi
           done
           echo $b
           echo "bump=$b" >> "$GITHUB_OUTPUT"
+        env:
+          CURRENT_VERSION: ${{ needs.setup.outputs.currentVersion }}
+
       - name: Comment the pull request
         run: |
-          echo "::info title=Next version:: Last public version is '${{ needs.setup.outputs.currentVersion }}' but version of this branch is '${{ needs.setup.outputs.nextVersion }}'."
+          echo "::info title=Next version:: Last public version is '${VERSION}' but version of this branch is '${NEXT_VERSION}'."
           {
-            printf "This pull request is not ready because version \`%s\` is already published." "${{ needs.setup.outputs.currentVersion }}"
-            printf "\nAccording to \`cargo-semver-checks\`, the next version should be \`v%s\`:" "$(bash .github/workflows/semver.sh bump ${{ steps.bump.outputs.bump }} ${{ needs.setup.outputs.currentVersion }} | tr -d "\n")"
+            printf "This pull request is not ready because version \`%s\` is already published." "${VERSION}"
+            printf "\nAccording to \`cargo-semver-checks\`, the next version should be \`v%s\`:" "$(bash .github/workflows/semver.sh bump ${{ steps.bump.outputs.bump }} ${VERSION} | tr -d "\n")"
             printf "\n"
             echo '```shell'
             printf "git checkout %s\n" "$branch"
@@ -179,4 +202,6 @@ jobs:
           gh pr comment ${{ github.event.number }} --body-file ./report.md
         env:
           GH_TOKEN: ${{ github.token }}
-          branch : '${{ toJSON(github.head_ref) }}'
+          VERSION: ${{ needs.setup.outputs.currentVersion }}
+          NEXT_VERSION: ${{ needs.setup.outputs.nextVersion }}
+          branch: '${{ toJSON(github.head_ref) }}'
