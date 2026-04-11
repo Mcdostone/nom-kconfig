@@ -10,7 +10,7 @@ readme = "README.md"
 description = "A Kconfig parser"
 categories = ["parsing"]
 keywords = ["parser",  "parsing", "kconfig", "linux-kernel"]
-rust-version = "1.56"
+rust-version = "1.65"
 exclude = [
     ".github",
 ]
@@ -26,15 +26,20 @@ members = [
 ]
 
 [dependencies]
+
+glob = { version = "0.3.3", optional = true }
 nom = "8.0.0"
 nom_locate = "5.0.0"
 regex = "1.12.3"
 serde = { version = "1.0.228", features = ["derive"], optional = true }
+tracing = { version = "0.1.40", features = ["log"] }
 
 [dev-dependencies]
 criterion = { version = "0.8.2", features = ["html_reports"] }
 walkdir = "2.5.0"
 reqwest = { version = "0.13.2", features = ["blocking"] }
+tracing-subscriber = "0.3.17"
+clap = { version = "4.3.24", features = ["derive"] }
 
 [[bench]]
 name = "my_benchmark"
@@ -42,17 +47,16 @@ harness = false
 
 [features]
 default = ["display", "hash", "serialize", "deserialize"]
+coreboot = ["dep:glob"]
 display = []
 hash = []
 serialize = ["dep:serde"]
 deserialize = ["dep:serde"]
 
-
 [package.metadata.typos]
 files.extend-exclude = [
     "benches/linux-6.4.10"
 ]
-
 
 [workspace.metadata.release]
 shared-version = true

@@ -1,3 +1,4 @@
+use crate::attribute::expression::CompareOperand;
 use crate::attribute::DefaultAttribute;
 use crate::{
     assert_parsing_eq,
@@ -5,10 +6,13 @@ use crate::{
         r#type::{ConfigType, Type},
         AndExpression, Atom, CompareExpression, CompareOperator, Expression, Term,
     },
-    entry::{config::Config, Choice},
+    entry::config::Config,
     kconfig::parse_kconfig,
     Attribute, Entry, Kconfig, Symbol,
 };
+
+#[cfg(not(feature = "coreboot"))]
+use crate::entry::Choice;
 
 #[test]
 fn test_parse_kconfig() {
@@ -37,6 +41,7 @@ fn test_parse_kconfig() {
 }
 
 #[test]
+#[cfg(not(feature = "coreboot"))]
 fn test_parse_kconfig_choice() {
     let input = "
 choice
@@ -89,18 +94,26 @@ config 64BIT
                             r#type: Type::Bool(Some("64-bit kernel".to_string())),
                             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                                 Atom::Compare(CompareExpression {
-                                    left: Symbol::NonConstant("$(SUBARCH)".to_string()),
+                                    left: CompareOperand::Symbol(Symbol::NonConstant(
+                                        "$(SUBARCH)".to_string()
+                                    )),
                                     operator: CompareOperator::Equal,
-                                    right: Symbol::Constant("x86".to_string())
+                                    right: CompareOperand::Symbol(Symbol::Constant(
+                                        "x86".to_string()
+                                    ))
                                 })
                             )))),
                         }),
                         Attribute::Default(DefaultAttribute {
                             expression: Expression::Term(AndExpression::Term(Term::Atom(
                                 Atom::Compare(CompareExpression {
-                                    left: Symbol::NonConstant("$(SUBARCH)".to_string()),
+                                    left: CompareOperand::Symbol(Symbol::NonConstant(
+                                        "$(SUBARCH)".to_string()
+                                    )),
                                     operator: CompareOperator::NotEqual,
-                                    right: Symbol::Constant("i386".to_string())
+                                    right: CompareOperand::Symbol(Symbol::Constant(
+                                        "i386".to_string()
+                                    ))
                                 })
                             ))),
                             r#if: None

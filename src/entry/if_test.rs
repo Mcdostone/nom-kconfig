@@ -7,7 +7,7 @@ use crate::{
     },
     entry::{parse_if, Config, If, Source},
     symbol::Symbol,
-    Attribute, Entry,
+    Attribute, Entry, Kconfig,
 };
 
 #[test]
@@ -23,8 +23,10 @@ fn test_parse_if_entry() {
                     Symbol::NonConstant("NET_VENDOR_AMD".to_string())
                 )))),
                 entries: vec!(Entry::Source(Source {
-                    file: "$(VAR)/Kconfig".to_string(),
-                    ..Default::default()
+                    entries: vec![Kconfig {
+                        file: "$(VAR)/Kconfig".to_string(),
+                        ..Default::default()
+                    }]
                 }))
             }
         ))

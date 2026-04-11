@@ -1,3 +1,4 @@
+use crate::attribute::expression::CompareOperand;
 use crate::attribute::parse_attributes;
 use crate::attribute::r#type::{ConfigType, Type};
 use crate::attribute::{
@@ -103,9 +104,9 @@ fn test_parse_attribute() {
             "",
             Attribute::Requires(Expression::Term(AndExpression::Term(Term::Atom(
                 Atom::Compare(CompareExpression {
-                    left: Symbol::NonConstant("MTK_INFRACFG".to_string()),
+                    left: CompareOperand::Symbol(Symbol::NonConstant("MTK_INFRACFG".to_string())),
                     operator: CompareOperator::Equal,
-                    right: Symbol::Constant("y".to_string())
+                    right: CompareOperand::Symbol(Symbol::Constant("y".to_string()))
                 })
             ))))
         ))
