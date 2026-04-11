@@ -1,8 +1,8 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
-        requires::parse_requires, AndExpression, Atom, CompareExpression, CompareOperator,
-        Expression, Term,
+        expression::CompareOperand, requires::parse_requires, AndExpression, Atom,
+        CompareExpression, CompareOperator, Expression, Term,
     },
     symbol::Symbol,
 };
@@ -18,9 +18,9 @@ fn test_parse_requires() {
             "",
             Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
                 CompareExpression {
-                    left: Symbol::NonConstant("MTK_INFRACFG".to_string()),
+                    left: CompareOperand::Symbol(Symbol::NonConstant("MTK_INFRACFG".to_string())),
                     operator: CompareOperator::Equal,
-                    right: Symbol::Constant("y".to_string())
+                    right: CompareOperand::Symbol(Symbol::Constant("y".to_string()))
                 }
             ))))
         ))

@@ -1,22 +1,44 @@
-use std::{env, fs, path::PathBuf};
+use std::{env, path::PathBuf};
 
+use clap::Parser;
 use nom_kconfig::{parse_kconfig, KconfigFile, KconfigInput};
+use tracing::{error, Level};
 
-fn main() -> std::io::Result<()> {
-    let args = std::env::args().collect::<Vec<String>>();
-    if args.len() < 2 {
-        eprintln!("Usage: {} <file", args[0]);
-        eprintln!("Example: {} linux-6.18/arch/Kconfig", args[0]);
-        std::process::exit(1);
+#[derive(Parser)]
+#[command(author,
+    bin_name = "parse_file",
+    long_about = Some("Parse a Kconfig file and print the resulting AST to stdout."),
+    version
+)]
+struct Cli {
+    #[clap(long)]
+    /// Root directory to resolve Kconfig file paths from. If not provided, the current working directory will be used.
+    root_dir: Option<PathBuf>,
+    /// Kconfig file to parse
+    file: PathBuf,
+    remaining_args: Vec<PathBuf>,
+}
+
+/// to use this example, run
+/// ```shell
+/// cargo run --all-features --example parse_file --  --root-dir [root_dir] <kconfig_file>
+/// ```
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .with_max_level(Level::TRACE)
+        .init();
+
+    let cli = Cli::parse();
+    let path = cli.file.clone();
+    let root_dir = cli.root_dir.unwrap_or_else(|| env::current_dir().unwrap());
+
+    if !cli.remaining_args.is_empty() {
+        error!("Please use '--root-dir' to specify the root directory of your Kconfig project");
+        return Err(format!("Please run the command:  cargo run --all-features --example parse_file -- --root-dir '{}' '{}'", cli.remaining_args[0].display(), cli.file.display()).into());
     }
 
-    let path = PathBuf::from(&args[1]);
-
-    let mut root_dir = env::current_dir().unwrap();
-    if args.len() == 3 {
-        root_dir = fs::canonicalize(PathBuf::from(&args[2]))?;
-    }
-
+    let root_dir = root_dir.canonicalize()?;
     let kconfig_file = KconfigFile::new(root_dir, path.clone());
     let input = kconfig_file.read_to_string().unwrap();
     let parsing_result = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));

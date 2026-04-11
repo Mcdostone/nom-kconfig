@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+#[cfg(feature = "coreboot")]
+use glob::glob;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -11,6 +13,10 @@ use nom::{
     IResult, Parser,
 };
 use regex::Regex;
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::{
     kconfig::{parse_kconfig, Kconfig},
@@ -22,11 +28,61 @@ pub fn parse_filepath(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str
     map(
         recognize(ws(many1(alt((
             alphanumeric1::<KconfigInput, _>,
-            recognize(one_of(".$()-_$/")),
+            recognize(one_of(".$()*-_$/")),
         ))))),
         |d| d.fragment().to_owned(),
     )
     .parse(input)
+}
+
+fn parse_source_kconfig(
+    input: KconfigInput,
+    source_kconfig_file: KconfigFile,
+) -> Result<Kconfig, nom::Err<Error<KconfigInput>>> {
+    let source_content = source_kconfig_file
+        .read_to_string()
+        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+
+    #[allow(clippy::let_and_return)]
+    let x = match cut(parse_kconfig).parse(KconfigInput::new_extra(
+        &source_content,
+        source_kconfig_file.clone(),
+    )) {
+        Ok((_, kconfig)) => Ok(kconfig),
+        Err(_e) => Err(nom::Err::Error(Error::new(
+            KconfigInput::new_extra("", source_kconfig_file),
+            ErrorKind::Fail,
+        ))),
+    };
+    x
+}
+
+#[cfg(feature = "coreboot")]
+fn expand_source_files<'a>(
+    input: KconfigInput<'a>,
+    file: &str,
+) -> Result<Vec<PathBuf>, nom::Err<Error<KconfigInput<'a>>>> {
+    let full_path_pattern = input.extra.root_dir.join(file).display().to_string();
+    let mut expanded_files = Vec::new();
+    for source_path in glob(&full_path_pattern)
+        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?
+    {
+        let source_path = source_path
+            .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+        let source_path_without_root = source_path
+            .strip_prefix(&input.extra.root_dir)
+            .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+        expanded_files.push(source_path_without_root.to_path_buf());
+    }
+    expanded_files.sort();
+    if expanded_files.is_empty() {
+        return Err(nom::Err::Error(Error::from_error_kind(
+            input,
+            ErrorKind::Fail,
+        )));
+    }
+
+    Ok(expanded_files)
 }
 
 pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
@@ -37,34 +93,47 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     )))
     .parse(input)?;
     if let Some(file) = apply_vars(file, &input.extra.vars) {
-        let source_kconfig_file = KconfigFile::new_with_vars(
-            input.clone().extra.root_dir,
-            PathBuf::from(file),
-            &input.extra.vars,
-        );
-        let source_content = source_kconfig_file
-            .read_to_string()
-            .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+        #[cfg(feature = "coreboot")]
+        {
+            let expanded_files = expand_source_files(input.clone(), &file)?;
+            let mut sources = vec![];
 
-        let binding = source_content.clone();
-        #[allow(clippy::let_and_return)]
-        let x = match cut(parse_kconfig).parse(KconfigInput::new_extra(
-            &binding,
-            source_kconfig_file.clone(),
-        )) {
-            Ok((_, kconfig)) => Ok((input, kconfig)),
-            Err(_e) => Err(nom::Err::Error(Error::new(
-                KconfigInput::new_extra("", source_kconfig_file),
-                ErrorKind::Fail,
-            ))),
-        };
-        x
+            for expanded_file in expanded_files {
+                let source_kconfig_file = KconfigFile::new_with_vars(
+                    input.clone().extra.root_dir,
+                    expanded_file,
+                    &input.extra.vars,
+                );
+                let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+                sources.push(source);
+            }
+
+            Ok((input, Source { entries: sources }))
+        }
+
+        #[cfg(not(feature = "coreboot"))]
+        {
+            let source_kconfig_file = KconfigFile::new_with_vars(
+                input.clone().extra.root_dir,
+                PathBuf::from(file),
+                &input.extra.vars,
+            );
+            let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+            Ok((
+                input,
+                Source {
+                    entries: vec![source],
+                },
+            ))
+        }
     } else {
         Ok((
             input,
             Source {
-                file: file.to_string(),
-                ..Default::default()
+                entries: vec![Kconfig {
+                    file: file.to_string(),
+                    ..Default::default()
+                }],
             },
         ))
     }
@@ -91,4 +160,10 @@ pub fn apply_vars(
 }
 
 /// Entry that reads the specified configuration file. This file is always parsed.
-pub type Source = Kconfig;
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+pub struct Source {
+    pub entries: Vec<Kconfig>,
+}

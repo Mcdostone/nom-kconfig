@@ -15,7 +15,6 @@ env:
   RUST_BACKTRACE: 1
   RUSTDOCFLAGS: "--deny warnings"
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
-  LINUX_VERSION: 6.18.4
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -108,23 +107,6 @@ jobs:
       - name: Run cargo clippy
         run: cargo clippy --all-targets --all-features -- --deny warnings
 
-  license:
-    needs: check
-    name: License
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Install git-cliff
-        run: cargo install --locked cargo-deny
-      - name: Run cargo deny
-        run: cargo deny check licenses
-
   format:
     needs: check
     name: Format
@@ -166,8 +148,8 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo install cargo-nextest --locked
-      - run: cargo nextest run --locked
+      - uses: taiki-e/install-action@nextest
+      - run: cargo nextest run --locked --all-features
         env:
           RUST_BACKTRACE: full
           CI: "true"
@@ -184,7 +166,10 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo run --example=download_and_parse ${{ env.LINUX_VERSION }}
+      - name: Get latest Linux version
+        id: get_latest_linux_version
+        run: printf "linux_version=%s" "$(curl -s https://www.kernel.org | grep -A1 latest_link | tail -n1 | grep -Eo '>[^<]+' | grep -Eo '[^>]+')" >> "$GITHUB_OUTPUT"
+      - run: cargo run --example=download_and_parse ${{ steps.get_latest_linux_version.outputs.linux_version }} > /dev/null
         env:
           RUST_BACKTRACE: full
 
@@ -213,7 +198,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - run: cargo install --locked cargo-shear
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@cargo-shear
       - name: Run cargo Shear
         run: cargo shear
 
@@ -253,4 +242,9 @@ jobs:
     needs: [check]
     steps:
     - uses: actions/checkout@v6
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
     - uses: EmbarkStudios/cargo-deny-action@v2
+      with:
+        command: check all

@@ -12,8 +12,10 @@ fn test_parse_source() {
         Ok((
             "",
             Source {
-                file: "empty".to_string(),
-                entries: vec![],
+                entries: vec![Kconfig {
+                    file: "empty".to_string(),
+                    ..Default::default()
+                }],
             },
         )),
     )
@@ -27,8 +29,10 @@ fn test_parse_source_no_quote() {
         Ok((
             "",
             Source {
-                file: "empty".to_string(),
-                entries: vec![],
+                entries: vec![Kconfig {
+                    file: "empty".to_string(),
+                    ..Default::default()
+                }],
             },
         )),
     )
@@ -58,9 +62,35 @@ fn test_parse_source_fail_to_parse() {
     assert!(res.is_err())
 }
 
+#[cfg(not(feature = "coreboot"))]
+#[test]
+fn test_parse_source_glob_not_supported_without_feature() {
+    let res = parse_source(KconfigInput::new_extra(
+        "source glob-fixtures/source-child-*.Kconfig",
+        KconfigFile {
+            root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests"),
+            ..Default::default()
+        },
+    ));
+    assert!(res.is_err())
+}
+
+#[cfg(feature = "coreboot")]
+#[test]
+fn test_parse_source_glob_no_match_fails_with_feature() {
+    let res = parse_source(KconfigInput::new_extra(
+        "source glob-fixtures/does-not-exist-*.Kconfig",
+        KconfigFile {
+            root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests"),
+            ..Default::default()
+        },
+    ));
+    assert!(res.is_err())
+}
+
 fn assert_parsing_source_eq(
     input: &str,
-    expected: Result<(&str, Kconfig), nom::Err<nom::error::Error<KconfigInput>>>,
+    expected: Result<(&str, Source), nom::Err<nom::error::Error<KconfigInput>>>,
 ) {
     let res = parse_source(KconfigInput::new_extra(
         input,

@@ -2,7 +2,7 @@ use crate::{
     assert_parsing_eq, assert_parsing_fail,
     attribute::{
         expression::{
-            parse_expression, parse_string, AndExpression, Atom, CompareExpression,
+            parse_expression, parse_string, AndExpression, Atom, CompareExpression, CompareOperand,
             CompareOperator, Expression, Term,
         },
         function::{ExpressionToken, FunctionCall, Parameter},
@@ -140,11 +140,11 @@ fn test_parse_depends_on_optimization() {
                 AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_LX164".to_string()))),
                     Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::NonConstant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::NonConstant("world".to_string()) }))))))),
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: CompareOperand::Symbol(Symbol::NonConstant("HELLO".to_string())), operator: CompareOperator::Equal, right: CompareOperand::Symbol(Symbol::NonConstant("world".to_string())) }))))))),
                 )),
                 AndExpression::Expression(vec!(
                     Term::Atom(Atom::Symbol(Symbol::NonConstant("ALPHA_SX164".to_string()))),
-                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: Symbol::NonConstant("HELLO".to_string()), operator: CompareOperator::Equal, right: Symbol::NonConstant("world".to_string())})))))))
+                    Term::Atom(Atom::Parenthesis(Box::new(Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(CompareExpression { left: CompareOperand::Symbol(Symbol::NonConstant("HELLO".to_string())), operator: CompareOperator::Equal, right: CompareOperand::Symbol(Symbol::NonConstant("world".to_string()))})))))))
                 )
             )
         )))))
@@ -224,9 +224,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS = 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::Equal,
-                right: Symbol::Constant("5".to_string())
+                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
             }
         ))))
         .to_string()
@@ -235,9 +235,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS != 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::NotEqual,
-                right: Symbol::Constant("5".to_string())
+                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
             }
         ))))
         .to_string()
@@ -246,9 +246,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS < 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::LowerThan,
-                right: Symbol::Constant("5".to_string())
+                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
             }
         ))))
         .to_string()
@@ -257,9 +257,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS <= 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::LowerOrEqual,
-                right: Symbol::Constant("5".to_string())
+                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
             }
         ))))
         .to_string()
@@ -268,9 +268,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS > 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::GreaterThan,
-                right: Symbol::Constant("5".to_string())
+                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
             }
         ))))
         .to_string()
@@ -286,9 +286,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS >= 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: Symbol::Constant("NUMBER_OF_PROCS".to_string()),
+                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::GreaterOrEqual,
-                right: Symbol::Constant("5".to_string())
+                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
             }
         ))))
         .to_string()
@@ -356,11 +356,50 @@ fn test_expression_constant_and_non_constant() {
             "",
             Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
                 CompareExpression {
-                    left: Symbol::NonConstant("MTD".to_string()),
+                    left: CompareOperand::Symbol(Symbol::NonConstant("MTD".to_string())),
                     operator: CompareOperator::NotEqual,
-                    right: Symbol::Constant("n".to_string())
+                    right: CompareOperand::Symbol(Symbol::Constant("n".to_string()))
                 }
             ))))
+        ))
+    )
+}
+
+// https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/init/Kconfig?h=next-20260403#n91
+#[test]
+#[cfg(feature = "coreboot")]
+fn test_expression_compare_with_function_call() {
+    assert_parsing_eq!(
+        parse_expression,
+        "CC_IS_CLANG && RUSTC_LLVM_MAJOR_VERSION = $(shell,expr $(cc-version) / 10000)",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Expression(vec!(
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("CC_IS_CLANG".to_string()))),
+                Term::Atom(Atom::Compare(CompareExpression {
+                    left: CompareOperand::Symbol(Symbol::NonConstant(
+                        "RUSTC_LLVM_MAJOR_VERSION".to_string()
+                    )),
+                    operator: CompareOperator::Equal,
+                    right: CompareOperand::Macro(FunctionCall {
+                        name: "shell".to_string(),
+                        parameters: vec!(Parameter {
+                            tokens: vec!(
+                                ExpressionToken::Literal("expr".to_string()),
+                                ExpressionToken::Space,
+                                ExpressionToken::Function(Box::new(FunctionCall {
+                                    name: "cc-version".to_string(),
+                                    parameters: vec![]
+                                })),
+                                ExpressionToken::Space,
+                                ExpressionToken::Literal("/".to_string()),
+                                ExpressionToken::Space,
+                                ExpressionToken::Literal("10000".to_string())
+                            )
+                        })
+                    })
+                }))
+            )))
         ))
     )
 }

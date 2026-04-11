@@ -17,4 +17,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: actionlint
+<<<<<<< HEAD
         uses: raven-actions/actionlint@v2.1.1
+=======
+        uses: raven-actions/actionlint@v2.1.2
+>>>>>>> a2acdca (feat: support of coreboot syntax with a rust feature 'coreboot')

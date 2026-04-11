@@ -1,3 +1,5 @@
+#[cfg(feature = "coreboot")]
+use crate::attribute::{expression::CompareOperand, CompareExpression, CompareOperator};
 use crate::{
     assert_parsing_eq,
     attribute::{parse_depends_on, AndExpression, Atom, Expression, OrExpression, Term},
@@ -61,6 +63,28 @@ fn test_parse_depends_on_backslash() {
                         "ARCH_PXA_PALM".to_string()
                     )))),
                 ))))
+            ))))
+        ))
+    )
+}
+
+/// https://github.com/coreboot/coreboot/blob/main/payloads/external/SeaBIOS/Kconfig#L159
+#[test]
+#[cfg(feature = "coreboot")]
+fn test_parse_depends_on_with_minus_one() {
+    assert_parsing_eq!(
+        parse_depends_on,
+        r"depends on SEABIOS_DEBUG_LEVEL = -1",
+        Ok((
+            "",
+            Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
+                Atom::Compare(CompareExpression {
+                    left: CompareOperand::Symbol(Symbol::NonConstant(
+                        "SEABIOS_DEBUG_LEVEL".to_string()
+                    )),
+                    operator: CompareOperator::Equal,
+                    right: CompareOperand::Number(-1)
+                })
             ))))
         ))
     )
