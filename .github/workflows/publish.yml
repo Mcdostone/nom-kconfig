@@ -62,6 +62,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      id-token: write
 
   publish-to-registry:
     runs-on: ubuntu-latest
