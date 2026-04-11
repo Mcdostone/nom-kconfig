@@ -1,3 +1,12 @@
+## What's Changed in 0.8.0
+* chore: Release version v0.8.0 by @Mcdostone
+* ci: trying to improve security of the CI pipeline by @Mcdostone
+* feat: support of coreboot syntax with a rust feature 'coreboot' by @Mcdostone
+* refactor: allow to specify the root dir in `parse_file.rs` by @Mcdostone
+* Changelog for v0.7.0 by @github-actions[bot] in [#122](https://github.com/Mcdostone/nom-kconfig/pull/122)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.7.0...v0.8.0
+
 ## What's Changed in 0.7.0
 * develop by @Mcdostone in [#113](https://github.com/Mcdostone/nom-kconfig/pull/113)
 * fix: strings are delimited by single or double quotes by @Mcdostone
