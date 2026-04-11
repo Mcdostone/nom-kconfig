@@ -14,6 +14,7 @@ env:
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: '--deny warnings'
   MINIMUM_SUPPORTED_RUST_VERSION: 1.80.1
+  RUST_CHANNEL: stable
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,17 +24,24 @@ jobs:
   code-coverage:
     name: Code coverage
     runs-on: ubuntu-latest
+    environment: codecov
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@v2
+          persist-credentials: false
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
+        env:
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
       - name: Install cargo-tarpaulin
         run: cargo install cargo-tarpaulin
       - name: Run cargo tarpaulin
         run: cargo tarpaulin --all-features --out Xml
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # ratchet:codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
