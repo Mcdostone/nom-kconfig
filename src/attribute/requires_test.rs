@@ -4,7 +4,7 @@ use crate::{
         expression::CompareOperand, requires::parse_requires, AndExpression, Atom,
         CompareExpression, CompareOperator, Expression, Term,
     },
-    symbol::Symbol,
+    symbol::{ConstantSymbol, Symbol},
 };
 
 // 2.5.55/drivers/char/Kconfig
@@ -20,7 +20,7 @@ fn test_parse_requires() {
                 CompareExpression {
                     left: CompareOperand::Symbol(Symbol::NonConstant("MTK_INFRACFG".to_string())),
                     operator: CompareOperator::Equal,
-                    right: CompareOperand::Symbol(Symbol::Constant("y".to_string()))
+                    right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Boolean(true)))
                 }
             ))))
         ))

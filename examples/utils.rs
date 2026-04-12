@@ -28,6 +28,13 @@ pub fn clone(url: &str, destination: &Path) -> std::io::Result<PathBuf> {
             &destination.display().to_string(),
         ])
         .output()?;
+    match _output.status.success() {
+        true => info!("Successfully cloned repository"),
+        false => warn!(
+            "Failed to clone repository, git output: {}",
+            String::from_utf8_lossy(&_output.stderr)
+        ),
+    }
 
     Ok(destination.to_path_buf())
 }

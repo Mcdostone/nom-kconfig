@@ -34,7 +34,9 @@ use std::{fs, io};
 pub mod attribute;
 pub mod entry;
 pub mod kconfig;
+pub mod string;
 pub mod symbol;
+pub mod tristate;
 pub mod util;
 
 pub use self::attribute::Attribute;
@@ -82,7 +84,10 @@ impl KconfigFile {
     }
 
     pub fn full_path(&self) -> PathBuf {
-        self.root_dir.join(&self.file)
+        match self.file.is_absolute() {
+            true => self.file.clone(),
+            false => self.root_dir.join(&self.file),
+        }
     }
 
     pub fn read_to_string(&self) -> io::Result<String> {

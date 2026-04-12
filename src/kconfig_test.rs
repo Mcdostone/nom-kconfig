@@ -1,18 +1,23 @@
-use crate::attribute::expression::CompareOperand;
-use crate::attribute::DefaultAttribute;
 use crate::{
     assert_parsing_eq,
-    attribute::{
-        r#type::{ConfigType, Type},
-        AndExpression, Atom, CompareExpression, CompareOperator, Expression, Term,
-    },
+    attribute::r#type::{ConfigType, Type},
     entry::config::Config,
     kconfig::parse_kconfig,
-    Attribute, Entry, Kconfig, Symbol,
+    Attribute, Entry, Kconfig,
 };
 
+#[cfg(feature = "coreboot")]
+use crate::attribute::expression::CompareOperand;
+#[cfg(feature = "coreboot")]
+use crate::attribute::{AndExpression, Atom, CompareExpression, CompareOperator, Expression, Term};
+#[cfg(feature = "coreboot")]
+use crate::attribute::{DefaultAttribute, FunctionCall};
 #[cfg(not(feature = "coreboot"))]
 use crate::entry::Choice;
+#[cfg(feature = "coreboot")]
+use crate::symbol::ConstantSymbol;
+#[cfg(feature = "coreboot")]
+use crate::Symbol;
 
 #[test]
 fn test_parse_kconfig() {
@@ -73,6 +78,7 @@ endchoice
 }
 
 #[test]
+#[cfg(feature = "coreboot")]
 /// https://github.com/Mcdostone/nom-kconfig/issues/107#issuecomment-3736187967
 fn test_parse_kconfig_bool() {
     let input = r#"
@@ -94,12 +100,13 @@ config 64BIT
                             r#type: Type::Bool(Some("64-bit kernel".to_string())),
                             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                                 Atom::Compare(CompareExpression {
-                                    left: CompareOperand::Symbol(Symbol::NonConstant(
-                                        "$(SUBARCH)".to_string()
-                                    )),
+                                    left: CompareOperand::Macro(FunctionCall {
+                                        name: "SUBARCH".to_string(),
+                                        parameters: vec!()
+                                    }),
                                     operator: CompareOperator::Equal,
                                     right: CompareOperand::Symbol(Symbol::Constant(
-                                        "x86".to_string()
+                                        ConstantSymbol::String("x86".to_string())
                                     ))
                                 })
                             )))),
@@ -107,12 +114,13 @@ config 64BIT
                         Attribute::Default(DefaultAttribute {
                             expression: Expression::Term(AndExpression::Term(Term::Atom(
                                 Atom::Compare(CompareExpression {
-                                    left: CompareOperand::Symbol(Symbol::NonConstant(
-                                        "$(SUBARCH)".to_string()
-                                    )),
+                                    left: CompareOperand::Macro(FunctionCall {
+                                        name: "SUBARCH".to_string(),
+                                        parameters: vec!()
+                                    }),
                                     operator: CompareOperator::NotEqual,
                                     right: CompareOperand::Symbol(Symbol::Constant(
-                                        "i386".to_string()
+                                        ConstantSymbol::String("i386".to_string())
                                     ))
                                 })
                             ))),

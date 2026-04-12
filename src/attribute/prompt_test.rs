@@ -46,10 +46,21 @@ fn test_prompt_to_string() {
         Prompt {
             prompt: "Support of KVM".to_string(),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("KVM".to_string()))
+                Atom::Symbol(Symbol::NonConstant("KVM".to_string()))
             ))))
         }
         .to_string(),
         r#""Support of KVM" if KVM"#
+    )
+}
+
+/// https://github.com/u-boot/u-boot/blob/e2fa3e570f83ab0f9ce667ddaec9dc738bcf05b9/net/Kconfig#L82-L88
+#[test]
+fn test_prompt_starting_with_hash() {
+    let input = "\"# Support in-kernel module decompression\"";
+    assert_parsing_eq!(
+        parse_prompt_value,
+        input,
+        Ok(("", "# Support in-kernel module decompression".to_string()))
     )
 }
