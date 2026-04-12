@@ -2,12 +2,13 @@ use crate::{
     assert_parsing_eq, assert_parsing_fail,
     attribute::{
         expression::{
-            parse_expression, parse_string, AndExpression, Atom, CompareExpression, CompareOperand,
+            parse_expression, AndExpression, Atom, CompareExpression, CompareOperand,
             CompareOperator, Expression, Term,
         },
         function::{ExpressionToken, FunctionCall, Parameter},
     },
-    symbol::Symbol,
+    string::parse_string,
+    symbol::{ConstantSymbol, Symbol},
 };
 
 #[test]
@@ -17,7 +18,9 @@ fn test_parse_expression_number() {
         "-412",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(-412))))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant(ConstantSymbol::Integer(-412))
+            ))))
         ))
     )
 }
@@ -68,7 +71,9 @@ fn test_parse_number_or_symbol() {
         "64",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64))),)
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant(ConstantSymbol::Integer(64))
+            )))),
         ))
     );
 
@@ -77,7 +82,9 @@ fn test_parse_number_or_symbol() {
         "\"64\"",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64))))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant(ConstantSymbol::String("64".to_string()))
+            )))),
         ))
     );
 
@@ -86,7 +93,9 @@ fn test_parse_number_or_symbol() {
         "'64'",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64))))
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant(ConstantSymbol::String("64".to_string()))
+            )))),
         ))
     );
 }
@@ -211,7 +220,26 @@ fn test_parse_expression_number_and() {
         Ok((
             "",
             Expression::Term(AndExpression::Expression(vec!(
-                Term::Atom(Atom::Number(8500)),
+                Term::Atom(Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(
+                    8500
+                )))),
+                Term::Atom(Atom::Symbol(Symbol::NonConstant("MTD_CFI".to_string()))),
+            )))
+        ))
+    )
+}
+
+#[test]
+fn lol() {
+    assert_parsing_eq!(
+        parse_expression,
+        "\"$(SUBARCH)\" = \"x86\"",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Expression(vec!(
+                Term::Atom(Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(
+                    8500
+                )))),
                 Term::Atom(Atom::Symbol(Symbol::NonConstant("MTD_CFI".to_string()))),
             )))
         ))
@@ -224,9 +252,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS = 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
+                left: CompareOperand::Symbol(Symbol::NonConstant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::Equal,
-                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
+                right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(5)))
             }
         ))))
         .to_string()
@@ -235,9 +263,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS != 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
+                left: CompareOperand::Symbol(Symbol::NonConstant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::NotEqual,
-                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
+                right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(5)))
             }
         ))))
         .to_string()
@@ -246,9 +274,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS < 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
+                left: CompareOperand::Symbol(Symbol::NonConstant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::LowerThan,
-                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
+                right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(5)))
             }
         ))))
         .to_string()
@@ -257,9 +285,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS <= 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
+                left: CompareOperand::Symbol(Symbol::NonConstant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::LowerOrEqual,
-                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
+                right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(5)))
             }
         ))))
         .to_string()
@@ -268,17 +296,19 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS > 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
+                left: CompareOperand::Symbol(Symbol::NonConstant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::GreaterThan,
-                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
+                right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(5)))
             }
         ))))
         .to_string()
     );
     assert_eq!(
         r#""A string with "double quotes"""#,
-        Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
-            r#"A string with "double quotes""#.to_string()
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+            Symbol::Constant(ConstantSymbol::String(
+                r#"A string with "double quotes""#.to_string()
+            ))
         ))))
         .to_string()
     );
@@ -286,9 +316,9 @@ fn test_expression_to_string() {
         "NUMBER_OF_PROCS >= 5",
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
             CompareExpression {
-                left: CompareOperand::Symbol(Symbol::Constant("NUMBER_OF_PROCS".to_string())),
+                left: CompareOperand::Symbol(Symbol::NonConstant("NUMBER_OF_PROCS".to_string())),
                 operator: CompareOperator::GreaterOrEqual,
-                right: CompareOperand::Symbol(Symbol::Constant("5".to_string()))
+                right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(5)))
             }
         ))))
         .to_string()
@@ -296,18 +326,18 @@ fn test_expression_to_string() {
     assert_eq!(
         "KVM && NET",
         Expression::Term(AndExpression::Expression(vec!(
-            Term::Atom(Atom::Symbol(Symbol::Constant("KVM".to_string()))),
-            Term::Atom(Atom::Symbol(Symbol::Constant("NET".to_string())))
+            Term::Atom(Atom::Symbol(Symbol::NonConstant("KVM".to_string()))),
+            Term::Atom(Atom::Symbol(Symbol::NonConstant("NET".to_string())))
         )))
         .to_string()
     );
     assert_eq!(
         "KVM || NET",
         Expression::Expression(vec!(
-            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                 "KVM".to_string()
             )))),
-            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::Constant(
+            AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
                 "NET".to_string()
             ))))
         ))
@@ -316,19 +346,22 @@ fn test_expression_to_string() {
     assert_eq!(
         "!KVM",
         Expression::Term(AndExpression::Term(Term::Not(Atom::Symbol(
-            Symbol::Constant("KVM".to_string())
+            Symbol::NonConstant("KVM".to_string())
         ))))
         .to_string()
     );
     assert_eq!(
         "55",
-        Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(55)))).to_string()
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+            Symbol::Constant(ConstantSymbol::Integer(55))
+        ))))
+        .to_string()
     );
     assert_eq!(
         r#"(hello)"#,
         Expression::Term(AndExpression::Term(Term::Atom(Atom::Parenthesis(
             Box::new(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("hello".to_string()))
+                Atom::Symbol(Symbol::NonConstant("hello".to_string()))
             ))))
         ))))
         .to_string()
@@ -358,7 +391,7 @@ fn test_expression_constant_and_non_constant() {
                 CompareExpression {
                     left: CompareOperand::Symbol(Symbol::NonConstant("MTD".to_string())),
                     operator: CompareOperator::NotEqual,
-                    right: CompareOperand::Symbol(Symbol::Constant("n".to_string()))
+                    right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Boolean(false)))
                 }
             ))))
         ))
@@ -418,9 +451,9 @@ fn test_expression_compare_with_string() {
                         "DEFAULT_DEVICE_TREE".to_string()
                     )),
                     operator: CompareOperator::Equal,
-                    right: CompareOperand::Symbol(Symbol::Constant(
+                    right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::String(
                         "sun7i-a20-icnova-swac".to_string()
-                    ))
+                    )))
                 }
             ))))
         ))

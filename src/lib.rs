@@ -34,7 +34,9 @@ use std::{fs, io};
 pub mod attribute;
 pub mod entry;
 pub mod kconfig;
+pub mod string;
 pub mod symbol;
+pub mod tristate;
 pub mod util;
 
 pub use self::attribute::Attribute;

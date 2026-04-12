@@ -45,12 +45,13 @@ impl Display for Range {
     }
 }
 
+// TODO bounds can be numbers or hex, here we only accept numbers...
 fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
     alt((
         map((ws(parse_number), ws(parse_number)), |(l, r)| {
             (
-                Symbol::Constant(l.to_string()),
-                Symbol::Constant(r.to_string()),
+                Symbol::Constant(crate::symbol::ConstantSymbol::Integer(l)),
+                Symbol::Constant(crate::symbol::ConstantSymbol::Integer(r)),
             )
         }),
         (ws(parse_symbol), ws(parse_symbol)),

@@ -1,5 +1,6 @@
 use crate::attribute::expression::CompareOperand;
 use crate::attribute::DefaultAttribute;
+use crate::symbol::ConstantSymbol;
 use crate::{
     assert_parsing_eq,
     attribute::{
@@ -99,7 +100,7 @@ config 64BIT
                                     )),
                                     operator: CompareOperator::Equal,
                                     right: CompareOperand::Symbol(Symbol::Constant(
-                                        "x86".to_string()
+                                        ConstantSymbol::String("x86".to_string())
                                     ))
                                 })
                             )))),
@@ -112,7 +113,7 @@ config 64BIT
                                     )),
                                     operator: CompareOperator::NotEqual,
                                     right: CompareOperand::Symbol(Symbol::Constant(
-                                        "i386".to_string()
+                                        ConstantSymbol::String("i386".to_string())
                                     ))
                                 })
                             ))),

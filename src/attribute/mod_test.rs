@@ -8,7 +8,8 @@ use crate::attribute::{
 };
 
 use crate::assert_parsing_eq;
-use crate::symbol::Symbol;
+use crate::symbol::{ConstantSymbol, Symbol};
+use crate::tristate::Tristate;
 
 #[test]
 fn test_parse_attribute() {
@@ -25,7 +26,7 @@ fn test_parse_attribute() {
             "",
             Attribute::Default(DefaultAttribute {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("m".to_string())
+                    Symbol::Constant(ConstantSymbol::Tristate(Tristate::Module))
                 )))),
                 r#if: None
             })
@@ -91,8 +92,8 @@ fn test_parse_attribute() {
         Ok((
             "",
             Attribute::Range(Range {
-                lower_bound: Symbol::Constant("0".to_string()),
-                upper_bound: Symbol::Constant("512".to_string()),
+                lower_bound: Symbol::Constant(ConstantSymbol::Integer(0)),
+                upper_bound: Symbol::Constant(ConstantSymbol::Integer(512)),
                 r#if: None
             })
         ))
@@ -106,7 +107,7 @@ fn test_parse_attribute() {
                 Atom::Compare(CompareExpression {
                     left: CompareOperand::Symbol(Symbol::NonConstant("MTK_INFRACFG".to_string())),
                     operator: CompareOperator::Equal,
-                    right: CompareOperand::Symbol(Symbol::Constant("y".to_string()))
+                    right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Boolean(true)))
                 })
             ))))
         ))
@@ -147,7 +148,9 @@ fn test_parse_attributes() {
                 }),
                 Attribute::Modules,
                 Attribute::Default(DefaultAttribute {
-                    expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(5)))),
+                    expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                        Symbol::Constant(ConstantSymbol::Integer(5))
+                    )))),
                     r#if: None
                 }),
             )
@@ -158,7 +161,7 @@ fn test_parse_attributes() {
 #[test]
 fn test_attributes_to_string() {
     let expression = Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-        Symbol::Constant("KVM".to_string()),
+        Symbol::NonConstant("KVM".to_string()),
     ))));
     assert_eq!(
         Attribute::Help("help please".to_string()).to_string(),
@@ -197,8 +200,8 @@ fn test_attributes_to_string() {
     );
     assert_eq!(
         Attribute::Range(Range {
-            lower_bound: Symbol::Constant("0".to_string()),
-            upper_bound: Symbol::Constant("15".to_string()),
+            lower_bound: Symbol::Constant(ConstantSymbol::Integer(0)),
+            upper_bound: Symbol::Constant(ConstantSymbol::Integer(15)),
             r#if: None
         })
         .to_string(),
@@ -214,7 +217,7 @@ fn test_attributes_to_string() {
     );
     assert_eq!(
         Attribute::Imply(Imply {
-            symbol: Symbol::Constant("DEBUGGER".to_string()),
+            symbol: Symbol::NonConstant("DEBUGGER".to_string()),
             r#if: None
         })
         .to_string(),

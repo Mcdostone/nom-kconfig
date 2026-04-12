@@ -1,4 +1,5 @@
 use crate::attribute::{parse_expression, ExpressionToken, FunctionCall, Parameter};
+use crate::symbol::ConstantSymbol;
 use crate::{
     assert_parsing_eq,
     attribute::{parse_default, AndExpression, Atom, DefaultAttribute, Expression, Term},
@@ -14,7 +15,7 @@ fn test_parse_default() {
             "",
             DefaultAttribute {
                 expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
-                    Symbol::Constant("0x1".to_string())
+                    Symbol::Constant(ConstantSymbol::Hex("0x1".to_string()))
                 )))),
                 r#if: None
             }
@@ -90,7 +91,9 @@ fn test_parse_default_ambigus() {
 fn test_default_attribute_to_string() {
     assert_eq!(
         DefaultAttribute {
-            expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64)))),
+            expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant(ConstantSymbol::Integer(64))
+            )))),
             r#if: None
         }
         .to_string(),
@@ -99,9 +102,11 @@ fn test_default_attribute_to_string() {
 
     assert_eq!(
         DefaultAttribute {
-            expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(64)))),
+            expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant(ConstantSymbol::Integer(64))
+            )))),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("NET".to_string()))
+                Atom::Symbol(Symbol::NonConstant("NET".to_string()))
             ))))
         }
         .to_string(),
@@ -118,7 +123,9 @@ fn test_default_attribute_number() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(0)))),
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::Constant(ConstantSymbol::Integer(0))
+                )))),
                 r#if: None
             }
         ))
@@ -134,7 +141,9 @@ fn test_default_attribute_number_2() {
         Ok((
             "",
             DefaultAttribute {
-                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Number(845)))),
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::Constant(ConstantSymbol::String("845".to_string()))
+                )))),
                 r#if: None
             }
         ))
@@ -148,8 +157,8 @@ fn test_default_attribute_number_3() {
         "'console=ttyS0,19200'",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::String(
-                "console=ttyS0,19200".to_string()
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                Symbol::Constant(ConstantSymbol::String("console=ttyS0,19200".to_string()))
             ))))
         ))
     )

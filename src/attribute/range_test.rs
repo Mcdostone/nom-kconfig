@@ -1,7 +1,7 @@
 use crate::{
     assert_parsing_eq,
     attribute::{parse_range, AndExpression, Atom, Expression, Range, Term},
-    symbol::Symbol,
+    symbol::{ConstantSymbol, Symbol},
 };
 
 #[test]
@@ -12,8 +12,8 @@ fn test_parse_range() {
         Ok((
             "",
             Range {
-                lower_bound: Symbol::Constant("1".to_string()),
-                upper_bound: Symbol::Constant("5".to_string()),
+                lower_bound: Symbol::Constant(ConstantSymbol::Integer(1)),
+                upper_bound: Symbol::Constant(ConstantSymbol::Integer(5)),
                 r#if: None
             }
         ))
@@ -24,8 +24,8 @@ fn test_parse_range() {
 fn test_parse_range_to_string() {
     assert_eq!(
         Range {
-            lower_bound: Symbol::Constant("1".to_string()),
-            upper_bound: Symbol::Constant("5".to_string()),
+            lower_bound: Symbol::Constant(ConstantSymbol::Integer(1)),
+            upper_bound: Symbol::Constant(ConstantSymbol::Integer(5)),
             r#if: None
         }
         .to_string(),
@@ -34,10 +34,10 @@ fn test_parse_range_to_string() {
 
     assert_eq!(
         Range {
-            lower_bound: Symbol::Constant("1".to_string()),
-            upper_bound: Symbol::Constant("5".to_string()),
+            lower_bound: Symbol::Constant(ConstantSymbol::Integer(1)),
+            upper_bound: Symbol::Constant(ConstantSymbol::Integer(5)),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("NET".to_string()))
+                Atom::Symbol(Symbol::NonConstant("NET".to_string()))
             ))))
         }
         .to_string(),
