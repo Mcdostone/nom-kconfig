@@ -134,7 +134,7 @@ pub fn parse_constant_string(input: KconfigInput<'_>) -> IResult<KconfigInput<'_
 
 pub fn parse_non_constant_symbol(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
-        recognize(ws(many1(alt((alphanumeric1, recognize(one_of("._"))))))),
+        recognize(ws(many1(alt((alphanumeric1, recognize(one_of("._-"))))))),
         |c: KconfigInput| c.trim(),
     )
     .parse(input)

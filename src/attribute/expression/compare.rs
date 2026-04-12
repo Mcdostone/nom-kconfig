@@ -58,11 +58,11 @@ pub enum CompareOperand {
 impl Display for CompareOperand {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            #[cfg(feature = "coreboot")]
+            CompareOperand::Number(number) => write!(f, "{}", number),
             CompareOperand::Symbol(symbol) => write!(f, "{}", symbol),
             #[cfg(feature = "coreboot")]
             CompareOperand::Macro(function_call) => write!(f, "{}", function_call),
-            #[cfg(feature = "coreboot")]
-            CompareOperand::Number(number) => write!(f, "{}", number),
         }
     }
 }

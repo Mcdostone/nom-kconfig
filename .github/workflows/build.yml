@@ -17,7 +17,6 @@ env:
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
   RUST_CHANNEL: stable
 
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -113,6 +112,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
@@ -132,6 +134,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
@@ -151,6 +155,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
@@ -183,6 +189,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: actions-rust-lang/setup-rust-toolchain@150fca883cd4034361b621bd4e6a9d34e5143606 # ratchet:actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -195,22 +203,31 @@ jobs:
 
   integration-tests:
     needs: check
-    name: Integration tests
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        project:
+          - linux
+          - openwrt
+          - coreboot
+          - uboot
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
-      - uses: actions-rust-lang/setup-rust-toolchain@150fca883cd4034361b621bd4e6a9d34e5143606 # ratchet:actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: stable
-      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - name: Get latest Linux version
-        id: get_latest_linux_version
-        run: printf "linux_version=%s" "$(curl -s https://www.kernel.org | grep -A1 latest_link | tail -n1 | grep -Eo '>[^<]+' | grep -Eo '[^>]+')" >> "$GITHUB_OUTPUT"
-      - run: cargo run --example=download_and_parse ${LINUX_VERSION} > /dev/null
+          persist-credentials: false
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
         env:
-          LINUX_VERSION: ${{ steps.get_latest_linux_version.outputs.linux_version }}
+          RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
+      - run: cargo run --all-features --example parse_${{ matrix.project }} > /dev/null
+        env:
           RUST_BACKTRACE: full
 
   doc:
@@ -221,6 +238,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
@@ -279,6 +298,8 @@ jobs:
     steps:
       - name: Checkout Actions Repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Check spelling of the project
         uses: crate-ci/typos@02ea592e44b3a53c302f697cddca7641cd051c3d # ratchet:crate-ci/typos@master
 
@@ -290,4 +311,6 @@ jobs:
     needs: [check]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: EmbarkStudios/cargo-deny-action@175dc7fd4fb85ec8f46948fb98f44db001149081 # ratchet:EmbarkStudios/cargo-deny-action@v2

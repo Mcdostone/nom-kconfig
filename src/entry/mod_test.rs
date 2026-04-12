@@ -4,7 +4,9 @@ use crate::{
         r#type::{ConfigType, Type},
         AndExpression, Atom, DefaultAttribute, Expression, Term,
     },
-    entry::{parse_entries, Comment, Config},
+    entry::{
+        parse_entries, parse_entry, Comment, Config, Value, VariableAssignment, VariableIdentifier,
+    },
     Attribute, Entry, Symbol,
 };
 
@@ -31,6 +33,26 @@ fn test_parse_entries() {
                     dependencies: vec!()
                 }),
             )
+        ))
+    )
+}
+
+#[test]
+fn test_if_success_variable() {
+    let input = r#"if-success = $(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")"#;
+    assert_parsing_eq!(
+        parse_entry,
+        input,
+        Ok((
+            "",
+            Entry::VariableAssignment(VariableAssignment {
+                identifier: VariableIdentifier::Identifier("if-success".to_string()),
+                operator: "=".to_string(),
+                right: Value::Literal(
+                    r#"$(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")"#
+                        .to_string()
+                )
+            })
         ))
     )
 }
