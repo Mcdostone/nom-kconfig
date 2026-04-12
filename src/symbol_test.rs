@@ -22,7 +22,15 @@ fn test_parse_non_constant_symbol() {
     assert_parsing_eq!(
         parse_symbol,
         input,
-        Ok(("", Symbol::NonConstant("ALPHA_MIATA".to_string())))
+        Ok(("", Symbol::NonConstant(input.trim().to_string())))
+    );
+
+    // Symbol with a hyphen: https://github.com/openwrt/openwrt/blob/75f2f960caa03dd2d1aa1bc38de908bb5a47c979/config/Config-build.in#L72
+    let input = " PACKAGE_apk-mbedtls";
+    assert_parsing_eq!(
+        parse_symbol,
+        input,
+        Ok(("", Symbol::NonConstant(input.trim().to_string())))
     )
 }
 

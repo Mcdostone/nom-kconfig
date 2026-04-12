@@ -13,3 +13,12 @@ pub fn parse_number(input: KconfigInput) -> IResult<KconfigInput, i64> {
     )
     .parse(input)
 }
+
+#[test]
+fn test_parse_number() {
+    use crate::assert_parsing_eq;
+
+    assert_parsing_eq!(parse_number, "13", Ok(("", 13)));
+
+    assert_parsing_eq!(parse_number, "-1", Ok(("", -1)));
+}
