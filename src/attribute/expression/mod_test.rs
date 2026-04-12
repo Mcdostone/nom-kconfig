@@ -403,3 +403,26 @@ fn test_expression_compare_with_function_call() {
         ))
     )
 }
+
+#[test]
+/// https://github.com/u-boot/u-boot/blob/master/arch/arm/Kconfig#L2239
+fn test_expression_compare_with_string() {
+    assert_parsing_eq!(
+        parse_expression,
+        "DEFAULT_DEVICE_TREE = \"sun7i-a20-icnova-swac\"",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+                CompareExpression {
+                    left: CompareOperand::Symbol(Symbol::NonConstant(
+                        "DEFAULT_DEVICE_TREE".to_string()
+                    )),
+                    operator: CompareOperator::Equal,
+                    right: CompareOperand::Symbol(Symbol::Constant(
+                        "sun7i-a20-icnova-swac".to_string()
+                    ))
+                }
+            ))))
+        ))
+    )
+}
