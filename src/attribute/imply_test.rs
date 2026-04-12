@@ -33,7 +33,7 @@ fn test_imply_to_string() {
         Imply {
             symbol: Symbol::NonConstant("PCI".to_string()),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("64BITS".to_string()))
+                Atom::Symbol(Symbol::NonConstant("64BITS".to_string()))
             ))))
         }
         .to_string(),

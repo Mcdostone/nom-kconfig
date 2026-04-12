@@ -24,11 +24,11 @@ use crate::{
     KconfigFile, KconfigInput,
 };
 
-pub fn parse_filepath(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
+fn parse_filepath(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
         recognize(ws(many1(alt((
             alphanumeric1::<KconfigInput, _>,
-            recognize(one_of(".$()*-_$/")),
+            recognize(one_of(".$()*-_$+@/")),
         ))))),
         |d| d.fragment().to_owned(),
     )
@@ -166,4 +166,22 @@ pub fn apply_vars(
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Source {
     pub entries: Vec<Kconfig>,
+}
+
+#[cfg(test)]
+use crate::assert_parsing_eq;
+
+#[test]
+fn test_parse_filepath() {
+    assert_parsing_eq!(
+        parse_filepath,
+        "u-boot/board/sagem/f@st1704/Kconfig",
+        Ok(("", "u-boot/board/sagem/f@st1704/Kconfig"))
+    );
+
+    assert_parsing_eq!(
+        parse_filepath,
+        "u-boot/board/l+g/vinco/Kconfig",
+        Ok(("", "u-boot/board/l+g/vinco/Kconfig"))
+    );
 }

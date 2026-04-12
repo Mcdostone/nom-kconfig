@@ -5,7 +5,7 @@ use crate::{
         AndExpression, Atom, DefaultAttribute, Expression, Term,
     },
     entry::{parse_config, Config},
-    symbol::Symbol,
+    symbol::{ConstantSymbol, Symbol},
     Attribute,
 };
 
@@ -44,7 +44,7 @@ fn test_parse_config_no_type() {
                 attributes: vec!(
                     Attribute::Default(DefaultAttribute {
                         expression: Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Number(18)
+                            Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(18)))
                         ))),
                         r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                             Atom::Symbol(Symbol::NonConstant("64BIT".to_string()))
@@ -52,7 +52,7 @@ fn test_parse_config_no_type() {
                     }),
                     Attribute::Default(DefaultAttribute {
                         expression: Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Number(8)
+                            Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(8)))
                         ))),
                         r#if: None
                     })
@@ -103,7 +103,7 @@ fn test_parse_config_def_bool_multiline_expression() {
                     )))),
                     Attribute::Type(ConfigType {
                         r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Symbol(Symbol::Constant("y".to_string()))
+                            Atom::Symbol(Symbol::Constant(ConstantSymbol::Boolean(true)))
                         )))),
                         r#if: Some(Expression::Term(AndExpression::Expression(vec!(
                             Term::Not(Atom::Symbol(Symbol::NonConstant(
@@ -153,7 +153,9 @@ fn test_parse_config_bootparam_string() {
                     }),
                     Attribute::Default(DefaultAttribute {
                         expression: Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::String("console=ttyS0,19200".to_string())
+                            Atom::Symbol(Symbol::Constant(ConstantSymbol::String(
+                                "console=ttyS0,19200".to_string()
+                            )))
                         ))),
                         r#if: None
                     }),

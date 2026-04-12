@@ -33,7 +33,7 @@ fn test_select_to_string() {
     assert_eq!(
         Select {
             r#if: Some(Expression::Term(AndExpression::Term(Term::Not(
-                Atom::Symbol(Symbol::Constant("KVM".to_string()))
+                Atom::Symbol(Symbol::NonConstant("KVM".to_string()))
             )))),
             symbol: "MTK_INFRACFG".to_string()
         }

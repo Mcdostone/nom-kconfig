@@ -1,8 +1,6 @@
 use crate::attribute::Atom;
 #[cfg(feature = "coreboot")]
 use crate::attribute::{parse_function_call, FunctionCall};
-#[cfg(feature = "coreboot")]
-use crate::number::parse_number;
 use crate::symbol::parse_symbol;
 use crate::util::wsi;
 use crate::{KconfigInput, Symbol};
@@ -50,16 +48,12 @@ pub enum CompareOperand {
     Symbol(Symbol),
     #[cfg(feature = "coreboot")]
     Macro(FunctionCall),
-    #[cfg(feature = "coreboot")]
-    Number(i64),
 }
 
 #[cfg(feature = "display")]
 impl Display for CompareOperand {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            #[cfg(feature = "coreboot")]
-            CompareOperand::Number(number) => write!(f, "{}", number),
             CompareOperand::Symbol(symbol) => write!(f, "{}", symbol),
             #[cfg(feature = "coreboot")]
             CompareOperand::Macro(function_call) => write!(f, "{}", function_call),
@@ -69,11 +63,9 @@ impl Display for CompareOperand {
 
 pub fn parse_compare_operand(input: KconfigInput) -> IResult<KconfigInput, CompareOperand> {
     alt((
-        map(parse_symbol, CompareOperand::Symbol),
         #[cfg(feature = "coreboot")]
         map(parse_function_call, CompareOperand::Macro),
-        #[cfg(feature = "coreboot")]
-        map(parse_number, CompareOperand::Number),
+        map(parse_symbol, CompareOperand::Symbol),
     ))
     .parse(input)
 }

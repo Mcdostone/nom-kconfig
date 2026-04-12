@@ -64,14 +64,14 @@ pub fn parse_prompt_value(input: KconfigInput) -> IResult<KconfigInput, String> 
         alt((
             delimited(
                 ws(char('"')),
-                recognize(ws(many1(alt((
+                recognize(many1(alt((
                     alphanumeric1,
                     multispace1,
                     tag("\\\""),
                     // TODO
                     //recognize(anychar),
                     recognize(one_of("&#*|!É{}^<>%[]()+'=,:;μ-?._$/")),
-                ))))),
+                )))),
                 char('"'),
             ),
             delimited(ws(char('\'')), take_until("'"), char('\'')),

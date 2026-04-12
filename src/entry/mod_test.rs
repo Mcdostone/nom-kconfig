@@ -7,6 +7,7 @@ use crate::{
     entry::{
         parse_entries, parse_entry, Comment, Config, Value, VariableAssignment, VariableIdentifier,
     },
+    symbol::ConstantSymbol,
     Attribute, Entry, Symbol,
 };
 
@@ -129,7 +130,7 @@ config COMPACT_UNEVICTABLE_DEFAULT
                     )))),
                     Attribute::Default(DefaultAttribute {
                         expression: Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Number(0)
+                            Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(0)))
                         ))),
                         r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
                             Atom::Symbol(Symbol::NonConstant("PREEMPT_RT".to_string()))
@@ -137,7 +138,7 @@ config COMPACT_UNEVICTABLE_DEFAULT
                     }),
                     Attribute::Default(DefaultAttribute {
                         expression: Expression::Term(AndExpression::Term(Term::Atom(
-                            Atom::Number(1)
+                            Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(1)))
                         ))),
                         r#if: None
                     })

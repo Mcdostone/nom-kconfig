@@ -13,12 +13,11 @@ use serde::Serialize;
 use std::fmt::Display;
 
 use super::expression::{parse_if_attribute, Expression};
-use crate::number::parse_number;
 use crate::{
-    symbol::{parse_symbol, Symbol},
-    util::ws,
-    KconfigInput,
+    number::parse_number,
+    symbol::{parse_constant_hex_as_string, parse_non_constant_symbol},
 };
+use crate::{util::ws, KconfigInput};
 
 /// This attribute allows to limit the range of possible input values for int and hex symbols. The user can only input a value which is larger than or equal to the first symbol and smaller than or equal to the second symbol.
 #[derive(Debug, Clone, PartialEq)]
@@ -26,8 +25,8 @@ use crate::{
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Range {
-    pub lower_bound: Symbol,
-    pub upper_bound: Symbol,
+    pub lower_bound: RangeBound,
+    pub upper_bound: RangeBound,
     #[cfg_attr(
         any(feature = "serialize", feature = "deserialize"),
         serde(skip_serializing_if = "Option::is_none")
@@ -45,17 +44,9 @@ impl Display for Range {
     }
 }
 
-fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (Symbol, Symbol)> {
-    alt((
-        map((ws(parse_number), ws(parse_number)), |(l, r)| {
-            (
-                Symbol::Constant(l.to_string()),
-                Symbol::Constant(r.to_string()),
-            )
-        }),
-        (ws(parse_symbol), ws(parse_symbol)),
-    ))
-    .parse(input)
+// TODO bounds can be numbers or hex, here we only accept numbers...
+fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (RangeBound, RangeBound)> {
+    (ws(parse_range_bound), ws(parse_range_bound)).parse(input)
 }
 
 /// Parses the `range` attribute.
@@ -90,4 +81,36 @@ pub fn parse_range(input: KconfigInput) -> IResult<KconfigInput, Range> {
         },
     )
     .parse(input)
+}
+
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "hash", derive(Hash))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+pub enum RangeBound {
+    Hex(String),
+    Number(i64),
+    Symbol(String),
+}
+
+fn parse_range_bound(input: KconfigInput) -> IResult<KconfigInput, RangeBound> {
+    alt((
+        map(parse_constant_hex_as_string, RangeBound::Hex),
+        map(parse_number, RangeBound::Number),
+        map(parse_non_constant_symbol, |s| {
+            RangeBound::Symbol(s.to_string())
+        }),
+    ))
+    .parse(input)
+}
+
+#[cfg(feature = "display")]
+impl Display for RangeBound {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RangeBound::Hex(h) => write!(f, "{}", h),
+            RangeBound::Number(n) => write!(f, "{}", n),
+            RangeBound::Symbol(s) => write!(f, "{}", s),
+        }
+    }
 }
