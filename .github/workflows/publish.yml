@@ -87,6 +87,18 @@ jobs:
           rustup default ${RUST_CHANNEL}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
+      
+      - run: cargo install --locked cargo-cyclonedx
+      - name: Generate SBOM
+        run:  cargo cyclonedx --all --all-features --override-filename sbom --format json
+      
+      - uses: actions/attest@v4
+        with:
+          subject-name: '${{ github.workspace }}/nom-kconfig-${VERSION}'
+          sbom-path: '${{ github.workspace }}/sbom.json'
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+      
       - uses: rust-lang/crates-io-auth-action@b7e9a28eded4986ec6b1fa40eeee8f8f165559ec
         id: auth
       - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev

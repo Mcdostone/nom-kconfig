@@ -1,10 +1,13 @@
-#[cfg(feature = "coreboot")]
-use crate::attribute::{expression::CompareOperand, CompareExpression, CompareOperator};
 use crate::{
     assert_parsing_eq,
     attribute::{parse_depends_on, AndExpression, Atom, Expression, OrExpression, Term},
     symbol::Symbol,
     Attribute,
+};
+#[cfg(feature = "coreboot")]
+use crate::{
+    attribute::{expression::CompareOperand, CompareExpression, CompareOperator},
+    symbol::ConstantSymbol,
 };
 
 #[test]
@@ -83,7 +86,7 @@ fn test_parse_depends_on_with_minus_one() {
                         "SEABIOS_DEBUG_LEVEL".to_string()
                     )),
                     operator: CompareOperator::Equal,
-                    right: CompareOperand::Number(-1)
+                    right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(-1)))
                 })
             ))))
         ))

@@ -4,7 +4,8 @@ use crate::{
         r#type::{parse_type, ConfigType, Type},
         AndExpression, Atom, Expression, ExpressionToken, FunctionCall, Parameter, Term,
     },
-    symbol::Symbol,
+    symbol::{ConstantSymbol, Symbol},
+    tristate::Tristate,
     Attribute,
 };
 
@@ -162,7 +163,7 @@ fn test_parse_def_tristate() {
             "",
             Attribute::Type(ConfigType {
                 r#type: Type::DefTristate(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::Constant("m".to_string()))
+                    Atom::Symbol(Symbol::Constant(ConstantSymbol::Tristate(Tristate::Module)))
                 )))),
                 r#if: None
             })
@@ -183,14 +184,14 @@ fn test_type_to_string() {
     assert_eq!(
         "def_bool y",
         Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
-            Atom::Symbol(Symbol::Constant("y".to_string()))
+            Atom::Symbol(Symbol::Constant(ConstantSymbol::Boolean(true)))
         ))))
         .to_string()
     );
     assert_eq!(
         "def_tristate m",
         Type::DefTristate(Expression::Term(AndExpression::Term(Term::Atom(
-            Atom::Symbol(Symbol::Constant("m".to_string()))
+            Atom::Symbol(Symbol::Constant(ConstantSymbol::Tristate(Tristate::Module)))
         ))))
         .to_string()
     );
@@ -212,7 +213,7 @@ fn test_type_with_prompt() {
 }
 
 #[test]
-fn test_config_type_tostring() {
+fn test_config_type_to_string() {
     assert_eq!(
         ConfigType {
             r#type: Type::Bool(None),
@@ -226,7 +227,7 @@ fn test_config_type_tostring() {
         ConfigType {
             r#type: Type::Bool(None),
             r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::Constant("NET".to_string()))
+                Atom::Symbol(Symbol::NonConstant("NET".to_string()))
             ))))
         }
         .to_string(),

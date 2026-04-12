@@ -5,7 +5,7 @@ use crate::{
         AndExpression, Atom, Expression, Term,
     },
     entry::{parse_menu_config, MenuConfig},
-    symbol::Symbol,
+    symbol::{ConstantSymbol, Symbol},
     Attribute,
 };
 
@@ -21,7 +21,7 @@ fn test_parse_menuconfig() {
                 symbol: "VIRTUALIZATION".to_string(),
                 attributes: vec!(Attribute::Type(ConfigType {
                     r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
-                        Atom::Symbol(Symbol::Constant("y".to_string()))
+                        Atom::Symbol(Symbol::Constant(ConstantSymbol::Boolean(true)))
                     )))),
                     r#if: None,
                 }))
