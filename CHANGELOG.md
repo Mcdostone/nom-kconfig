@@ -1,3 +1,11 @@
+## What's Changed in 0.9.0
+* chore: Release version v0.9.0 by @Mcdostone
+* refactor: breaking change in the way I deal with constant symbols and non constant symbols by @Mcdostone
+* fix: allow hyphens in non constant symbols by @Mcdostone
+* Changelog for v0.8.0 by @github-actions[bot] in [#129](https://github.com/Mcdostone/nom-kconfig/pull/129)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.8.0...v0.9.0
+
 ## What's Changed in 0.8.0
 * chore: Release version v0.8.0 by @Mcdostone
 * ci: trying to improve security of the CI pipeline by @Mcdostone
