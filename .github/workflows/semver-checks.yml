@@ -8,9 +8,6 @@ env:
   MINIMUM_SUPPORTED_RUST_VERSION: 1.85.0
   RUST_CHANNEL: stable
 
-permissions:
-  packages: write
-  contents: write
 
 on:
   pull_request:
@@ -36,9 +33,11 @@ jobs:
     steps:
       - name: you can't run this action on 'main' branch
         run: |
-          if [[ "${{ github.ref_name }}" = "main" ]]; then
+          if [[ "$GITHUB_REF_NAME" = "main" ]]; then
             exit 1
           fi
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
   setup:
     needs: check-branches
     outputs:
@@ -130,12 +129,16 @@ jobs:
         run: |
           printf "\`cargo-semver-checks\` has detected some issues: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" > report.md
           printf '```bash' >> report.md
-          cargo semver-checks --color never --baseline-rev "${{ needs.setup.outputs.currentVersion }}" --release-type "${{ steps.semver.outputs.release }}" 2>&1 | tee -a report.md
+          cargo semver-checks --color never --baseline-rev "$NAME" --release-type "$RELEASE_TYPE" 2>&1 | tee -a report.md
           if [[ "${PIPESTATUS[0]}" != "0" ]]; then
             printf '```' >> report.md
             exit 1
           fi
         continue-on-error: true
+        env:
+          VERSION: ${{ needs.setup.outputs.currentVersion }}
+          RELEASE_TYPE: ${{ steps.semver.outputs.release }}
+
       - name: Publish semver-checks report
         if: ${{ steps.check.outcome != 'success' }}
         run: |
@@ -143,6 +146,8 @@ jobs:
           exit 1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+
 
       - name: Publish semver-checks report
         if: ${{ steps.check.outcome != 'success' }}
@@ -194,11 +199,11 @@ jobs:
           echo "::info title=Next version:: Last public version is '${VERSION}' but version of this branch is '${NEXT_VERSION}'."
           {
             printf "This pull request is not ready because version \`%s\` is already published." "${VERSION}"
-            printf "\nAccording to \`cargo-semver-checks\`, the next version should be \`v%s\`:" "$(bash .github/workflows/semver.sh bump ${{ steps.bump.outputs.bump }} ${VERSION} | tr -d "\n")"
+            printf "\nAccording to \`cargo-semver-checks\`, the next version should be \`v%s\`:" "$(bash .github/workflows/semver.sh bump $BUMP ${VERSION} | tr -d "\n")"
             printf "\n"
             echo '```shell'
             printf "git checkout %s\n" "$branch"
-            echo "cargo release ${{ steps.bump.outputs.bump }} --no-push --no-tag --no-publish --no-confirm --execute"
+            echo "cargo release $BUMP --no-push --no-tag --no-publish --no-confirm --execute"
             echo "git push"
             echo '```'
           } >> report.md
@@ -208,3 +213,5 @@ jobs:
           VERSION: ${{ needs.setup.outputs.currentVersion }}
           NEXT_VERSION: ${{ needs.setup.outputs.nextVersion }}
           branch: '${{ toJSON(github.head_ref) }}'
+          BUMP: ${{ steps.bump.outputs.bump }}
+
