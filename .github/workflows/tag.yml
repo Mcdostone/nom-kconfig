@@ -11,12 +11,7 @@ env:
 
 permissions:
   contents: write
-  actions: write
   packages: write
-  attestations: write
-  id-token: write
-  pull-requests: write
-  artifact-metadata: write
 
 on:
   push:
@@ -51,8 +46,8 @@ jobs:
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
       - name: Configure git
         run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "$NAME"
+          git config --global user.email "$EMAIL"
           git config --global push.autoSetupRemote true
       - name: Get the version
         id: current
@@ -68,6 +63,8 @@ jobs:
           fi
         env:
           VERSION: ${{ steps.current.outputs.version }}
+          NAME: ${{ github.actor }}
+          EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
 
 
   publish:
@@ -75,3 +72,11 @@ jobs:
     if: ${{ needs.tag.outputs.created == 'true' }}
     uses: ./.github/workflows/publish.yml
     secrets: inherit
+    permissions:
+      contents: write
+      actions: write
+      packages: write
+      attestations: write
+      id-token: write
+      pull-requests: write
+      artifact-metadata: write
