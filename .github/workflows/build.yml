@@ -182,7 +182,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses: bnjbvr/cargo-machete@db87f5ee388b462ee8c4311742246d599b78a00a # ratchet:bnjbvr/cargo-machete@main
+      - uses: bnjbvr/cargo-machete@ac30a525c0a8d163a92d727b3ff079ee3f6ecb08 # ratchet:bnjbvr/cargo-machete@main
 
   tests:
     needs: check
