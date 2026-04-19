@@ -383,7 +383,6 @@ fn test_expression_constant_and_non_constant() {
 
 // https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/init/Kconfig?h=next-20260403#n91
 #[test]
-#[cfg(feature = "coreboot")]
 fn test_expression_compare_with_function_call() {
     assert_parsing_eq!(
         parse_expression,

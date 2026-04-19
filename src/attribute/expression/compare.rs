@@ -1,5 +1,4 @@
 use crate::attribute::Atom;
-#[cfg(feature = "coreboot")]
 use crate::attribute::{parse_function_call, FunctionCall};
 use crate::symbol::parse_symbol;
 use crate::util::wsi;
@@ -46,7 +45,6 @@ pub struct CompareExpression {
 #[cfg_attr(feature = "serialize", serde(rename = "CompareOperand"))]
 pub enum CompareOperand {
     Symbol(Symbol),
-    #[cfg(feature = "coreboot")]
     Macro(FunctionCall),
 }
 
@@ -55,7 +53,6 @@ impl Display for CompareOperand {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             CompareOperand::Symbol(symbol) => write!(f, "{}", symbol),
-            #[cfg(feature = "coreboot")]
             CompareOperand::Macro(function_call) => write!(f, "{}", function_call),
         }
     }
@@ -63,7 +60,6 @@ impl Display for CompareOperand {
 
 pub fn parse_compare_operand(input: KconfigInput) -> IResult<KconfigInput, CompareOperand> {
     alt((
-        #[cfg(feature = "coreboot")]
         map(parse_function_call, CompareOperand::Macro),
         map(parse_symbol, CompareOperand::Symbol),
     ))
