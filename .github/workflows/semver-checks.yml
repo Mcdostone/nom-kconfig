@@ -53,6 +53,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Delete old cargo-semver-checks comments
         continue-on-error: true
         run: |
@@ -98,6 +99,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
@@ -159,6 +161,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
