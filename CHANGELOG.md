@@ -1,3 +1,13 @@
+## What's Changed in 0.10.0
+* Develop by @Mcdostone in [#136](https://github.com/Mcdostone/nom-kconfig/pull/136)
+* test: new integration test for linux-next by @Mcdostone
+* build: update deps by @Mcdostone
+* fix: move some specific coreboot feature to the core library regarding compare.rs by @Mcdostone
+* ci: remove useless packages installation by @Mcdostone
+* Changelog for v0.9.0 by @github-actions[bot] in [#134](https://github.com/Mcdostone/nom-kconfig/pull/134)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.9.0...v0.10.0
+
 ## What's Changed in 0.9.0
 * chore: Release version v0.9.0 by @Mcdostone
 * refactor: breaking change in the way I deal with constant symbols and non constant symbols by @Mcdostone
