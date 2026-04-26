@@ -4,9 +4,15 @@
 use nom::{branch::alt, bytes::complete::tag, sequence::delimited, IResult, Parser};
 
 use crate::{
-    KconfigFile, KconfigInput, entry::{
-        Source, source::{JoinPathMode, apply_vars, expand_source_files, parse_filepath, parse_source_kconfig}
-    }, kconfig::Kconfig, util::{ws, wsi}
+    entry::{
+        source::{
+            apply_vars, expand_source_files, parse_filepath, parse_source_kconfig, JoinPathMode,
+        },
+        Source,
+    },
+    kconfig::Kconfig,
+    util::{ws, wsi},
+    KconfigFile, KconfigInput,
 };
 
 pub type OSource = Source;
@@ -53,13 +59,6 @@ pub fn parse_osource(input: KconfigInput) -> IResult<KconfigInput, OSource> {
         ))
     }
 }
-
-
-
-
-
-
-
 
 #[cfg(test)]
 use crate::attribute::r#type::ConfigType;

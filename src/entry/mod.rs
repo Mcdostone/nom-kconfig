@@ -30,12 +30,15 @@ pub use self::{
 };
 
 #[cfg(feature = "kconfiglib")]
-use crate::entry::source::{parse_osource, parse_rsource, parse_orsource, OSource, RSource, OrSource};
-
+use crate::entry::source::{
+    parse_orsource, parse_osource, parse_rsource, OSource, OrSource, RSource,
+};
 
 pub mod choice;
 pub mod comment;
 pub mod config;
+#[cfg(feature = "kconfiglib")]
+pub mod configdefault;
 pub mod function;
 pub mod r#if;
 pub mod main_menu;
@@ -43,9 +46,6 @@ pub mod menu;
 pub mod menuconfig;
 pub mod source;
 pub mod variable;
-#[cfg(feature = "kconfiglib")]
-pub mod configdefault;
-
 
 /// Official documentation about the different entries: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries)
 #[derive(Debug, Clone, PartialEq)]

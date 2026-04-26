@@ -5,15 +5,11 @@ use nom::{bytes::complete::tag, IResult, Parser};
 use nom::{branch::alt, sequence::delimited};
 
 use crate::{
-    entry::{
-        source::{apply_vars, expand_source_files, parse_filepath, parse_source_kconfig},
-    },
+    entry::source::{apply_vars, expand_source_files, parse_filepath, parse_source_kconfig},
     kconfig::Kconfig,
-    util::{wsi},
-    KconfigFile
+    util::wsi,
+    KconfigFile,
 };
-
-
 
 pub type RSource = Source;
 
@@ -36,7 +32,6 @@ pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
                 &input.extra.vars,
             );
 
-            
             let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
             sources.push(source);
         }

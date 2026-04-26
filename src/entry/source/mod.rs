@@ -1,9 +1,9 @@
 #[cfg(feature = "kconfiglib")]
+mod orsource;
+#[cfg(feature = "kconfiglib")]
 mod osource;
 #[cfg(feature = "kconfiglib")]
 mod rsource;
-#[cfg(feature = "kconfiglib")]
-mod orsource;
 #[allow(clippy::module_inception)]
 mod source;
 
@@ -21,17 +21,16 @@ pub use source::{parse_source, Source};
 
 #[cfg(feature = "kconfiglib")]
 pub use self::{
-    osource::parse_osource, rsource::parse_rsource, orsource::parse_orsource,
-    osource::OSource, rsource::RSource, orsource::OrSource
+    orsource::parse_orsource, orsource::OrSource, osource::parse_osource, osource::OSource,
+    rsource::parse_rsource, rsource::RSource,
 };
 
-#[cfg(any(feature = "kconfiglib"))]
+#[cfg(feature = "kconfiglib")]
 use crate::{parse_kconfig, util::ws, Kconfig, KconfigFile, KconfigInput};
 
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 pub use glob::glob;
 #[cfg(feature = "kconfiglib")]
-
 use std::collections::HashMap;
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 use std::path::PathBuf;
@@ -39,13 +38,10 @@ use std::path::PathBuf;
 #[cfg(test)]
 mod source_test;
 
-
-
 enum JoinPathMode {
     Relative,
     Root,
 }
-
 
 pub(crate) fn parse_filepath(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
@@ -80,12 +76,7 @@ fn parse_source_kconfig(
     x
 }
 
-
-
-pub fn apply_vars(
-    file: &str,
-    extra_vars: &HashMap<String, String>,
-) -> Option<String> {
+pub fn apply_vars(file: &str, extra_vars: &HashMap<String, String>) -> Option<String> {
     let re = Regex::new(r"\$\((\S+)\)").unwrap();
     let mut file_copy = String::from(file);
     for (var_name, var_value) in re.captures_iter(file).map(|cap| {
@@ -106,21 +97,20 @@ pub fn apply_vars(
 fn expand_source_files<'a>(
     input: KconfigInput<'a>,
     file: &str,
-    mode: JoinPathMode
+    mode: JoinPathMode,
 ) -> Result<Vec<PathBuf>, nom::Err<Error<KconfigInput<'a>>>> {
     let full_path_pattern = input.extra.root_dir.join(file).display().to_string();
     let mut expanded_files = Vec::new();
 
     let prefix_path = match mode {
-        JoinPathMode::Relative =>  PathBuf::from(file).parent().unwrap().to_path_buf(),
+        JoinPathMode::Relative => PathBuf::from(file).parent().unwrap().to_path_buf(),
         JoinPathMode::Root => input.extra.root_dir.clone(),
     };
 
     let paths: Vec<PathBuf> = glob(&full_path_pattern)
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?
         .collect::<Result<Vec<_>, _>>()
-        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))
-        ?;
+        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
 
     if paths.is_empty() {
         return Ok(vec![prefix_path.join(file)]);
@@ -131,7 +121,7 @@ fn expand_source_files<'a>(
             .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
         expanded_files.push(source_path_without_root.to_path_buf());
     }
-    
+
     expanded_files.sort();
     if expanded_files.is_empty() {
         return Err(nom::Err::Error(Error::from_error_kind(
@@ -142,11 +132,6 @@ fn expand_source_files<'a>(
 
     Ok(expanded_files)
 }
-
-
-
-
-
 
 #[cfg(test)]
 use crate::assert_parsing_eq;
