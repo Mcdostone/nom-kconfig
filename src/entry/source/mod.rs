@@ -16,14 +16,15 @@ use nom::{
     IResult, Parser,
 };
 
-use regex::Regex;
-pub use source::{parse_source, Source};
-
+#[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 #[cfg(feature = "kconfiglib")]
 pub use self::{
     orsource::parse_orsource, orsource::OrSource, osource::parse_osource, osource::OSource,
     rsource::parse_rsource, rsource::RSource,
 };
+use regex::Regex;
+pub use source::{parse_source, Source};
+use tracing::debug;
 
 #[cfg(feature = "kconfiglib")]
 use crate::{parse_kconfig, util::ws, Kconfig, KconfigFile, KconfigInput};
@@ -58,6 +59,10 @@ fn parse_source_kconfig(
     input: KconfigInput,
     source_kconfig_file: KconfigFile,
 ) -> Result<Kconfig, nom::Err<Error<KconfigInput>>> {
+    debug!(
+        "Parsing source file '{}'",
+        source_kconfig_file.full_path().display()
+    );
     let source_content = source_kconfig_file
         .read_to_string()
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
@@ -99,15 +104,19 @@ fn expand_source_files<'a>(
     file: &str,
     mode: JoinPathMode,
 ) -> Result<Vec<PathBuf>, nom::Err<Error<KconfigInput<'a>>>> {
-    let full_path_pattern = input.extra.root_dir.join(file).display().to_string();
     let mut expanded_files = Vec::new();
-
     let prefix_path = match mode {
-        JoinPathMode::Relative => PathBuf::from(file).parent().unwrap().to_path_buf(),
+        JoinPathMode::Relative => input.extra.full_path().parent().unwrap().to_path_buf(),
         JoinPathMode::Root => input.extra.root_dir.clone(),
     };
+    let full_path_pattern = prefix_path.join(file);
 
-    let paths: Vec<PathBuf> = glob(&full_path_pattern)
+    dbg!(
+        "Expanding source file pattern '{}'",
+        full_path_pattern.display()
+    );
+
+    let paths: Vec<PathBuf> = glob(&full_path_pattern.display().to_string())
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;

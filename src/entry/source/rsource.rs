@@ -6,7 +6,6 @@ use nom::{branch::alt, sequence::delimited};
 
 use crate::{
     entry::source::{apply_vars, expand_source_files, parse_filepath, parse_source_kconfig},
-    kconfig::Kconfig,
     util::wsi,
     KconfigFile,
 };
@@ -21,33 +20,23 @@ pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
         parse_filepath,
     )))
     .parse(input)?;
-    if let Some(file) = apply_vars(file, &input.extra.vars) {
-        let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Relative)?;
-        let mut sources = vec![];
 
-        for expanded_file in expanded_files {
-            let source_kconfig_file = KconfigFile::new_with_vars(
-                input.clone().extra.root_dir,
-                expanded_file,
-                &input.extra.vars,
-            );
+    let file = apply_vars(file, &input.extra.vars).unwrap_or(file.to_string());
+    let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Relative)?;
+    let mut sources = vec![];
 
-            let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
-            sources.push(source);
-        }
+    for expanded_file in expanded_files {
+        let source_kconfig_file = KconfigFile::new_with_vars(
+            input.clone().extra.root_dir,
+            expanded_file,
+            &input.extra.vars,
+        );
 
-        Ok((input, RSource { kconfigs: sources }))
-    } else {
-        Ok((
-            input,
-            RSource {
-                kconfigs: vec![Kconfig {
-                    file: file.to_string(),
-                    ..Default::default()
-                }],
-            },
-        ))
+        let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        sources.push(source);
     }
+
+    Ok((input, RSource { kconfigs: sources }))
 }
 
 #[cfg(test)]
@@ -57,7 +46,7 @@ use std::path::PathBuf;
 #[ignore]
 fn test_parse_rsource() {
     let res = parse_rsource(KconfigInput::new_extra(
-        "rsource glob-fixtures/does-not-exist-*.Kconfig",
+        r#"rsource "boards/*.defconfig""#,
         KconfigFile {
             root_dir: PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests"),
             ..Default::default()

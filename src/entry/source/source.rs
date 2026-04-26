@@ -4,7 +4,7 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
-#[cfg(feature = "coreboot")]
+#[cfg(any(feature = "coreboot", feature = "kconfiglib"))]
 use crate::entry::source::{expand_source_files, JoinPathMode};
 use crate::{
     entry::source::{apply_vars, parse_filepath, parse_source_kconfig},
@@ -30,7 +30,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     )))
     .parse(input)?;
     if let Some(file) = apply_vars(file, &input.extra.vars) {
-        #[cfg(feature = "coreboot")]
+        #[cfg(any(feature = "coreboot", feature = "kconfiglib"))]
         {
             let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Root)?;
             let mut sources = vec![];
@@ -48,7 +48,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             Ok((input, Source { kconfigs: sources }))
         }
 
-        #[cfg(not(feature = "coreboot"))]
+        #[cfg(not(any(feature = "coreboot", feature = "kconfiglib")))]
         {
             use std::path::PathBuf;
 

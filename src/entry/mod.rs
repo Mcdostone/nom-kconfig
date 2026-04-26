@@ -76,6 +76,9 @@ pub enum Entry {
 
 pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
     alt((
+        #[cfg(feature = "kconfiglib")]
+        // Order matters here (configdefault must be parsed before config)
+        map(ws(parse_configdefault), Entry::ConfigDefault),
         map(ws(parse_config), Entry::Config),
         map(ws(parse_choice), Entry::Choice),
         map(ws(parse_menu_config), Entry::MenuConfig),
@@ -93,8 +96,6 @@ pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
         map(ws(parse_orsource), Entry::OrSource),
         map(ws(parse_variable_assignment), Entry::VariableAssignment),
         map(ws(parse_function_call), Entry::FunctionCall),
-        #[cfg(feature = "kconfiglib")]
-        map(ws(parse_configdefault), Entry::ConfigDefault),
     ))
     .parse(input)
 }
