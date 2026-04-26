@@ -1,18 +1,60 @@
+use crate::entry::source::JoinPathMode;
 use crate::{entry::Source, util::ws, KconfigInput};
 use nom::{bytes::complete::tag, IResult, Parser};
+
+use nom::{branch::alt, sequence::delimited};
+
+use crate::{
+    entry::{
+        source::{apply_vars, expand_source_files, parse_filepath, parse_source_kconfig},
+    },
+    kconfig::Kconfig,
+    util::{wsi},
+    KconfigFile
+};
+
+
 
 pub type RSource = Source;
 
 #[allow(dead_code)]
 pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
-    let (_input, _) = ws(tag("rsource")).parse(input)?;
-    todo!("need to implemnt rsource");
-    //Ok((input, RSource(kconfigs: vec![Kconfig
-    //        { kconfigs: vec![] })))
+    let (input, _) = ws(tag("rsource")).parse(input)?;
+    let (input, file) = wsi(alt((
+        delimited(tag("\""), parse_filepath, tag("\"")),
+        parse_filepath,
+    )))
+    .parse(input)?;
+    if let Some(file) = apply_vars(file, &input.extra.vars) {
+        let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Relative)?;
+        let mut sources = vec![];
+
+        for expanded_file in expanded_files {
+            let source_kconfig_file = KconfigFile::new_with_vars(
+                input.clone().extra.root_dir,
+                expanded_file,
+                &input.extra.vars,
+            );
+
+            
+            let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+            sources.push(source);
+        }
+
+        Ok((input, RSource { kconfigs: sources }))
+    } else {
+        Ok((
+            input,
+            RSource {
+                kconfigs: vec![Kconfig {
+                    file: file.to_string(),
+                    ..Default::default()
+                }],
+            },
+        ))
+    }
 }
 
-#[cfg(test)]
-use crate::KconfigFile;
 #[cfg(test)]
 use std::path::PathBuf;
 

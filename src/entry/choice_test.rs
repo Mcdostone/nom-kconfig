@@ -1,4 +1,4 @@
-#[cfg(feature = "coreboot")]
+#[cfg(feature = "named-choice")]
 use crate::attribute::Prompt;
 use crate::{
     assert_parsing_eq,
@@ -6,7 +6,7 @@ use crate::{
     entry::{parse_choice, Choice, Config},
     Attribute, Entry,
 };
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 use crate::{
     attribute::{AndExpression, Atom, DefaultAttribute, Expression, Term},
     entry::Comment,
@@ -14,7 +14,7 @@ use crate::{
 };
 
 #[test]
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 fn test_parse_choice_optional() {
     assert_parsing_eq!(
         parse_choice,
@@ -44,7 +44,7 @@ fn test_parse_choice_optional() {
 // 6.4.9/drivers/usb/mtu3/Kconfig
 // 6.4.9/drivers/usb/dwc2/Kconfig
 #[test]
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 fn test_parse_choice_with_comment() {
     assert_parsing_eq!(
         parse_choice,

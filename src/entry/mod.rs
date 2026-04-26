@@ -29,11 +29,13 @@ pub use self::{
     variable::{parse_variable_assignment, Value, VariableAssignment, VariableIdentifier},
 };
 
+#[cfg(feature = "kconfiglib")]
+use crate::entry::source::{parse_osource, parse_rsource, parse_orsource, OSource, RSource, OrSource};
+
+
 pub mod choice;
 pub mod comment;
 pub mod config;
-#[cfg(feature = "kconfiglib")]
-pub mod configdefault;
 pub mod function;
 pub mod r#if;
 pub mod main_menu;
@@ -41,6 +43,9 @@ pub mod menu;
 pub mod menuconfig;
 pub mod source;
 pub mod variable;
+#[cfg(feature = "kconfiglib")]
+pub mod configdefault;
+
 
 /// Official documentation about the different entries: [https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries)
 #[derive(Debug, Clone, PartialEq)]
@@ -61,6 +66,12 @@ pub enum Entry {
     MainMenu(MainMenu),
     #[cfg(feature = "kconfiglib")]
     ConfigDefault(ConfigDefault),
+    #[cfg(feature = "kconfiglib")]
+    OSource(OSource),
+    #[cfg(feature = "kconfiglib")]
+    RSource(RSource),
+    #[cfg(feature = "kconfiglib")]
+    OrSource(OrSource),
 }
 
 pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
@@ -74,6 +85,12 @@ pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
         map(ws(parse_menu), Entry::Menu),
         map(ws(parse_comment), Entry::Comment),
         map(ws(parse_source), Entry::Source),
+        #[cfg(feature = "kconfiglib")]
+        map(ws(parse_osource), Entry::OSource),
+        #[cfg(feature = "kconfiglib")]
+        map(ws(parse_rsource), Entry::RSource),
+        #[cfg(feature = "kconfiglib")]
+        map(ws(parse_orsource), Entry::OrSource),
         map(ws(parse_variable_assignment), Entry::VariableAssignment),
         map(ws(parse_function_call), Entry::FunctionCall),
         #[cfg(feature = "kconfiglib")]

@@ -4,13 +4,9 @@
 use nom::{branch::alt, bytes::complete::tag, sequence::delimited, IResult, Parser};
 
 use crate::{
-    entry::{
-        source::{apply_vars, expand_source_files, parse_filepath, parse_source_kconfig},
-        Source,
-    },
-    kconfig::Kconfig,
-    util::{ws, wsi},
-    KconfigFile, KconfigInput,
+    KconfigFile, KconfigInput, entry::{
+        Source, source::{JoinPathMode, apply_vars, expand_source_files, parse_filepath, parse_source_kconfig}
+    }, kconfig::Kconfig, util::{ws, wsi}
 };
 
 pub type OSource = Source;
@@ -23,7 +19,7 @@ pub fn parse_osource(input: KconfigInput) -> IResult<KconfigInput, OSource> {
     )))
     .parse(input)?;
     if let Some(file) = apply_vars(file, &input.extra.vars) {
-        let expanded_files = expand_source_files(input.clone(), &file)?;
+        let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Root)?;
         let mut sources = vec![];
 
         for expanded_file in expanded_files {
@@ -31,12 +27,6 @@ pub fn parse_osource(input: KconfigInput) -> IResult<KconfigInput, OSource> {
                 input.clone().extra.root_dir,
                 expanded_file,
                 &input.extra.vars,
-            );
-
-            println!(
-                "Checking if file exists: {} {}",
-                source_kconfig_file.full_path().display(),
-                source_kconfig_file.full_path().exists()
             );
 
             if !source_kconfig_file.full_path().exists() {
@@ -63,6 +53,13 @@ pub fn parse_osource(input: KconfigInput) -> IResult<KconfigInput, OSource> {
         ))
     }
 }
+
+
+
+
+
+
+
 
 #[cfg(test)]
 use crate::attribute::r#type::ConfigType;
