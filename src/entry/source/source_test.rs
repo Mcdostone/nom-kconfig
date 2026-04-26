@@ -12,7 +12,7 @@ fn test_parse_source() {
         Ok((
             "",
             Source {
-                entries: vec![Kconfig {
+                kconfigs: vec![Kconfig {
                     file: "empty".to_string(),
                     ..Default::default()
                 }],
@@ -29,7 +29,7 @@ fn test_parse_source_no_quote() {
         Ok((
             "",
             Source {
-                entries: vec![Kconfig {
+                kconfigs: vec![Kconfig {
                     file: "empty".to_string(),
                     ..Default::default()
                 }],
@@ -88,7 +88,7 @@ fn test_parse_source_glob_no_match_fails_with_feature() {
     assert!(res.is_err())
 }
 
-fn assert_parsing_source_eq(
+pub fn assert_parsing_source_eq(
     input: &str,
     expected: Result<(&str, Source), nom::Err<nom::error::Error<KconfigInput>>>,
 ) {

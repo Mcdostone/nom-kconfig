@@ -43,6 +43,18 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
                 map(preceded(tag("def_tristate"), ws(parse_expression)), |e| {
                     Type::DefTristate(e)
                 }),
+                #[cfg(feature = "kconfiglib")]
+                map(preceded(tag("def_int"), ws(parse_expression)), |e| {
+                    Type::DefInt(e)
+                }),
+                #[cfg(feature = "kconfiglib")]
+                map(preceded(tag("def_hex"), ws(parse_expression)), |e| {
+                    Type::DefHex(e)
+                }),
+                #[cfg(feature = "kconfiglib")]
+                map(preceded(tag("def_string"), ws(parse_expression)), |e| {
+                    Type::DefString(e)
+                }),
             ))),
             parse_if_attribute,
         ),
@@ -60,13 +72,19 @@ pub fn parse_type(input: KconfigInput) -> IResult<KconfigInput, Attribute> {
     serde(rename_all = "lowercase")
 )]
 pub enum Type {
-    DefBool(Expression),
-    DefTristate(Expression),
     Bool(Option<String>),
     Tristate(Option<String>),
     String(Option<String>),
     Hex(Option<String>),
     Int(Option<String>),
+    DefBool(Expression),
+    DefTristate(Expression),
+    #[cfg(feature = "kconfiglib")]
+    DefInt(Expression),
+    #[cfg(feature = "kconfiglib")]
+    DefHex(Expression),
+    #[cfg(feature = "kconfiglib")]
+    DefString(Expression),
 }
 
 /// Every config option must have a type. There are only two basic types: tristate and string; the other types are based on these two. The type definition optionally accepts an input prompt.
@@ -104,6 +122,12 @@ impl Display for Type {
             Type::Int(prompt) => fmt_type(f, "int", prompt),
             Type::DefBool(v) => write!(f, "def_bool {}", v),
             Type::DefTristate(v) => write!(f, "def_tristate {}", v),
+            #[cfg(feature = "kconfiglib")]
+            Type::DefInt(v) => write!(f, "def_int {}", v),
+            #[cfg(feature = "kconfiglib")]
+            Type::DefHex(v) => write!(f, "def_hex {}", v),
+            #[cfg(feature = "kconfiglib")]
+            Type::DefString(v) => write!(f, "def_string {}", v),
         }
     }
 }
@@ -119,3 +143,6 @@ fn fmt_type(
         None => write!(f, "{}", keyword),
     }
 }
+
+#[cfg(test)]
+mod mod_test;

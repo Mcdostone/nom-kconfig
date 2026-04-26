@@ -12,18 +12,18 @@ fn test_source_glob_expands_and_parses_children() {
     let result = result.unwrap();
     let source = source_entry(&result.1);
 
-    assert_eq!(source.entries.len(), 2);
+    assert_eq!(source.kconfigs.len(), 2);
     assert_eq!(
-        source.entries[0].file,
+        source.kconfigs[0].file,
         "glob-fixtures/source-child-a.Kconfig"
     );
     assert_eq!(
-        source.entries[1].file,
+        source.kconfigs[1].file,
         "glob-fixtures/source-child-b.Kconfig"
     );
 
     let symbols: Vec<&str> = source
-        .entries
+        .kconfigs
         .iter()
         .flat_map(|s| &s.entries)
         .filter_map(config_symbol)
@@ -46,13 +46,13 @@ fn test_source_literal_path_works_with_glob_feature() {
     let result = result.unwrap();
     let source = source_entry(&result.1);
 
-    assert_eq!(source.entries.len(), 1);
+    assert_eq!(source.kconfigs.len(), 1);
     assert_eq!(
-        source.entries[0].file,
+        source.kconfigs[0].file,
         "glob-fixtures/source-child-a.Kconfig"
     );
     assert_eq!(
-        config_symbol(&source.entries[0].entries[0]),
+        config_symbol(&source.kconfigs[0].entries[0]),
         Some("GLOB_CHILD_A")
     );
 }

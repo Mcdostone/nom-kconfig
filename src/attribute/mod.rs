@@ -153,6 +153,4 @@ mod select_test;
 #[cfg(test)]
 mod transitional_test;
 #[cfg(test)]
-mod type_test;
-#[cfg(test)]
 mod visible_test;

@@ -7,6 +7,9 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
+#[cfg(feature = "kconfiglib")]
+use crate::entry::configdefault::{parse_configdefault, ConfigDefault};
+
 use crate::{
     attribute::function::{parse_function_call, FunctionCall},
     util::{ws, ws_comment},
@@ -29,6 +32,8 @@ pub use self::{
 pub mod choice;
 pub mod comment;
 pub mod config;
+#[cfg(feature = "kconfiglib")]
+pub mod configdefault;
 pub mod function;
 pub mod r#if;
 pub mod main_menu;
@@ -54,6 +59,8 @@ pub enum Entry {
     Function(Function),
     If(If),
     MainMenu(MainMenu),
+    #[cfg(feature = "kconfiglib")]
+    ConfigDefault(ConfigDefault),
 }
 
 pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
@@ -69,6 +76,8 @@ pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
         map(ws(parse_source), Entry::Source),
         map(ws(parse_variable_assignment), Entry::VariableAssignment),
         map(ws(parse_function_call), Entry::FunctionCall),
+        #[cfg(feature = "kconfiglib")]
+        map(ws(parse_configdefault), Entry::ConfigDefault),
     ))
     .parse(input)
 }
@@ -97,6 +106,8 @@ mod menu_test;
 #[cfg(test)]
 mod menuconfig_test;
 #[cfg(test)]
-mod source_test;
-#[cfg(test)]
 mod variable_test;
+
+#[cfg(test)]
+#[cfg(feature = "kconfiglib")]
+mod configdefault_test;

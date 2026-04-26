@@ -105,8 +105,8 @@ endchoice"#,
 
 /// https://github.com/coreboot/coreboot/blob/4e522f49b6944f336aec5048d0fd84832e1b6ff3/src/device/Kconfig#L522
 #[test]
-#[cfg(feature = "coreboot")]
-fn test_parse_choice_from_coreboot() {
+#[cfg(feature = "named-choice")]
+fn test_parse_named_choice_from_coreboot() {
     assert_parsing_eq!(
         parse_choice,
         r#"choice DEFAULT_SCREEN_ROTATION
@@ -137,8 +137,8 @@ endchoice"#,
 
 /// https://github.com/coreboot/coreboot/blob/main/src/Kconfig#L22
 #[test]
-#[cfg(feature = "coreboot")]
-fn test_parse_choice_from_coreboot_without_extra_name() {
+#[cfg(feature = "named-choice")]
+fn test_parse_named_choice_from_coreboot_without_extra_name() {
     assert_parsing_eq!(
         parse_choice,
         r#"choice 

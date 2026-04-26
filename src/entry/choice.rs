@@ -7,7 +7,7 @@ use nom::{
     IResult, Parser,
 };
 
-#[cfg(feature = "coreboot")]
+#[cfg(feature = "named-choice")]
 use nom::{
     character::complete::{alphanumeric1, one_of},
     combinator::recognize,
@@ -36,8 +36,8 @@ use super::parse_entry;
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Choice {
-    /// Only possible in the coreboot Kconfig format
-    #[cfg(feature = "coreboot")]
+    /// Only possible in the named_choice Kconfig format
+    #[cfg(feature = "named-choice")]
     pub name: Option<String>,
     pub options: Vec<Attribute>,
     pub entries: Vec<Entry>,
@@ -52,8 +52,38 @@ fn parse_choice_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Att
     .parse(input)
 }
 
-#[cfg(feature = "coreboot")]
-pub fn parse_choice_for_coreboot(input: KconfigInput) -> IResult<KconfigInput, Choice> {
+fn parse_choice_simple(input: KconfigInput) -> IResult<KconfigInput, Choice> {
+    map(
+        delimited(
+            tag("choice"),
+            pair(parse_choice_attributes, many0(ws(parse_entry))),
+            ws(tag("endchoice")),
+        ),
+        |(options, entries)| {
+            #[cfg(feature = "named-choice")]
+            return Choice {
+                options,
+                entries,
+                name: None,
+            };
+            #[cfg(not(feature = "named-choice"))]
+            return Choice { options, entries };
+        },
+    )
+    .parse(input)
+}
+
+pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
+    alt((
+        parse_choice_simple,
+        #[cfg(feature = "named-choice")]
+        parse_named_choice,
+    ))
+    .parse(input)
+}
+
+#[cfg(feature = "named-choice")]
+pub fn parse_named_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
     map(
         delimited(
             tag("choice"),
@@ -73,35 +103,5 @@ pub fn parse_choice_for_coreboot(input: KconfigInput) -> IResult<KconfigInput, C
             name: Some(name),
         },
     )
-    .parse(input)
-}
-
-fn parse_choice_simple(input: KconfigInput) -> IResult<KconfigInput, Choice> {
-    map(
-        delimited(
-            tag("choice"),
-            pair(parse_choice_attributes, many0(ws(parse_entry))),
-            ws(tag("endchoice")),
-        ),
-        |(options, entries)| {
-            #[cfg(feature = "coreboot")]
-            return Choice {
-                options,
-                entries,
-                name: None,
-            };
-            #[cfg(not(feature = "coreboot"))]
-            return Choice { options, entries };
-        },
-    )
-    .parse(input)
-}
-
-pub fn parse_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> {
-    alt((
-        parse_choice_simple,
-        #[cfg(feature = "coreboot")]
-        parse_choice_for_coreboot,
-    ))
     .parse(input)
 }
