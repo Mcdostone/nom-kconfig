@@ -110,12 +110,6 @@ fn expand_source_files<'a>(
         JoinPathMode::Root => input.extra.root_dir.clone(),
     };
     let full_path_pattern = prefix_path.join(file);
-
-    dbg!(
-        "Expanding source file pattern '{}'",
-        full_path_pattern.display()
-    );
-
     let paths: Vec<PathBuf> = glob(&full_path_pattern.display().to_string())
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?
         .collect::<Result<Vec<_>, _>>()
@@ -125,8 +119,9 @@ fn expand_source_files<'a>(
         return Ok(vec![prefix_path.join(file)]);
     }
     for source_path in paths {
+        let source_path = source_path.canonicalize().unwrap();
         let source_path_without_root = source_path
-            .strip_prefix(&prefix_path)
+            .strip_prefix(&input.extra.root_dir)
             .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
         expanded_files.push(source_path_without_root.to_path_buf());
     }
