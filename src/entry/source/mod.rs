@@ -7,6 +7,7 @@ mod rsource;
 #[allow(clippy::module_inception)]
 mod source;
 
+use nom::lib::std::collections::HashMap;
 use nom::{
     branch::alt,
     character::complete::{alphanumeric1, one_of},
@@ -26,19 +27,18 @@ use regex::Regex;
 pub use source::{parse_source, Source};
 use tracing::debug;
 
-#[cfg(feature = "kconfiglib")]
-use crate::{parse_kconfig, util::ws, Kconfig, KconfigFile, KconfigInput};
+use crate::KconfigInput;
+use crate::{parse_kconfig, util::ws, Kconfig, KconfigFile};
 
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 pub use glob::glob;
-#[cfg(feature = "kconfiglib")]
-use std::collections::HashMap;
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 use std::path::PathBuf;
 
 #[cfg(test)]
 mod source_test;
 
+#[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 enum JoinPathMode {
     Relative,
     Root,
