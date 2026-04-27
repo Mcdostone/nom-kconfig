@@ -41,6 +41,7 @@ mod source_test;
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 enum JoinPathMode {
     Relative,
+
     Root,
 }
 
