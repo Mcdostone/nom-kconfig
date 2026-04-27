@@ -24,7 +24,7 @@ pub fn parse_osource(input: KconfigInput) -> IResult<KconfigInput, OSource> {
         parse_filepath,
     )))
     .parse(input)?;
-    if let Some(file) = apply_vars(file, &input.extra.vars) {
+    if let Some(file) = apply_vars(file, &input.extra.vars()) {
         let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Root)?;
         let mut sources = vec![];
 
@@ -32,7 +32,7 @@ pub fn parse_osource(input: KconfigInput) -> IResult<KconfigInput, OSource> {
             let source_kconfig_file = KconfigFile::new_with_vars(
                 input.clone().extra.root_dir,
                 expanded_file,
-                &input.extra.vars,
+                &input.extra.vars(),
             );
 
             if !source_kconfig_file.full_path().exists() {
