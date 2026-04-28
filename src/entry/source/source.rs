@@ -29,6 +29,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
         parse_filepath,
     )))
     .parse(input)?;
+
     if let Some(file) = apply_vars(file, &input.extra.vars()) {
         #[cfg(any(feature = "coreboot", feature = "kconfiglib"))]
         {

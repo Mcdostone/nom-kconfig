@@ -163,3 +163,45 @@ fn test_default_attribute_number_3() {
         ))
     )
 }
+
+/// https://github.com/zephyrproject-rtos/zephyr/blob/c6f781a4988fbb5cc3420f74e36add5ef65dbb94/arch/Kconfig#L1192-L1201
+#[test]
+fn test_default_attribute_dt_node() {
+    assert_parsing_eq!(
+        parse_default,
+        "default $(dt_node_int_prop_int,/cpus/cpu@0,d-cache-line-size) if $(dt_node_has_prop,/cpus/cpu@0,d-cache-line-size)",
+        Ok((
+            "",
+            DefaultAttribute {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Function(
+                    FunctionCall {
+                        name: "dt_node_int_prop_int".to_string(),
+                        parameters: vec![
+                            Parameter {
+                                tokens: vec!(ExpressionToken::Literal("/cpus/cpu@0".to_string()))
+                            },
+                            Parameter {
+                                tokens: vec!(ExpressionToken::Literal("d-cache-line-size".to_string()))
+                            }
+                        ]
+                    }
+                    )))),
+                r#if: Some(
+                    Expression::Term(AndExpression::Term(Term::Atom(Atom::Function(
+                        FunctionCall {
+                            name: "dt_node_has_prop".to_string(),
+                            parameters: vec![
+                                Parameter {
+                                    tokens: vec!(ExpressionToken::Literal("/cpus/cpu@0".to_string()))
+                                },
+                                Parameter {
+                                    tokens: vec!(ExpressionToken::Literal("d-cache-line-size".to_string()))
+                                }
+                            ]
+                        }
+                    ))))
+                )
+            }
+        ))
+    )
+}

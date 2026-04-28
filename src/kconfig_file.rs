@@ -29,6 +29,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::{fs, io};
 
+use regex::Regex;
+
 /// Represents a Kconfig file.
 /// It stores the kernel root directory because we need this information when a [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#kconfig-syntax) keyword is met.
 #[derive(Debug, Default, Clone)]
@@ -96,10 +98,10 @@ impl KconfigFile {
     }
 
     pub fn read_to_string(&self) -> io::Result<String> {
-        fs::read_to_string(self.full_path())
+        fs::read_to_string(self.full_path()).map(|content| self.preprocess_variables(content))
     }
 
-    pub fn set_vars<S: AsRef<str>>(&mut self, vars: &[(S, S)]) {
+    pub fn set_global_vars<S: AsRef<str>>(&mut self, vars: &[(S, S)]) {
         self.global_vars = vars
             .iter()
             .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
@@ -112,7 +114,23 @@ impl KconfigFile {
     }
 
     pub fn set_local_vars(mut self, vars: HashMap<String, String>) -> Self {
-        self.global_vars = vars;
+        self.local_vars = vars;
         self
+    }
+
+    fn preprocess_variables(&self, content: String) -> String {
+        let regex: Regex = Regex::new(r"\$\(([a-zA-Z_][a-zA-Z0-9_-]*)\)").unwrap();
+        let mut processed_content = content.clone();
+        let variables = self.vars();
+        for (var_name, var_value) in regex.captures_iter(&content).map(|cap| {
+            let ex: (&str, [&str; 1]) = cap.extract();
+            let var = ex.1[0];
+            (var, variables.get(var))
+        }) {
+            if let Some(var_value) = var_value {
+                processed_content = processed_content.replace(&format!("$({var_name})"), var_value);
+            }
+        }
+        processed_content
     }
 }

@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use nom_kconfig::KconfigFile;
+
 mod parsing;
 mod utils;
 
@@ -20,7 +24,15 @@ fn main() -> std::io::Result<()> {
         "https://github.com/zephyrproject-rtos/zephyr.git",
         &destination,
     )?;
-    parsing::parse_from_entrypoint(&destination, destination.join("Kconfig"))?;
+
+    let kconfig_file = KconfigFile::new_with_vars(
+        destination.clone(),
+        destination.join("Kconfig"),
+        &HashMap::from([("ZEPHYR_BASE", destination.display().to_string().as_str())]),
+        &HashMap::default(),
+    );
+
+    parsing::parse_kconfig_file(kconfig_file)?;
 
     Ok(())
 }

@@ -317,3 +317,24 @@ fn test_parse_def_string() {
         ))
     )
 }
+
+/// https://github.com/zephyrproject-rtos/zephyr/blob/main/subsys/bluetooth/audio/Kconfig.micp#L22-L23
+#[test]
+fn c() {
+    assert_parsing_eq!(
+        parse_type,
+        "int \"Audio Input Control Service instance count for \
+	     Microphone Control Service Microphone Device\"",
+        Ok((
+            "",
+            Attribute::Type(ConfigType {
+                r#type: Type::Int(Some(
+                    "Audio Input Control Service instance count for \
+	     Microphone Control Service Microphone Device"
+                        .to_string()
+                )),
+                r#if: None
+            })
+        ))
+    )
+}

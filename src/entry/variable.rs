@@ -2,7 +2,7 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{alphanumeric1, one_of},
-    combinator::{map, recognize},
+    combinator::{map, map_parser, recognize},
     multi::many1,
     IResult, Parser,
 };
@@ -13,6 +13,7 @@ use serde::Serialize;
 
 use crate::{
     attribute::function::{parse_expression_token_variable_parameter, ExpressionToken},
+    string::parse_string,
     util::{parse_until_eol, ws},
     KconfigInput,
 };
@@ -68,11 +69,23 @@ impl Value {
 }
 
 pub fn parse_value(input: KconfigInput) -> IResult<KconfigInput, Value> {
-    map(parse_until_eol, |d| {
-        Value::Literal(d.fragment().trim().to_string())
-    })
+    alt((
+        map(map_parser(parse_until_eol, parse_string), |s| {
+            Value::Literal(s)
+        }),
+        map(parse_until_eol, |s| {
+            Value::Literal(s.fragment().to_string())
+        }),
+    ))
     .parse(input)
 }
+
+//pub fn parse_value(input: KconfigInput) -> IResult<KconfigInput, Value> {
+//    map(parse_until_eol, |d| {
+//        Value::Literal(d.fragment().trim().to_string())
+//    })
+//    .parse(input)
+//}
 
 pub fn parse_variable_identifier(input: KconfigInput) -> IResult<KconfigInput, VariableIdentifier> {
     alt((
@@ -118,4 +131,27 @@ pub fn parse_assign(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> 
         d.fragment().to_owned()
     })
     .parse(input)
+}
+
+#[test]
+#[ignore]
+fn test_parse_value() {
+    assert_eq!(
+        parse_value(KconfigInput::new_extra("hello world", Default::default())),
+        Ok((
+            KconfigInput::new_extra("", Default::default()),
+            Value::Literal("hello world".to_string())
+        ))
+    );
+
+    assert_eq!(
+        parse_value(KconfigInput::new_extra(
+            r#""hello world""#,
+            Default::default()
+        )),
+        Ok((
+            KconfigInput::new_extra("", Default::default()),
+            Value::Literal("hello world".to_string())
+        ))
+    );
 }
