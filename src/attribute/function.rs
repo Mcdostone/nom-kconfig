@@ -1,4 +1,3 @@
-#[cfg(feature = "display")]
 use std::fmt::Display;
 
 use nom::{
@@ -26,7 +25,6 @@ pub struct FunctionCall {
     pub parameters: Vec<Parameter>,
 }
 
-#[cfg(feature = "display")]
 impl Display for Parameter {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
@@ -41,7 +39,6 @@ impl Display for Parameter {
     }
 }
 
-#[cfg(feature = "display")]
 impl Display for ExpressionToken {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
@@ -60,7 +57,6 @@ impl Display for ExpressionToken {
     }
 }
 
-#[cfg(feature = "display")]
 impl Display for FunctionCall {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.parameters.is_empty() {

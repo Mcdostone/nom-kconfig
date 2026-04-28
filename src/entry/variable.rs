@@ -27,6 +27,19 @@ pub struct VariableAssignment {
     pub right: Value,
 }
 
+impl VariableIdentifier {
+    fn raw(&self) -> String {
+        match self {
+            VariableIdentifier::Identifier(s) => s.clone(),
+            VariableIdentifier::VariableRef(reff) => reff
+                .iter()
+                .map(|e| e.to_string())
+                .collect::<Vec<_>>()
+                .join(" "),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(feature = "hash", derive(Hash))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
@@ -43,6 +56,15 @@ pub enum VariableIdentifier {
 pub enum Value {
     Literal(String),
     ExpandedVariable(String),
+}
+
+impl Value {
+    fn raw(&self) -> String {
+        match self {
+            Value::Literal(s) => s.clone(),
+            Value::ExpandedVariable(s) => s.clone(),
+        }
+    }
 }
 
 pub fn parse_value(input: KconfigInput) -> IResult<KconfigInput, Value> {
@@ -66,7 +88,8 @@ pub fn parse_variable_identifier(input: KconfigInput) -> IResult<KconfigInput, V
 }
 
 pub fn parse_variable_assignment(input: KconfigInput) -> IResult<KconfigInput, VariableAssignment> {
-    map(
+    let mut new_extra = input.extra.clone();
+    let result = map(
         (
             ws(parse_variable_identifier),
             ws(parse_assign),
@@ -78,7 +101,16 @@ pub fn parse_variable_assignment(input: KconfigInput) -> IResult<KconfigInput, V
             right: r,
         },
     )
-    .parse(input)
+    .parse(input);
+
+    // If the parsing is successful, we add the variable assignment to the local variables of the KconfigFile.
+    // variables can be used by the preprocessor.
+    if let Ok((mut remaining, assignment)) = result {
+        new_extra.add_local_var(assignment.identifier.raw(), assignment.right.raw());
+        remaining.extra = new_extra;
+        return Ok((remaining, assignment.clone()));
+    }
+    result
 }
 
 pub fn parse_assign(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {

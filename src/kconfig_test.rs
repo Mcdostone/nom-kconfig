@@ -12,7 +12,7 @@ use crate::attribute::expression::CompareOperand;
 use crate::attribute::{AndExpression, Atom, CompareExpression, CompareOperator, Expression, Term};
 #[cfg(feature = "coreboot")]
 use crate::attribute::{DefaultAttribute, FunctionCall};
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 use crate::entry::Choice;
 #[cfg(feature = "coreboot")]
 use crate::symbol::ConstantSymbol;
@@ -46,7 +46,7 @@ fn test_parse_kconfig() {
 }
 
 #[test]
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 fn test_parse_kconfig_choice() {
     let input = "
 choice

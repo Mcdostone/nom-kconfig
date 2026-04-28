@@ -258,3 +258,62 @@ fn test_def_bool_with_function() {
         ))
     )
 }
+
+/// https://github.com/zephyrproject-rtos/zephyr/blob/e2a556ff64170573f21a7e4d21fcb6286f5fb8eb/modules/hostap/Kconfig#L40
+#[test]
+#[cfg(feature = "kconfiglib")]
+fn test_parse_def_int() {
+    assert_parsing_eq!(
+        parse_type,
+        "def_int 34",
+        Ok((
+            "",
+            Attribute::Type(ConfigType {
+                r#type: Type::DefInt(Expression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(34)))
+                )))),
+                r#if: None
+            })
+        ))
+    )
+}
+
+/// https://github.com/zephyrproject-rtos/zephyr/blob/e2a556ff64170573f21a7e4d21fcb6286f5fb8eb/share/sysbuild/Kconfig#L16
+#[test]
+#[cfg(feature = "kconfiglib")]
+fn test_parse_def_hex() {
+    assert_parsing_eq!(
+        parse_type,
+        "def_hex 0x23",
+        Ok((
+            "",
+            Attribute::Type(ConfigType {
+                r#type: Type::DefHex(Expression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::Constant(ConstantSymbol::Hex("0x23".to_string())))
+                )))),
+                r#if: None
+            })
+        ))
+    )
+}
+
+/// https://github.com/zephyrproject-rtos/zephyr/blob/e2a556ff64170573f21a7e4d21fcb6286f5fb8eb/share/sysbuild/Kconfig#L16
+#[test]
+#[cfg(feature = "kconfiglib")]
+fn test_parse_def_string() {
+    assert_parsing_eq!(
+        parse_type,
+        "def_string 'hello'",
+        Ok((
+            "",
+            Attribute::Type(ConfigType {
+                r#type: Type::DefString(Expression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::Constant(ConstantSymbol::String(
+                        "hello".to_string()
+                    )))
+                )))),
+                r#if: None
+            })
+        ))
+    )
+}

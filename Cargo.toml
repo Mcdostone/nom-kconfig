@@ -46,8 +46,10 @@ name = "my_benchmark"
 harness = false
 
 [features]
-default = ["display", "hash", "serialize", "deserialize"]
-coreboot = ["dep:glob"]
+default = ["display", "hash", "serialize", "deserialize", "kconfiglib"]
+coreboot = ["dep:glob", "named-choice"]
+kconfiglib = ["dep:glob", "named-choice"]
+named-choice = []
 display = []
 hash = []
 serialize = ["dep:serde"]
