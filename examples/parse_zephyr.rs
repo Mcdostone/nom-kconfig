@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fs};
 
 use nom_kconfig::KconfigFile;
 
@@ -30,6 +30,13 @@ fn main() -> std::io::Result<()> {
         destination.join("Kconfig"),
         &HashMap::from([("ZEPHYR_BASE", destination.display().to_string().as_str())]),
         &HashMap::default(),
+    );
+
+    // todo
+    let _ = fs::write(destination.join("boards").join("Kconfig.v2"), "");
+    let _ = fs::write(
+        destination.join("drivers/modem/hl78xx/hl78xx_evt_monitor/Kconfig.hl78xx_evt_monitor"),
+        "",
     );
 
     parsing::parse_kconfig_file(kconfig_file)?;
