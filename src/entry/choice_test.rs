@@ -166,3 +166,22 @@ endchoice"#,
         ))
     )
 }
+
+/// https://github.com/nrfconnect/sdk-zephyr/blob/main/subsys/logging/Kconfig.template.log_config#L3
+#[test]
+#[cfg(feature = "named-choice")]
+fn test_named_choice_with_double_quotes() {
+    assert_parsing_eq!(
+        parse_choice,
+        r#"choice "MCUBOOT_UTIL_LOG_LEVEL_CHOICE"
+        endchoice"#,
+        Ok((
+            "",
+            Choice {
+                name: Some("MCUBOOT_UTIL_LOG_LEVEL_CHOICE".to_string()),
+                options: vec!(),
+                entries: vec!(),
+            }
+        ))
+    )
+}

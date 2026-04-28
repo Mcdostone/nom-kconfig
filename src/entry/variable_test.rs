@@ -95,3 +95,20 @@ fn test_parse_variable_if_success() {
         ))
     )
 }
+
+#[test]
+fn test_pouet() {
+    let input = r#"module = MCUBOOT_UTIL"#;
+    assert_parsing_eq!(
+        parse_variable_assignment,
+        input,
+        Ok((
+            "",
+            VariableAssignment {
+                identifier: VariableIdentifier::Identifier("module".to_string()),
+                operator: "=".to_string(),
+                right: Value::Literal("MCUBOOT_UTIL".to_string())
+            }
+        ))
+    )
+}

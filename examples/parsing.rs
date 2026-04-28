@@ -63,8 +63,6 @@ pub fn parse_all_kconfig_files(root_dir: &PathBuf) -> std::io::Result<()> {
             .map(|ext| ext.eq("Kconfig"))
             .unwrap_or(false)
         {
-            eprintln!("Parsing file '{}'", path.display());
-
             let mut file = File::open(&path)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;

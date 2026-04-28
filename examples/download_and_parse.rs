@@ -115,8 +115,6 @@ fn parse_kconfig_files(linux_source: &PathBuf) -> std::io::Result<()> {
             .map(|ext| ext.eq("Kconfig"))
             .unwrap_or(false)
         {
-            eprintln!("Parsing file '{}'", path.display());
-
             let mut file = File::open(&path)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;

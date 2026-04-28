@@ -55,16 +55,20 @@ impl KconfigFile {
     pub fn new_with_vars<S: AsRef<str>>(
         root_dir: PathBuf,
         file: PathBuf,
-        vars: &HashMap<S, S>,
+        global_vars: &HashMap<S, S>,
+        local_vars: &HashMap<S, S>,
     ) -> Self {
         Self {
             root_dir,
             file,
-            global_vars: vars
+            global_vars: global_vars
                 .iter()
                 .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
                 .collect(),
-            local_vars: HashMap::new(),
+            local_vars: local_vars
+                .iter()
+                .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
+                .collect(),
         }
     }
 
@@ -74,6 +78,14 @@ impl KconfigFile {
             .chain(self.local_vars.iter())
             .map(|(k, v)| (k.clone(), v.clone()))
             .collect()
+    }
+
+    pub fn local_vars(&self) -> &HashMap<String, String> {
+        &self.local_vars
+    }
+
+    pub fn global_vars(&self) -> &HashMap<String, String> {
+        &self.global_vars
     }
 
     pub fn full_path(&self) -> PathBuf {
@@ -97,5 +109,10 @@ impl KconfigFile {
     pub fn add_local_var<S: AsRef<str>>(&mut self, key: S, value: S) {
         self.local_vars
             .insert(key.as_ref().to_string(), value.as_ref().to_string());
+    }
+
+    pub fn set_local_vars(mut self, vars: HashMap<String, String>) -> Self {
+        self.global_vars = vars;
+        self
     }
 }

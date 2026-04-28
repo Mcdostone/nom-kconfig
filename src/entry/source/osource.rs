@@ -32,7 +32,8 @@ pub fn parse_osource(input: KconfigInput) -> IResult<KconfigInput, OSource> {
             let source_kconfig_file = KconfigFile::new_with_vars(
                 input.clone().extra.root_dir,
                 expanded_file,
-                &input.extra.vars(),
+                input.extra.global_vars(),
+                input.extra.local_vars(),
             );
 
             if !source_kconfig_file.full_path().exists() {

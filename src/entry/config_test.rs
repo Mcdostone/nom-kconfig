@@ -167,3 +167,24 @@ fn test_parse_config_bootparam_string() {
         ))
     )
 }
+
+/// https://github.com/nrfconnect/sdk-zephyr/blob/d947269643dd51e4e95d35d148cecb40562fe0d2/modules/tflite-micro/Kconfig#L5
+#[test]
+fn test_parse_config_name_with_hyphen() {
+    let input = "config ZEPHYR_TFLITE-MICRO_MODULE
+	bool";
+    assert_parsing_eq!(
+        parse_config,
+        input,
+        Ok((
+            "",
+            Config {
+                symbol: "ZEPHYR_TFLITE-MICRO_MODULE".to_string(),
+                attributes: vec!(Attribute::Type(ConfigType {
+                    r#type: Type::Bool(None),
+                    r#if: None
+                }),)
+            }
+        ))
+    )
+}

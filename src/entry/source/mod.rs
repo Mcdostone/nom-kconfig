@@ -61,12 +61,15 @@ fn parse_source_kconfig(
     source_kconfig_file: KconfigFile,
 ) -> Result<Kconfig, nom::Err<Error<KconfigInput>>> {
     debug!(
-        "Parsing source file '{}'",
-        source_kconfig_file.full_path().display()
+        "Parsing source file '{}' from '{}'",
+        source_kconfig_file.full_path().display(),
+        input.extra.full_path().display()
     );
-    let source_content = source_kconfig_file
+
+    let mut source_content = source_kconfig_file
         .read_to_string()
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+    source_content = apply_vars(&source_content, &input.extra.vars()).unwrap_or(source_content);
 
     #[allow(clippy::let_and_return)]
     let x = match cut(parse_kconfig).parse(KconfigInput::new_extra(
@@ -82,10 +85,10 @@ fn parse_source_kconfig(
     x
 }
 
-pub fn apply_vars(file: &str, extra_vars: &HashMap<String, String>) -> Option<String> {
+pub fn apply_vars(content: &str, extra_vars: &HashMap<String, String>) -> Option<String> {
     let re = Regex::new(r"\$\((\S+)\)").unwrap();
-    let mut file_copy = String::from(file);
-    for (var_name, var_value) in re.captures_iter(file).map(|cap| {
+    let mut file_copy = String::from(content);
+    for (var_name, var_value) in re.captures_iter(content).map(|cap| {
         let ex: (&str, [&str; 1]) = cap.extract();
         let var = ex.1[0];
         (var, extra_vars.get(var))

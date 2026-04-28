@@ -105,8 +105,9 @@ pub fn parse_variable_assignment(input: KconfigInput) -> IResult<KconfigInput, V
 
     // If the parsing is successful, we add the variable assignment to the local variables of the KconfigFile.
     // variables can be used by the preprocessor.
-    if let Ok((remaining, assignment)) = result {
+    if let Ok((mut remaining, assignment)) = result {
         new_extra.add_local_var(assignment.identifier.raw(), assignment.right.raw());
+        remaining.extra = new_extra;
         return Ok((remaining, assignment.clone()));
     }
     result

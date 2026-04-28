@@ -1,14 +1,16 @@
+use std::collections::HashMap;
+
 use nom::{
     combinator::{eof, map},
     multi::many0,
     sequence::delimited,
     IResult, Parser,
 };
+use regex::Regex;
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
-use tracing::debug;
 
 use crate::{
     entry::{parse_entry, Entry},
@@ -40,7 +42,10 @@ pub struct Kconfig {
 /// ```
 pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     let file: std::path::PathBuf = input.extra.file.clone();
-    debug!("Parsing file '{}'", file.display());
+
+    let lol = preprocess_macros(input.fragment(), &input.extra.vars());
+    KconfigInput::new_extra(&lol, input.extra.clone());
+
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws(eof)), |d| {
         Kconfig {
             file: file.display().to_string(),
@@ -49,4 +54,21 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     })
     .parse(input)?;
     Ok((input, result))
+}
+
+pub fn preprocess_macros(content: &str, extra_vars: &HashMap<String, String>) -> String {
+    let re = Regex::new(r"\$\((\S+)\)").unwrap();
+    let mut file_copy = String::from(content);
+    for (var_name, var_value) in re.captures_iter(content).map(|cap| {
+        let ex: (&str, [&str; 1]) = cap.extract();
+        let var = ex.1[0];
+        (var, extra_vars.get(var))
+    }) {
+        if let Some(var_value) = var_value {
+            file_copy = file_copy.replace(&format!("$({var_name})"), var_value);
+        } else {
+            return file_copy;
+        }
+    }
+    file_copy
 }

@@ -82,7 +82,7 @@ pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
         map(ws(parse_config), Entry::Config),
         map(ws(parse_choice), Entry::Choice),
         map(ws(parse_menu_config), Entry::MenuConfig),
-        map(ws(parse_function), Entry::Function),
+        //map(ws(parse_function), Entry::Function),
         map(ws(parse_main_menu), Entry::MainMenu),
         map(ws(parse_if), Entry::If),
         map(ws(parse_menu), Entry::Menu),

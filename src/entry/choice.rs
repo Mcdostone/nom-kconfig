@@ -18,6 +18,8 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
+#[cfg(feature = "named-choice")]
+use crate::attribute::string::parse_string;
 use crate::{
     attribute::{optional::parse_optional, parse_attribute, r#type::parse_type, Attribute},
     util::ws,
@@ -88,10 +90,7 @@ pub fn parse_named_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> 
         delimited(
             tag("choice"),
             (
-                map(
-                    recognize(ws(many1(alt((alphanumeric1, recognize(one_of("._"))))))),
-                    |c: KconfigInput| c.trim().to_string(),
-                ),
+                ws(parse_choice_name),
                 parse_choice_attributes,
                 many0(ws(parse_entry)),
             ),
@@ -103,5 +102,17 @@ pub fn parse_named_choice(input: KconfigInput) -> IResult<KconfigInput, Choice> 
             name: Some(name),
         },
     )
+    .parse(input)
+}
+
+#[cfg(feature = "named-choice")]
+pub fn parse_choice_name(input: KconfigInput) -> IResult<KconfigInput, String> {
+    alt((
+        map(
+            recognize(ws(many1(alt((alphanumeric1, recognize(one_of("._"))))))),
+            |c: KconfigInput| c.trim().to_string(),
+        ),
+        parse_string,
+    ))
     .parse(input)
 }

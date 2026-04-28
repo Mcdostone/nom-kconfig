@@ -24,12 +24,13 @@ pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
     let file = apply_vars(file, &input.extra.vars()).unwrap_or(file.to_string());
     let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Relative)?;
     let mut sources = vec![];
-    dbg!(&expanded_files);
+
     for expanded_file in expanded_files {
         let source_kconfig_file = KconfigFile::new_with_vars(
             input.clone().extra.root_dir,
             expanded_file,
-            &input.extra.vars(),
+            input.extra.global_vars(),
+            input.extra.local_vars(),
         );
 
         let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;

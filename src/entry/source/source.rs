@@ -39,7 +39,8 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
                 let source_kconfig_file = KconfigFile::new_with_vars(
                     input.clone().extra.root_dir,
                     expanded_file,
-                    &input.extra.vars(),
+                    input.extra.global_vars(),
+                    input.extra.local_vars(),
                 );
                 let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
                 sources.push(source);
@@ -55,7 +56,8 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
             let source_kconfig_file = KconfigFile::new_with_vars(
                 input.clone().extra.root_dir,
                 PathBuf::from(file),
-                &input.extra.vars(),
+                &input.extra.global_vars(),
+                &input.extra.local_vars(),
             );
             let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
             Ok((
