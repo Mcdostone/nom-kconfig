@@ -5,18 +5,18 @@ use std::{
 };
 
 use nom_kconfig::{parse_kconfig, KconfigFile, KconfigInput};
-use tracing::{debug, error};
+use tracing::error;
 
 #[allow(dead_code)]
 pub fn parse_kconfig_file(kconfig_file: KconfigFile) -> std::io::Result<()> {
-    debug!("Parsing kconfig file: {:?}", kconfig_file);
     let input = kconfig_file.read_to_string().unwrap();
     let kconfig_parse_result = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file.clone()));
 
     if let Err(e) = kconfig_parse_result {
         error!(
-            "failed to parse kconfig file {:?}, error is {:?}",
-            kconfig_file.file, e
+            "failed to parse kconfig file '{}', error is {:?}",
+            kconfig_file.file.display(),
+            e
         );
         error!(
             "Please run the following command to debug:\n cargo run --all-features --example parse_file -- --root-dir '{}' '{}'",

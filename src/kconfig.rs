@@ -11,6 +11,7 @@ use regex::Regex;
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
+use tracing::debug;
 
 use crate::{
     entry::{parse_entry, Entry},
@@ -41,6 +42,7 @@ pub struct Kconfig {
 /// assert_eq!(parse_kconfig(input).unwrap().1, Kconfig {file: "Kconfig".to_string(), entries: vec!() })
 /// ```
 pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
+    debug!("parsing '{}'", input.extra.full_path().display());
     let file: std::path::PathBuf = input.extra.file.clone();
 
     let lol = preprocess_macros(input.fragment(), &input.extra.vars());

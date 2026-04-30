@@ -60,12 +60,6 @@ fn parse_source_kconfig(
     input: KconfigInput,
     source_kconfig_file: KconfigFile,
 ) -> Result<Kconfig, nom::Err<Error<KconfigInput>>> {
-    debug!(
-        "Parsing source file '{}' from '{}'",
-        source_kconfig_file.full_path().display(),
-        input.extra.full_path().display()
-    );
-
     let source_content = source_kconfig_file
         .read_to_string()
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
@@ -78,7 +72,11 @@ fn parse_source_kconfig(
         Ok((_, kconfig)) => Ok(kconfig),
         Err(e) => {
             debug!("Variables are {:?}", input.extra.vars());
-            error!("Failed to parse source file '{:?}'", e);
+            error!(
+                "Failed to parse source file '{}': '{:?}'",
+                source_kconfig_file.full_path().display(),
+                e
+            );
             Err(nom::Err::Error(Error::new(
                 KconfigInput::new_extra("", source_kconfig_file),
                 ErrorKind::Fail,
@@ -143,6 +141,7 @@ fn expand_source_files<'a>(
         JoinPathMode::Relative => input.extra.full_path().parent().unwrap().to_path_buf(),
         JoinPathMode::Root => input.extra.root_dir.clone(),
     };
+
     let full_path_pattern = prefix_path.join(file);
     let paths: Vec<PathBuf> = glob(&full_path_pattern.display().to_string())
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?
@@ -155,13 +154,17 @@ fn expand_source_files<'a>(
     for source_path in paths {
         let source_path = source_path.canonicalize().unwrap();
         let source_path_without_root = source_path
-            .strip_prefix(&input.extra.root_dir)
+            // TODO need to canonicalize because of macOS weird filepath for temp directories
+            // /var/folder
+            // and /private/var/folder
+            .strip_prefix(input.extra.root_dir.canonicalize().unwrap())
             .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
         expanded_files.push(source_path_without_root.to_path_buf());
     }
 
     expanded_files.sort();
     if expanded_files.is_empty() {
+        debug!("No expanded files found");
         return Err(nom::Err::Error(Error::from_error_kind(
             input,
             ErrorKind::Fail,
