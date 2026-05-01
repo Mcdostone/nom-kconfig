@@ -98,7 +98,9 @@ impl KconfigFile {
     }
 
     pub fn read_to_string(&self) -> io::Result<String> {
-        fs::read_to_string(self.full_path()).map(|content| self.preprocess_variables(content))
+        fs::read_to_string(self.full_path())
+            .map(|content| self.preprocess_variables(content))
+            .map(|content| self.preprocess_macros(content))
     }
 
     pub fn set_global_vars<S: AsRef<str>>(&mut self, vars: &[(S, S)]) {
@@ -132,5 +134,34 @@ impl KconfigFile {
             }
         }
         processed_content
+    }
+
+    pub fn preprocess_macros(&self, content: String) -> String {
+        let re = Regex::new(r"\$\((\S+)\)").unwrap();
+        let variables = self.vars();
+        let mut file_copy = content.clone();
+        for (var_name, var_value) in re.captures_iter(&content).map(|cap| {
+            let ex: (&str, [&str; 1]) = cap.extract();
+            let var = ex.1[0];
+            (var, variables.get(var))
+        }) {
+            if let Some(var_value) = var_value {
+                file_copy = file_copy.replace(&format!("$({var_name})"), var_value);
+            }
+        }
+
+        let re = Regex::new(r"\$\{(\S+)\}").unwrap();
+        let mut file_copy_2 = file_copy.clone();
+        for (var_name, var_value) in re.captures_iter(&file_copy).map(|cap| {
+            let ex: (&str, [&str; 1]) = cap.extract();
+            let var = ex.1[0];
+            (var, variables.get(var))
+        }) {
+            if let Some(var_value) = var_value {
+                file_copy_2 = file_copy_2.replace(&format!("${{{var_name}}}"), var_value);
+            }
+        }
+
+        file_copy_2
     }
 }

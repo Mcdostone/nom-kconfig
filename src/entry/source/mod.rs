@@ -25,7 +25,6 @@ pub use self::{
 pub use source::{parse_source, Source};
 use tracing::{debug, error};
 
-use crate::kconfig::preprocess_macros;
 use crate::KconfigInput;
 use crate::{parse_kconfig, util::ws, Kconfig, KconfigFile};
 
@@ -79,7 +78,6 @@ fn parse_source_kconfig(
     }
 
     let source_content = source_content?;
-    let source_content = preprocess_macros(&source_content, &input.extra.vars());
 
     #[allow(clippy::let_and_return)]
     let x = match cut(parse_kconfig).parse(KconfigInput::new_extra(

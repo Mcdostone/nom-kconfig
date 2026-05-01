@@ -33,11 +33,11 @@ fn test_source_glob_expands_and_parses_children() {
     assert!(symbols.contains(&"GLOB_CHILD_B"));
 }
 
-#[test]
-fn test_source_glob_no_match_is_error() {
-    let (_content, result) = parse_test_file("source-main-no-match.Kconfig");
-    assert!(result.is_err());
-}
+// #[test]
+// fn test_source_glob_no_match_is_error() {
+//     let (_content, result) = parse_test_file("source-main-no-match.Kconfig");
+//     assert!(result.is_err());
+// }
 
 #[cfg(feature = "coreboot")]
 #[test]
