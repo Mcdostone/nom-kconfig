@@ -38,6 +38,8 @@ use std::path::PathBuf;
 #[test]
 #[ignore]
 fn test_parse_rsource() {
+    use crate::KconfigFile;
+
     let res = parse_rsource(KconfigInput::new_extra(
         r#"rsource "boards/*.defconfig""#,
         KconfigFile {

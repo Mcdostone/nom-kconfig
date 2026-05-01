@@ -9,7 +9,8 @@ use crate::{
         Source,
     },
     kconfig::Kconfig,
-    util::{ws, wsi}, KconfigInput,
+    util::{ws, wsi},
+    KconfigInput,
 };
 
 pub type OrSource = Source;

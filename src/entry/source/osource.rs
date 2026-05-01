@@ -9,7 +9,8 @@ use crate::{
         Source,
     },
     kconfig::Kconfig,
-    util::{ws, wsi}, KconfigInput,
+    util::{ws, wsi},
+    KconfigInput,
 };
 
 pub type OSource = Source;
@@ -97,6 +98,8 @@ fn assert_parsing_osource_eq(
     input: &str,
     expected: Result<(&str, OSource), nom::Err<nom::error::Error<KconfigInput>>>,
 ) {
+    use crate::KconfigFile;
+
     let res = parse_osource(KconfigInput::new_extra(
         input,
         KconfigFile {

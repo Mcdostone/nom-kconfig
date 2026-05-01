@@ -33,10 +33,10 @@ fn main() -> std::io::Result<()> {
     //    destination.join("drivers/modem/hl78xx/hl78xx_evt_monitor/Kconfig.hl78xx_evt_monitor"),
     //    "",
     //);
-    //let _ = fs::write(
-    //    destination.join("subsys/logging/Kconfig.template.log_config_inherit"),
-    //    "",
-    //);
+    let _ = fs::write(
+        destination.join("subsys/logging/Kconfig.template.log_config_inherit"),
+        "",
+    );
 
     let kconfig_file = KconfigFile::new_with_vars(
         destination.clone(),

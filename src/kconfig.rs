@@ -43,6 +43,8 @@ pub struct Kconfig {
 /// ```
 pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     debug!("parsing '{}'", input.extra.full_path().display());
+    //let prefix = (0..input.extra.depth).map(|_| "   ").collect::<String>();
+    //debug!("{} {}", prefix, input.extra.full_path().display());
     let file: std::path::PathBuf = input.extra.file.clone();
 
     let preprocessed_content = preprocess_macros(input.fragment(), &input.extra.vars());
