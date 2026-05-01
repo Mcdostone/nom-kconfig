@@ -306,7 +306,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Check spelling of the project
-        uses: crate-ci/typos@02ea592e44b3a53c302f697cddca7641cd051c3d # ratchet:crate-ci/typos@master
+        uses: crate-ci/typos@cf5f1c29a8ac336af8568821ec41919923b05a83 # ratchet:crate-ci/typos@master
 
   cargo-deny:
     name: Cargo deny
