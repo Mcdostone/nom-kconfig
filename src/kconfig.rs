@@ -45,8 +45,8 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     debug!("parsing '{}'", input.extra.full_path().display());
     let file: std::path::PathBuf = input.extra.file.clone();
 
-    let lol = preprocess_macros(input.fragment(), &input.extra.vars());
-    KconfigInput::new_extra(&lol, input.extra.clone());
+    let preprocessed_content = preprocess_macros(input.fragment(), &input.extra.vars());
+    let _lol = KconfigInput::new_extra(&preprocessed_content, input.extra.clone());
 
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws(eof)), |d| {
         Kconfig {
@@ -68,9 +68,20 @@ pub fn preprocess_macros(content: &str, extra_vars: &HashMap<String, String>) ->
     }) {
         if let Some(var_value) = var_value {
             file_copy = file_copy.replace(&format!("$({var_name})"), var_value);
-        } else {
-            return file_copy;
         }
     }
+
+    let re = Regex::new(r"\$\{(\S+)\}").unwrap();
+    let mut file_copy = String::from(content);
+    for (var_name, var_value) in re.captures_iter(content).map(|cap| {
+        let ex: (&str, [&str; 1]) = cap.extract();
+        let var = ex.1[0];
+        (var, extra_vars.get(var))
+    }) {
+        if let Some(var_value) = var_value {
+            file_copy = file_copy.replace(&format!("${{{var_name}}}"), var_value);
+        }
+    }
+
     file_copy
 }

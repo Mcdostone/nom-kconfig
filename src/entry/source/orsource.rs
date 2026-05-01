@@ -5,9 +5,7 @@ use nom::{branch::alt, bytes::complete::tag, sequence::delimited, IResult, Parse
 
 use crate::{
     entry::{
-        source::{
-            apply_vars, expand_source_files, parse_filepath, parse_source_kconfig, JoinPathMode,
-        },
+        source::{expand_source_files, parse_filepath, parse_source_kconfig, JoinPathMode},
         Source,
     },
     kconfig::Kconfig,
@@ -24,39 +22,27 @@ pub fn parse_orsource(input: KconfigInput) -> IResult<KconfigInput, OrSource> {
         parse_filepath,
     )))
     .parse(input)?;
-    if let Some(file) = apply_vars(file, &input.extra.vars()) {
-        let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Relative)?;
-        let mut sources = vec![];
+    let expanded_files = expand_source_files(input.clone(), file, JoinPathMode::Relative)?;
+    let mut sources = vec![];
 
-        for expanded_file in expanded_files {
-            let source_kconfig_file = KconfigFile::new_with_vars(
-                input.clone().extra.root_dir,
-                expanded_file,
-                input.extra.global_vars(),
-                input.extra.local_vars(),
-            );
+    for expanded_file in expanded_files {
+        let source_kconfig_file = KconfigFile::new_with_vars(
+            input.clone().extra.root_dir,
+            expanded_file,
+            input.extra.global_vars(),
+            input.extra.local_vars(),
+        );
 
-            if !source_kconfig_file.full_path().exists() {
-                sources.push(Kconfig {
-                    file: file.to_string(),
-                    ..Default::default()
-                });
-                continue;
-            }
-            let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
-            sources.push(source);
+        if !source_kconfig_file.full_path().exists() {
+            sources.push(Kconfig {
+                file: file.to_string(),
+                ..Default::default()
+            });
+            continue;
         }
-
-        Ok((input, OrSource { kconfigs: sources }))
-    } else {
-        Ok((
-            input,
-            OrSource {
-                kconfigs: vec![Kconfig {
-                    file: file.to_string(),
-                    ..Default::default()
-                }],
-            },
-        ))
+        let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        sources.push(source);
     }
+
+    Ok((input, OrSource { kconfigs: sources }))
 }

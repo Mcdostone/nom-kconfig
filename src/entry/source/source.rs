@@ -7,7 +7,7 @@ use serde::Serialize;
 #[cfg(any(feature = "coreboot", feature = "kconfiglib"))]
 use crate::entry::source::{expand_source_files, JoinPathMode};
 use crate::{
-    entry::source::{apply_vars, parse_filepath, parse_source_kconfig},
+    entry::source::{parse_filepath, parse_source_kconfig},
     kconfig::Kconfig,
     util::{ws, wsi},
     KconfigFile, KconfigInput,
@@ -30,53 +30,41 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     )))
     .parse(input)?;
 
-    if let Some(file) = apply_vars(file, &input.extra.vars()) {
-        #[cfg(any(feature = "coreboot", feature = "kconfiglib"))]
-        {
-            let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Root)?;
-            let mut sources = vec![];
+    #[cfg(any(feature = "coreboot", feature = "kconfiglib"))]
+    {
+        let expanded_files = expand_source_files(input.clone(), file, JoinPathMode::Root)?;
+        let mut sources = vec![];
 
-            for expanded_file in expanded_files {
-                let source_kconfig_file = KconfigFile::new_with_vars(
-                    input.clone().extra.root_dir,
-                    expanded_file,
-                    input.extra.global_vars(),
-                    input.extra.local_vars(),
-                );
-                let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
-                sources.push(source);
-            }
-
-            Ok((input, Source { kconfigs: sources }))
-        }
-
-        #[cfg(not(any(feature = "coreboot", feature = "kconfiglib")))]
-        {
-            use std::path::PathBuf;
-
+        for expanded_file in expanded_files {
             let source_kconfig_file = KconfigFile::new_with_vars(
                 input.clone().extra.root_dir,
-                PathBuf::from(file),
-                &input.extra.global_vars(),
-                &input.extra.local_vars(),
+                expanded_file,
+                input.extra.global_vars(),
+                input.extra.local_vars(),
             );
             let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
-            Ok((
-                input,
-                Source {
-                    kconfigs: vec![source],
-                },
-            ))
+            sources.push(source);
         }
-    } else {
-        Ok((
+
+        Ok((input, Source { kconfigs: sources }))
+    }
+
+    #[cfg(not(any(feature = "coreboot", feature = "kconfiglib")))]
+    {
+        use std::path::PathBuf;
+
+        let source_kconfig_file = KconfigFile::new_with_vars(
+            input.clone().extra.root_dir,
+            PathBuf::from(file),
+            &input.extra.global_vars(),
+            &input.extra.local_vars(),
+        );
+        let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        return Ok((
             input,
             Source {
-                kconfigs: vec![Kconfig {
-                    file: file.to_string(),
-                    ..Default::default()
-                }],
+                kconfigs: vec![source],
             },
-        ))
+        ));
     }
 }

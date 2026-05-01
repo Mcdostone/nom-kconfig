@@ -24,11 +24,15 @@ fn main() -> std::io::Result<()> {
         "https://github.com/zephyrproject-rtos/zephyr.git",
         &destination,
     )?;
+
+    let binary_dir = destination.join("build").join("zephyr");
+    let _ = fs::create_dir_all(&binary_dir);
+
     let _ = fs::write(destination.join("boards").join("Kconfig.v2"), "");
-    let _ = fs::write(
-        destination.join("drivers/modem/hl78xx/hl78xx_evt_monitor/Kconfig.hl78xx_evt_monitor"),
-        "",
-    );
+    //let _ = fs::write(
+    //    destination.join("drivers/modem/hl78xx/hl78xx_evt_monitor/Kconfig.hl78xx_evt_monitor"),
+    //    "",
+    //);
     let _ = fs::write(
         destination.join("subsys/logging/Kconfig.template.log_config_inherit"),
         "",
@@ -37,7 +41,13 @@ fn main() -> std::io::Result<()> {
     let kconfig_file = KconfigFile::new_with_vars(
         destination.clone(),
         destination.join("Kconfig"),
-        &HashMap::from([("ZEPHYR_BASE", destination.display().to_string().as_str())]),
+        &HashMap::from([
+            ("ZEPHYR_BASE", destination.display().to_string().as_str()),
+            (
+                "KCONFIG_BINARY_DIR",
+                binary_dir.display().to_string().as_str(),
+            ),
+        ]),
         &HashMap::default(),
     );
 

@@ -1,6 +1,6 @@
 use nom::{
     bytes::complete::tag,
-    combinator::map,
+    combinator::{cut, map},
     multi::many0,
     sequence::{pair, terminated},
     IResult, Parser,
@@ -55,7 +55,7 @@ pub fn parse_if(input: KconfigInput) -> IResult<KconfigInput, If> {
     map(
         pair(
             ws(parse_if_expression),
-            terminated(many0(parse_entry), ws(tag("endif"))),
+            terminated(cut(many0(parse_entry)), ws(tag("endif"))),
         ),
         |(condition, entries)| If { condition, entries },
     )

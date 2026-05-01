@@ -5,7 +5,7 @@ use nom::{bytes::complete::tag, IResult, Parser};
 use nom::{branch::alt, sequence::delimited};
 
 use crate::{
-    entry::source::{apply_vars, expand_source_files, parse_filepath, parse_source_kconfig},
+    entry::source::{expand_source_files, parse_filepath, parse_source_kconfig},
     util::wsi,
     KconfigFile,
 };
@@ -21,8 +21,7 @@ pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
     )))
     .parse(input)?;
 
-    let file = apply_vars(file, &input.extra.vars()).unwrap_or(file.to_string());
-    let expanded_files = expand_source_files(input.clone(), &file, JoinPathMode::Relative)?;
+    let expanded_files = expand_source_files(input.clone(), file, JoinPathMode::Relative)?;
     let mut sources = vec![];
 
     for expanded_file in expanded_files {

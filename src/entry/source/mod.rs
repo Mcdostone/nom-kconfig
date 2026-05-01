@@ -7,7 +7,6 @@ mod rsource;
 #[allow(clippy::module_inception)]
 mod source;
 
-use nom::lib::std::collections::HashMap;
 use nom::{
     branch::alt,
     character::complete::{alphanumeric1, one_of},
@@ -23,10 +22,10 @@ pub use self::{
     orsource::parse_orsource, orsource::OrSource, osource::parse_osource, osource::OSource,
     rsource::parse_rsource, rsource::RSource,
 };
-use regex::Regex;
 pub use source::{parse_source, Source};
 use tracing::{debug, error};
 
+use crate::kconfig::preprocess_macros;
 use crate::KconfigInput;
 use crate::{parse_kconfig, util::ws, Kconfig, KconfigFile};
 
@@ -62,7 +61,25 @@ fn parse_source_kconfig(
 ) -> Result<Kconfig, nom::Err<Error<KconfigInput>>> {
     let source_content = source_kconfig_file
         .read_to_string()
-        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)))?;
+        .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)));
+
+    #[cfg(feature = "kconfiglib")]
+    {
+        // TODO
+        // if the file doesn't exist, it's probably because the filename is dynamically generated with macros/variables.
+        // In that case, we can return an empty Kconfig instead of failing to parse the source file.
+        //
+        // This is not the best solution !
+        if source_content.is_err() {
+            return Ok(Kconfig {
+                file: source_kconfig_file.full_path().display().to_string(),
+                entries: vec![],
+            });
+        }
+    }
+
+    let source_content = source_content?;
+    let source_content = preprocess_macros(&source_content, &input.extra.vars());
 
     #[allow(clippy::let_and_return)]
     let x = match cut(parse_kconfig).parse(KconfigInput::new_extra(
@@ -73,10 +90,26 @@ fn parse_source_kconfig(
         Err(e) => {
             debug!("Variables are {:?}", input.extra.vars());
             error!(
-                "Failed to parse source file '{}': '{:?}'",
+                "Failed to parse source file '{}'",
                 source_kconfig_file.full_path().display(),
-                e
             );
+            error!(
+                "The source file is defined in '{}'",
+                input.extra.full_path().display()
+            );
+            match e {
+                nom::Err::Incomplete(needed) => error!("Incomplete parsing: {:?}", needed),
+                nom::Err::Error(e) => error!(
+                    "error is due to '{:?}' parsing the content '{:?}'",
+                    e.code,
+                    e.input.fragment()[..std::cmp::min(100, e.input.fragment().len())].to_string()
+                ),
+                nom::Err::Failure(e) => error!(
+                    "error is due to '{:?}' parsing the content '{:?}'",
+                    e.code,
+                    e.input.fragment()[..std::cmp::min(100, e.input.fragment().len())].to_string()
+                ),
+            }
             Err(nom::Err::Error(Error::new(
                 KconfigInput::new_extra("", source_kconfig_file),
                 ErrorKind::Fail,
@@ -84,50 +117,6 @@ fn parse_source_kconfig(
         }
     };
     x
-}
-
-pub fn apply_vars(content: &str, extra_vars: &HashMap<String, String>) -> Option<String> {
-    apply_vars_for_pattern(
-        content,
-        extra_vars,
-        Regex::new(r"\$\(([a-zA-Z_][a-zA-Z0-9_-]*)\)").unwrap(),
-        true,
-    ) // {
-      //   Some(result) => Some(result),
-      //   None => match apply_vars_for_pattern(
-      //       content,
-      //       extra_vars,
-      //       Regex::new(r"\$\{([a-zA-Z_][a-zA-Z0-9_-]*)\}").unwrap(),
-      //       false
-      //   ) {
-      //       Some(result) => Some(result),
-      //       None => None,
-      //   }
-      //}//
-}
-
-fn apply_vars_for_pattern(
-    content: &str,
-    extra_vars: &HashMap<String, String>,
-    regex: Regex,
-    parenthesis: bool,
-) -> Option<String> {
-    let mut file_copy = String::from(content);
-    for (var_name, var_value) in regex.captures_iter(content).map(|cap| {
-        let ex: (&str, [&str; 1]) = cap.extract();
-        let var = ex.1[0];
-        (var, extra_vars.get(var))
-    }) {
-        if let Some(var_value) = var_value {
-            file_copy = match parenthesis {
-                true => file_copy.replace(&format!("$({var_name})"), var_value),
-                false => file_copy.replace(&format!("${{{var_name}}}"), var_value),
-            }
-        } else {
-            return None;
-        }
-    }
-    Some(file_copy)
 }
 
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
@@ -189,25 +178,5 @@ fn test_parse_filepath() {
         parse_filepath,
         "u-boot/board/l+g/vinco/Kconfig",
         Ok(("", "u-boot/board/l+g/vinco/Kconfig"))
-    );
-}
-
-#[test]
-#[ignore]
-fn test_apply_vars() {
-    assert_eq!(
-        apply_vars(
-            "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config",
-            &HashMap::from([("ZEPHYR_BASE".to_string(), "/zephyr".to_string())]),
-        ),
-        Some("/zephyr/subsys/logging/Kconfig.template.log_config".to_string())
-    );
-
-    assert_eq!(
-        apply_vars(
-            "$(ZEPHYR_BASE/subsys/logging/Kconfig.template.log_config",
-            &HashMap::from([("ZEPHYR_BASE".to_string(), "/zephyr".to_string())]),
-        ),
-        Some("/zephyr/subsys/logging/Kconfig.template.log_config".to_string())
     );
 }
