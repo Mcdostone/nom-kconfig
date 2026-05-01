@@ -10,7 +10,7 @@ use crate::{
     entry::source::{parse_filepath, parse_source_kconfig},
     kconfig::Kconfig,
     util::{ws, wsi},
-    KconfigFile, KconfigInput,
+    KconfigInput,
 };
 
 /// Entry that reads the specified configuration file. This file is always parsed.
@@ -36,12 +36,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
         let mut sources = vec![];
 
         for expanded_file in expanded_files {
-            let source_kconfig_file = KconfigFile::new_with_vars(
-                input.clone().extra.root_dir,
-                expanded_file,
-                input.extra.global_vars(),
-                input.extra.local_vars(),
-            );
+            let source_kconfig_file = input.extra.new_source_file(expanded_file);
             let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
             sources.push(source);
         }
@@ -53,12 +48,7 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     {
         use std::path::PathBuf;
 
-        let source_kconfig_file = KconfigFile::new_with_vars(
-            input.clone().extra.root_dir,
-            PathBuf::from(file),
-            &input.extra.global_vars(),
-            &input.extra.local_vars(),
-        );
+        let source_kconfig_file = input.extra.new_source_file(PathBuf::from(file));
         let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
         return Ok((
             input,

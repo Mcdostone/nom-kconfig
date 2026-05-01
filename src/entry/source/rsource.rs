@@ -7,7 +7,6 @@ use nom::{branch::alt, sequence::delimited};
 use crate::{
     entry::source::{expand_source_files, parse_filepath, parse_source_kconfig},
     util::wsi,
-    KconfigFile,
 };
 
 pub type RSource = Source;
@@ -25,13 +24,7 @@ pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
     let mut sources = vec![];
 
     for expanded_file in expanded_files {
-        let source_kconfig_file = KconfigFile::new_with_vars(
-            input.clone().extra.root_dir,
-            expanded_file,
-            input.extra.global_vars(),
-            input.extra.local_vars(),
-        );
-
+        let source_kconfig_file = input.extra.new_source_file(expanded_file);
         let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
         sources.push(source);
     }

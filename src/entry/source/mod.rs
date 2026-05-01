@@ -70,6 +70,11 @@ fn parse_source_kconfig(
         //
         // This is not the best solution !
         if source_content.is_err() {
+            error!(
+                "I tried to parse the source file '{}' defined in '{}'. This is likely because the filename is dynamically generated with macros/variables that are not supported yet. Returning an empty Kconfig for this source file.",
+                source_kconfig_file.full_path().display(),
+                input.extra.full_path().display()
+            );
             return Ok(Kconfig {
                 file: source_kconfig_file.full_path().display().to_string(),
                 entries: vec![],

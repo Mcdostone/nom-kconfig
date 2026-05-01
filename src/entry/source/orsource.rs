@@ -9,8 +9,7 @@ use crate::{
         Source,
     },
     kconfig::Kconfig,
-    util::{ws, wsi},
-    KconfigFile, KconfigInput,
+    util::{ws, wsi}, KconfigInput,
 };
 
 pub type OrSource = Source;
@@ -26,13 +25,7 @@ pub fn parse_orsource(input: KconfigInput) -> IResult<KconfigInput, OrSource> {
     let mut sources = vec![];
 
     for expanded_file in expanded_files {
-        let source_kconfig_file = KconfigFile::new_with_vars(
-            input.clone().extra.root_dir,
-            expanded_file,
-            input.extra.global_vars(),
-            input.extra.local_vars(),
-        );
-
+        let source_kconfig_file = input.extra.new_source_file(expanded_file);
         if !source_kconfig_file.full_path().exists() {
             sources.push(Kconfig {
                 file: file.to_string(),

@@ -42,6 +42,7 @@ pub struct KconfigFile {
     /// Externally-specified variables to use when including child source files
     pub global_vars: HashMap<String, String>,
     pub local_vars: HashMap<String, String>,
+    pub depth: usize,
 }
 
 impl KconfigFile {
@@ -51,6 +52,7 @@ impl KconfigFile {
             file,
             global_vars: HashMap::new(),
             local_vars: HashMap::new(),
+            depth: 0,
         }
     }
 
@@ -71,7 +73,15 @@ impl KconfigFile {
                 .iter()
                 .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
                 .collect(),
+            depth: 0,
         }
+    }
+
+    pub fn new_source_file(&self, path: PathBuf) -> Self {
+        let mut copied = self.clone();
+        copied.file = path;
+        copied.depth += 1;
+        copied
     }
 
     pub fn vars(&self) -> HashMap<String, String> {
