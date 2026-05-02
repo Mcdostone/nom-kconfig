@@ -1,9 +1,12 @@
+use std::collections::HashMap;
+
 use nom::{
     combinator::{eof, map},
     multi::many0,
     sequence::delimited,
     IResult, Parser,
 };
+use regex::Regex;
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
@@ -39,8 +42,14 @@ pub struct Kconfig {
 /// assert_eq!(parse_kconfig(input).unwrap().1, Kconfig {file: "Kconfig".to_string(), entries: vec!() })
 /// ```
 pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
+    debug!("parsing '{}'", input.extra.full_path().display());
+    //let prefix = (0..input.extra.depth).map(|_| "   ").collect::<String>();
+    //debug!("{} {}", prefix, input.extra.full_path().display());
     let file: std::path::PathBuf = input.extra.file.clone();
-    debug!("Parsing file '{}'", file.display());
+
+    let preprocessed_content = preprocess_macros(input.fragment(), input.extra.vars());
+    let _lol = KconfigInput::new_extra(&preprocessed_content, input.extra.clone());
+
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws(eof)), |d| {
         Kconfig {
             file: file.display().to_string(),
@@ -49,4 +58,32 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     })
     .parse(input)?;
     Ok((input, result))
+}
+
+pub fn preprocess_macros(content: &str, extra_vars: &HashMap<String, String>) -> String {
+    let re = Regex::new(r"\$\((\S+)\)").unwrap();
+    let mut file_copy = String::from(content);
+    for (var_name, var_value) in re.captures_iter(content).map(|cap| {
+        let ex: (&str, [&str; 1]) = cap.extract();
+        let var = ex.1[0];
+        (var, extra_vars.get(var))
+    }) {
+        if let Some(var_value) = var_value {
+            file_copy = file_copy.replace(&format!("$({var_name})"), var_value);
+        }
+    }
+
+    let re = Regex::new(r"\$\{(\S+)\}").unwrap();
+    let mut file_copy = String::from(content);
+    for (var_name, var_value) in re.captures_iter(content).map(|cap| {
+        let ex: (&str, [&str; 1]) = cap.extract();
+        let var = ex.1[0];
+        (var, extra_vars.get(var))
+    }) {
+        if let Some(var_value) = var_value {
+            file_copy = file_copy.replace(&format!("${{{var_name}}}"), var_value);
+        }
+    }
+
+    file_copy
 }

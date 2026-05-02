@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf};
+use std::{collections::HashMap, env, path::PathBuf};
 
 use clap::Parser;
 use nom_kconfig::{parse_kconfig, KconfigFile, KconfigInput};
@@ -17,6 +17,9 @@ struct Cli {
     /// Kconfig file to parse
     file: PathBuf,
     remaining_args: Vec<PathBuf>,
+    /// A comma-separated list of variables: var_a=hello
+    #[clap(long = "variables", use_value_delimiter = true, value_delimiter = ',')]
+    pub variables: Vec<String>,
 }
 
 /// to use this example, run
@@ -39,7 +42,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let root_dir = root_dir.canonicalize()?;
-    let kconfig_file = KconfigFile::new(root_dir, path.clone());
+
+    let variables = cli
+        .variables
+        .into_iter()
+        .filter_map(|var| {
+            let mut parts = var.splitn(2, '=');
+            match (parts.next(), parts.next()) {
+                (Some(name), Some(value)) => Some((name.to_string(), value.to_string())),
+                _ => {
+                    error!(
+                        "Invalid variable format: '{}'. Expected format is 'name=value'",
+                        var
+                    );
+                    None
+                }
+            }
+        })
+        .collect::<HashMap<String, String>>();
+
+    let kconfig_file =
+        KconfigFile::new_with_vars(root_dir, path.clone(), &variables, &HashMap::default());
+
     let input = kconfig_file.read_to_string().unwrap();
     let parsing_result = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
     if let Err(e) = parsing_result {

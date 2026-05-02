@@ -1,27 +1,26 @@
 use std::{
     fs::{self, File},
     io::Read,
-    path::{self, Path, PathBuf},
+    path::{self, PathBuf},
 };
 
 use nom_kconfig::{parse_kconfig, KconfigFile, KconfigInput};
-use tracing::{debug, error};
+use tracing::error;
 
 #[allow(dead_code)]
-pub fn parse_from_entrypoint(root_dir: &Path, entrypoint: PathBuf) -> std::io::Result<()> {
-    let cur_kconfig_file = KconfigFile::new(root_dir.to_path_buf(), entrypoint.clone());
-    debug!("Parsing kconfig file: {:?}", cur_kconfig_file);
-    let input = cur_kconfig_file.read_to_string().unwrap();
-    let kconfig_parse_result = parse_kconfig(KconfigInput::new_extra(&input, cur_kconfig_file));
+pub fn parse_kconfig_file(kconfig_file: KconfigFile) -> std::io::Result<()> {
+    let input = kconfig_file.read_to_string().unwrap();
+    let kconfig_parse_result = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file.clone()));
 
     if let Err(e) = kconfig_parse_result {
         error!(
-            "failed to parse kconfig file {:?}, error is {:?}",
-            entrypoint, e
+            "failed to parse kconfig file '{}', error is {:?}",
+            kconfig_file.file.display(),
+            e
         );
         error!(
             "Please run the following command to debug:\n cargo run --all-features --example parse_file -- --root-dir '{}' '{}'",
-            root_dir.display(), entrypoint.display()
+            kconfig_file.root_dir.display(), kconfig_file.file.display()
         );
 
         panic!("");
@@ -63,8 +62,6 @@ pub fn parse_all_kconfig_files(root_dir: &PathBuf) -> std::io::Result<()> {
             .map(|ext| ext.eq("Kconfig"))
             .unwrap_or(false)
         {
-            eprintln!("Parsing file '{}'", path.display());
-
             let mut file = File::open(&path)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;

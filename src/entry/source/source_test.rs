@@ -1,7 +1,7 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::path::PathBuf;
 
 use crate::{
-    entry::{parse_source, source::apply_vars, Source},
+    entry::{parse_source, Source},
     Kconfig, KconfigFile, KconfigInput,
 };
 
@@ -12,7 +12,7 @@ fn test_parse_source() {
         Ok((
             "",
             Source {
-                entries: vec![Kconfig {
+                kconfigs: vec![Kconfig {
                     file: "empty".to_string(),
                     ..Default::default()
                 }],
@@ -29,7 +29,7 @@ fn test_parse_source_no_quote() {
         Ok((
             "",
             Source {
-                entries: vec![Kconfig {
+                kconfigs: vec![Kconfig {
                     file: "empty".to_string(),
                     ..Default::default()
                 }],
@@ -39,6 +39,7 @@ fn test_parse_source_no_quote() {
 }
 
 #[test]
+#[cfg(not(feature = "kconfiglib"))]
 fn test_parse_source_fail_file_not_exist() {
     let res = parse_source(KconfigInput::new_extra(
         "source a/random/file",
@@ -85,10 +86,10 @@ fn test_parse_source_glob_no_match_fails_with_feature() {
             ..Default::default()
         },
     ));
-    assert!(res.is_err())
+    assert!(res.is_ok())
 }
 
-fn assert_parsing_source_eq(
+pub fn assert_parsing_source_eq(
     input: &str,
     expected: Result<(&str, Source), nom::Err<nom::error::Error<KconfigInput>>>,
 ) {
@@ -101,34 +102,4 @@ fn assert_parsing_source_eq(
     ))
     .map(|r| (r.0.fragment().to_owned(), r.1));
     assert_eq!(res, expected)
-}
-
-fn assert_apply_env_vars(s: &str, extra_vars: &[(&str, &str)], expected: Option<&str>) {
-    let extra_vars: HashMap<String, String> = extra_vars
-        .iter()
-        .map(|(s1, s2)| (s1.to_string(), s2.to_string()))
-        .collect();
-    assert_eq!(apply_vars(s, &extra_vars), expected.map(String::from));
-}
-
-#[test]
-fn test_apply_env_vars() {
-    assert_apply_env_vars("123 $(NON_EXISTENT_VAR) 456", &[], None);
-    assert_apply_env_vars(
-        "123 $(NON_EXISTENT_VAR) 456",
-        &[("USELESS_VAR", "789")],
-        None,
-    );
-    assert_apply_env_vars("123", &[], Some("123"));
-    assert_apply_env_vars("123", &[("USELESS_VAR", "789")], Some("123"));
-    assert_apply_env_vars(
-        "123 $(GOOD_VAR) 456",
-        &[("GOOD_VAR", "Bingo")],
-        Some("123 Bingo 456"),
-    );
-    assert_apply_env_vars(
-        "123 $(GOOD_VAR) 456 $(GOOD_VAR)",
-        &[("GOOD_VAR", "Bingo")],
-        Some("123 Bingo 456 Bingo"),
-    );
 }

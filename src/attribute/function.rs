@@ -1,4 +1,3 @@
-#[cfg(feature = "display")]
 use std::fmt::Display;
 
 use nom::{
@@ -26,7 +25,6 @@ pub struct FunctionCall {
     pub parameters: Vec<Parameter>,
 }
 
-#[cfg(feature = "display")]
 impl Display for Parameter {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
@@ -41,7 +39,6 @@ impl Display for Parameter {
     }
 }
 
-#[cfg(feature = "display")]
 impl Display for ExpressionToken {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
@@ -60,7 +57,6 @@ impl Display for ExpressionToken {
     }
 }
 
-#[cfg(feature = "display")]
 impl Display for FunctionCall {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.parameters.is_empty() {
@@ -177,7 +173,7 @@ fn parse_literal_parameter(input: KconfigInput) -> IResult<KconfigInput, Express
             recognize(ws(many1(alt((
                 alphanumeric1,
                 tag("\\$"),
-                recognize(one_of("+(<>%&\\[]_|'.-:\n\\/")),
+                recognize(one_of("+(<>%@&\\[]_|'.-:\n\\/")),
             ))))),
             |d: KconfigInput| ExpressionToken::Literal(d.fragment().to_string()),
         ),
@@ -200,7 +196,7 @@ pub fn parse_parameter(input: KconfigInput) -> IResult<KconfigInput, Parameter> 
 
 fn parse_function_name(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
-        recognize(ws(many1(alt((alphanumeric1, recognize(one_of("=-"))))))),
+        recognize(ws(many1(alt((alphanumeric1, recognize(one_of("=-_"))))))),
         |d: KconfigInput| d.fragment().to_owned(),
     )
     .parse(input)

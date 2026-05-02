@@ -45,7 +45,7 @@ There are plenty of other keywords in the Kconfig language, check out [the offic
  - When [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries) is met, it reads and parses the specified configuration file.
  - This library uses `clone()` a lot. Do not expect amazing performances.
  - This parser has been tested on the Linux kernel repository from [2.6.11](https://cdn.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.xz) to [6.4.9](https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz) (3733 versions).
- - There is a cargo feature `coreboot` that adds support for some coreboot-specific syntax.
+ - There are cargo feature for `coreboot` and `kconfiglib` compatibility. Enabling them adds support for some non-standard entries and attributes used by these projects.
  
 
 ## Getting started
