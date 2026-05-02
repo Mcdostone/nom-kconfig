@@ -17,7 +17,7 @@ pub type OrSource = Source;
 
 pub fn parse_orsource(input: KconfigInput) -> IResult<KconfigInput, OrSource> {
     let (input, _) = ws(tag("orsource")).parse(input)?;
-    let (input, file) = wsi(alt((
+    let (mut input, file) = wsi(alt((
         delimited(tag("\""), parse_filepath, tag("\"")),
         parse_filepath,
     )))
@@ -34,7 +34,8 @@ pub fn parse_orsource(input: KconfigInput) -> IResult<KconfigInput, OrSource> {
             });
             continue;
         }
-        let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        let (variables, source) = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        input.extra.add_local_vars(variables);
         sources.push(source);
     }
 

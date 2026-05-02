@@ -14,7 +14,7 @@ pub type RSource = Source;
 #[allow(dead_code)]
 pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
     let (input, _) = ws(tag("rsource")).parse(input)?;
-    let (input, file) = wsi(alt((
+    let (mut input, file) = wsi(alt((
         delimited(tag("\""), parse_filepath, tag("\"")),
         parse_filepath,
     )))
@@ -25,7 +25,8 @@ pub fn parse_rsource(input: KconfigInput) -> IResult<KconfigInput, RSource> {
 
     for expanded_file in expanded_files {
         let source_kconfig_file = input.extra.new_source_file(expanded_file);
-        let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        let (variables, source) = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        input.extra.add_local_vars(variables);
         sources.push(source);
     }
 

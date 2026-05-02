@@ -12,6 +12,7 @@ use crate::{
     util::{ws, wsi},
     KconfigInput,
 };
+use tracing::span;
 
 /// Entry that reads the specified configuration file. This file is always parsed.
 #[derive(Debug, Clone, PartialEq)]
@@ -24,7 +25,7 @@ pub struct Source {
 
 pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
     let (input, _) = ws(tag("source")).parse(input)?;
-    let (input, file) = wsi(alt((
+    let (mut input, file) = wsi(alt((
         delimited(tag("\""), parse_filepath, tag("\"")),
         parse_filepath,
     )))
@@ -36,8 +37,13 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
         let mut sources = vec![];
 
         for expanded_file in expanded_files {
+            use tracing::Level;
+
+            let my_span = span!(Level::TRACE, "parsing-source", variables = ?input.extra.vars());
+            let _ = my_span.enter();
             let source_kconfig_file = input.extra.new_source_file(expanded_file);
-            let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+            let (variables, source) = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+            input.extra.add_local_vars(variables);
             sources.push(source);
         }
 
@@ -49,7 +55,8 @@ pub fn parse_source(input: KconfigInput) -> IResult<KconfigInput, Source> {
         use std::path::PathBuf;
 
         let source_kconfig_file = input.extra.new_source_file(PathBuf::from(file));
-        let source = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        let (variables, source) = parse_source_kconfig(input.clone(), source_kconfig_file)?;
+        input.extra.add_local_vars(variables);
         return Ok((
             input,
             Source {

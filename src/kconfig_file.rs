@@ -125,6 +125,10 @@ impl KconfigFile {
             .insert(key.as_ref().to_string(), value.as_ref().to_string());
     }
 
+    pub fn add_local_vars(&mut self, new_vars: HashMap<String, String>) {
+        self.local_vars.extend(new_vars);
+    }
+
     pub fn set_local_vars(mut self, vars: HashMap<String, String>) -> Self {
         self.local_vars = vars;
         self

@@ -30,6 +30,7 @@ use crate::{parse_kconfig, util::ws, Kconfig, KconfigFile};
 
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 pub use glob::glob;
+use std::collections::HashMap;
 #[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 use std::path::PathBuf;
 
@@ -57,7 +58,7 @@ pub(crate) fn parse_filepath(input: KconfigInput<'_>) -> IResult<KconfigInput<'_
 fn parse_source_kconfig(
     input: KconfigInput,
     source_kconfig_file: KconfigFile,
-) -> Result<Kconfig, nom::Err<Error<KconfigInput>>> {
+) -> Result<(HashMap<String, String>, Kconfig), nom::Err<Error<KconfigInput>>> {
     let source_content = source_kconfig_file
         .read_to_string()
         .map_err(|_| nom::Err::Error(Error::from_error_kind(input.clone(), ErrorKind::Fail)));
@@ -75,10 +76,13 @@ fn parse_source_kconfig(
                 source_kconfig_file.full_path().display(),
                 input.extra.full_path().display()
             );
-            return Ok(Kconfig {
-                file: source_kconfig_file.full_path().display().to_string(),
-                entries: vec![],
-            });
+            return Ok((
+                input.extra.local_vars().clone(),
+                Kconfig {
+                    file: source_kconfig_file.full_path().display().to_string(),
+                    entries: vec![],
+                },
+            ));
         }
     }
 
@@ -89,7 +93,7 @@ fn parse_source_kconfig(
         &source_content,
         source_kconfig_file.clone(),
     )) {
-        Ok((_, kconfig)) => Ok(kconfig),
+        Ok((d, kconfig)) => Ok((d.extra.local_vars, kconfig)),
         Err(e) => {
             debug!("Variables are {:?}", input.extra.vars());
             error!(
