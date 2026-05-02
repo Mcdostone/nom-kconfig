@@ -11,7 +11,7 @@ pub fn init_tracing() {
     tracing_subscriber::fmt()
         .with_span_events(FmtSpan::CLOSE | FmtSpan::ENTER)
         .with_writer(std::io::stderr)
-        .with_max_level(Level::TRACE)
+        .with_max_level(Level::DEBUG)
         .init();
 }
 

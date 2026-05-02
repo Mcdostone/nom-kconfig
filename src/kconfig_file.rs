@@ -84,15 +84,7 @@ impl KconfigFile {
         copied
     }
 
-    pub fn vars(&self) -> HashMap<String, String> {
-        self.global_vars
-            .iter()
-            .chain(self.local_vars.iter())
-            .map(|(k, v)| (k.clone(), v.clone()))
-            .collect()
-    }
-
-    pub fn local_vars(&self) -> &HashMap<String, String> {
+    pub fn vars(&self) -> &HashMap<String, String> {
         &self.local_vars
     }
 
@@ -127,11 +119,6 @@ impl KconfigFile {
 
     pub fn add_local_vars(&mut self, new_vars: HashMap<String, String>) {
         self.local_vars.extend(new_vars);
-    }
-
-    pub fn set_local_vars(mut self, vars: HashMap<String, String>) -> Self {
-        self.local_vars = vars;
-        self
     }
 
     fn preprocess_variables(&self, content: String) -> String {

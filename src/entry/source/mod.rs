@@ -55,6 +55,7 @@ pub(crate) fn parse_filepath(input: KconfigInput<'_>) -> IResult<KconfigInput<'_
     .parse(input)
 }
 
+#[allow(clippy::type_complexity)]
 fn parse_source_kconfig(
     input: KconfigInput,
     source_kconfig_file: KconfigFile,
@@ -77,7 +78,7 @@ fn parse_source_kconfig(
                 input.extra.full_path().display()
             );
             return Ok((
-                input.extra.local_vars().clone(),
+                input.extra.vars().clone(),
                 Kconfig {
                     file: source_kconfig_file.full_path().display().to_string(),
                     entries: vec![],

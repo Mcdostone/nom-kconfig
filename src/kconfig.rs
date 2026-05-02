@@ -47,7 +47,7 @@ pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     //debug!("{} {}", prefix, input.extra.full_path().display());
     let file: std::path::PathBuf = input.extra.file.clone();
 
-    let preprocessed_content = preprocess_macros(input.fragment(), &input.extra.vars());
+    let preprocessed_content = preprocess_macros(input.fragment(), input.extra.vars());
     let _lol = KconfigInput::new_extra(&preprocessed_content, input.extra.clone());
 
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws(eof)), |d| {
