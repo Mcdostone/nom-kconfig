@@ -2,12 +2,12 @@
 name = "nom-kconfig"
 version = "0.10.0"
 edition = "2021"
-authors = ["yann Prono"]
+authors = ["Yann Prono"]
 repository = "https://github.com/Mcdostone/nom-kconfig"
 homepage = "https://github.com/Mcdostone/nom-kconfig"
 license = "MIT"
 readme = "README.md"
-description = "A Kconfig parser"
+description = "A parsing library for the Kconfig language"
 categories = ["parsing"]
 keywords = ["parser",  "parsing", "kconfig", "linux-kernel"]
 rust-version = "1.65"
@@ -63,3 +63,11 @@ shared-version = true
 tag-message = "chore: Release version v{{version}}"
 pre-release-commit-message = "chore: Release version v{{version}}"
 tag-name = "{{version}}"
+
+
+[package.metadata.deb]
+maintainer = "Yann Prono <mmstickman@gmail.com>"
+license-file = ["MIT"]
+extended-description = "A parsing library for the Kconfig language"
+depends = "$auto"
+section = "utility"
