@@ -88,7 +88,7 @@ lib = true
 
 # Maintainer
 #
-# Defaults to pkg-rust-team, should only be overriden with care. If overridden,
+# Defaults to pkg-rust-team, should only be overridden with care. If overridden,
 # vcs_* in [source] should also be overridden, otherwise they point the Rust
 # Team's salsa project.
 #
