@@ -30,7 +30,7 @@ members = [
 glob = { version = "0.3.3", optional = true }
 nom = "8.0.0"
 nom_locate = "5.0.0"
-regex = "1.12.3"
+regex-lite = "0.1.9"
 serde = { version = "1.0.228", features = ["derive"], optional = true }
 tracing = { version = "0.1.44", features = ["log"] }
 

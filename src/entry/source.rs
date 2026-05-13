@@ -12,7 +12,7 @@ use nom::{
     sequence::delimited,
     IResult, Parser,
 };
-use regex::Regex;
+use regex_lite::Regex;
 #[cfg(feature = "deserialize")]
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
