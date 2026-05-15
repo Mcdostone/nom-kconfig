@@ -62,9 +62,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -101,9 +101,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -169,9 +169,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
