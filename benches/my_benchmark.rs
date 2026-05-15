@@ -15,7 +15,7 @@ fn parse_files(kernel_directory: &str, files: Vec<&str>) -> Result<(), Box<dyn s
         let input = kconfig_file.read_to_string()?;
         match parse_kconfig(KconfigInput::new_extra(&input, kconfig_file)) {
             Ok((_, kconfig)) => kconfigs.push(kconfig),
-            Err(e) => return Err(Box::new(e.map_input(|f| (f.to_string().clone(), f.extra)))),
+            Err(e) => return Err(Box::new(e)),
         }
     }
     Ok(())

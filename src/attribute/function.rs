@@ -1,11 +1,10 @@
-#[cfg(feature = "display")]
 use std::fmt::Display;
 
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, char, one_of, space1},
-    combinator::{map, opt, recognize},
+    combinator::{map, recognize},
     multi::{many1, separated_list0},
     sequence::{delimited, preceded, terminated},
     IResult, Parser,
@@ -26,7 +25,13 @@ pub struct FunctionCall {
     pub parameters: Vec<Parameter>,
 }
 
-#[cfg(feature = "display")]
+//#[cfg(feature = "kconfiglib")]
+//impl FunctionCall {
+//    fn call(&self) -> String {
+//
+//    }
+//}
+
 impl Display for Parameter {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
@@ -41,7 +46,6 @@ impl Display for Parameter {
     }
 }
 
-#[cfg(feature = "display")]
 impl Display for ExpressionToken {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
@@ -60,7 +64,6 @@ impl Display for ExpressionToken {
     }
 }
 
-#[cfg(feature = "display")]
 impl Display for FunctionCall {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.parameters.is_empty() {
@@ -107,7 +110,7 @@ pub fn parse_expression_token_variable_parameter(
     map(
         delimited(
             tag("$("),
-            recognize(ws(many1(recognize(one_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ_"))))),
+            recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_-"))))))),
             tag(")"),
         ),
         |d: KconfigInput| ExpressionToken::Variable(d.fragment().to_string()),
@@ -177,7 +180,7 @@ fn parse_literal_parameter(input: KconfigInput) -> IResult<KconfigInput, Express
             recognize(ws(many1(alt((
                 alphanumeric1,
                 tag("\\$"),
-                recognize(one_of("+(<>%&\\[]_|'.-:\n\\/")),
+                recognize(one_of("+(<>%@&\\[]_|'.-:\n\\/")),
             ))))),
             |d: KconfigInput| ExpressionToken::Literal(d.fragment().to_string()),
         ),
@@ -200,7 +203,7 @@ pub fn parse_parameter(input: KconfigInput) -> IResult<KconfigInput, Parameter> 
 
 fn parse_function_name(input: KconfigInput<'_>) -> IResult<KconfigInput<'_>, &str> {
     map(
-        recognize(ws(many1(alt((alphanumeric1, recognize(one_of("=-"))))))),
+        recognize(ws(many1(alt((alphanumeric1, recognize(one_of("=-_"))))))),
         |d: KconfigInput| d.fragment().to_owned(),
     )
     .parse(input)
@@ -219,7 +222,7 @@ fn parse_function_call_inner(input: KconfigInput) -> IResult<KconfigInput, Funct
         delimited(
             tag("$("),
             (
-                terminated(parse_function_name, opt(ws(tag(",")))),
+                terminated(parse_function_name, ws(tag(","))),
                 separated_list0(ws(tag(",")), ws(parse_parameter)),
             ),
             ws(tag(")")),

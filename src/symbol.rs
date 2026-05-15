@@ -22,8 +22,8 @@ use serde::Serialize;
 use std::fmt::Display;
 
 /// There are two types of symbols: constant and non-constant symbols. Non-constant symbols are the most
-/// common ones and are defined with the 'config' statement. Non-constant symbols consist entirely of al-
-/// phanumeric characters or underscores. Constant symbols are only part of expressions. Constant symbols
+/// common ones and are defined with the 'config' statement. Non-constant symbols consist entirely of alphanumeric
+/// characters or underscores. Constant symbols are only part of expressions. Constant symbols
 /// are always surrounded by single or double quotes. Within the quote, any other character is allowed and
 /// the quotes can be escaped using ''.
 #[derive(Debug, PartialEq, Clone)]

@@ -1,5 +1,7 @@
 use std::fs;
 
+use nom_kconfig::KconfigFile;
+
 mod parsing;
 mod utils;
 
@@ -11,7 +13,10 @@ fn main() -> std::io::Result<()> {
     let _ = fs::create_dir(destination.join("site-local"));
     let _ = fs::write(destination.join("site-local").join("Kconfig"), "");
 
-    parsing::parse_from_entrypoint(&destination, destination.join("src/Kconfig"))?;
+    parsing::parse_kconfig_file(KconfigFile::new(
+        destination.clone(),
+        destination.join("src/Kconfig"),
+    ))?;
 
     Ok(())
 }

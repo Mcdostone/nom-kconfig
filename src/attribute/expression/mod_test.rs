@@ -1,3 +1,4 @@
+use crate::attribute::r#macro::Macro;
 use crate::{
     assert_parsing_eq, assert_parsing_fail,
     attribute::{
@@ -166,8 +167,8 @@ fn test_parse_expression_function() {
         "$(success,$(OBJCOPY) --version | head -n1 | grep -qv llvm)",
         Ok((
             "",
-            Expression::Term(AndExpression::Term(Term::Atom(Atom::Function(
-                FunctionCall {
+            Expression::Term(AndExpression::Term(Term::Atom(Atom::Macro(
+                Macro::FunctionCall(FunctionCall {
                     name: "success".to_string(),
                     parameters: vec!(Parameter {
                         tokens: vec!(
@@ -190,7 +191,7 @@ fn test_parse_expression_function() {
                             ExpressionToken::Literal("llvm".to_string())
                         )
                     })
-                }
+                })
             ))))
         ))
     )
@@ -351,11 +352,11 @@ fn test_expression_to_string() {
     );
     assert_eq!(
         "$(warning)",
-        Expression::Term(AndExpression::Term(Term::Atom(Atom::Function(
-            FunctionCall {
+        Expression::Term(AndExpression::Term(Term::Atom(Atom::Macro(
+            Macro::FunctionCall(FunctionCall {
                 name: "warning".to_string(),
                 parameters: vec!()
-            }
+            })
         ))))
         .to_string()
     );
@@ -396,23 +397,20 @@ fn test_expression_compare_with_function_call() {
                         "RUSTC_LLVM_MAJOR_VERSION".to_string()
                     )),
                     operator: CompareOperator::Equal,
-                    right: CompareOperand::Macro(FunctionCall {
+                    right: CompareOperand::Macro(Macro::FunctionCall(FunctionCall {
                         name: "shell".to_string(),
                         parameters: vec!(Parameter {
                             tokens: vec!(
                                 ExpressionToken::Literal("expr".to_string()),
                                 ExpressionToken::Space,
-                                ExpressionToken::Function(Box::new(FunctionCall {
-                                    name: "cc-version".to_string(),
-                                    parameters: vec![]
-                                })),
+                                ExpressionToken::Variable("cc-version".to_string()),
                                 ExpressionToken::Space,
                                 ExpressionToken::Literal("/".to_string()),
                                 ExpressionToken::Space,
                                 ExpressionToken::Literal("10000".to_string())
                             )
                         })
-                    })
+                    }))
                 }))
             )))
         ))
@@ -438,6 +436,35 @@ fn test_expression_compare_with_string() {
                     )))
                 }
             ))))
+        ))
+    )
+}
+
+/// https://github.com/zephyrproject-rtos/zephyr/blob/7a5d4a34c086fcb08e9e44c74316d94583750566/drivers/disk/Kconfig.sdmmc#L41
+
+#[test]
+fn test_expression_compare_with_macro() {
+    assert_parsing_eq!(
+        parse_expression,
+        "$(DT_STM32_SDMMC_HAS_DMA) && (SOC_SERIES_STM32F4X || SOC_SERIES_STM32F7X || SOC_SERIES_STM32L4X)",
+        Ok((
+            "",
+            Expression::Term(AndExpression::Expression(vec!(
+                Term::Atom(Atom::Macro(Macro::Variable("DT_STM32_SDMMC_HAS_DMA".to_string()))),
+                Term::Atom(Atom::Parenthesis(Box::new(Expression::Expression(
+                    vec!(
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "SOC_SERIES_STM32F4X".to_string()
+                        )))),
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "SOC_SERIES_STM32F7X".to_string()
+                        )))),
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "SOC_SERIES_STM32L4X".to_string()
+                        )))),
+                    )
+                ))))))
+            )
         ))
     )
 }

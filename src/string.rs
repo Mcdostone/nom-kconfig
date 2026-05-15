@@ -40,7 +40,15 @@ pub fn take_until_unbalanced(
         }
 
         // we split just before the last double quote
-        index -= 1;
+        match index.checked_sub(1) {
+            Some(i) => index = i,
+            None => {
+                return Err(nom::Err::Error(Error::from_error_kind(
+                    i,
+                    ErrorKind::TakeUntil,
+                )))
+            }
+        }
         // Last delimiter is the string delimiter
         delimiter_counter -= 1;
 

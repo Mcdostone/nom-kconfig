@@ -13,6 +13,7 @@ use tracing::debug;
 
 use crate::{
     entry::{parse_entry, Entry},
+    error::Error,
     util::{ws, ws_comment},
     KconfigInput,
 };
@@ -39,10 +40,17 @@ pub struct Kconfig {
 /// let input = KconfigInput::new_extra(content, kconfig_file);
 /// assert_eq!(parse_kconfig(input).unwrap().1, Kconfig {file: "Kconfig".to_string(), entries: vec!() })
 /// ```
-pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
-    let file: std::path::PathBuf = input.extra.file.clone();
+pub fn parse_kconfig(input: KconfigInput) -> Result<(KconfigInput, Kconfig), Error> {
+    match private_parse_kconfig(input) {
+        Ok((input, result)) => Ok((input, result)),
+        Err(nom_error) => Err(Error::from(nom_error)),
+    }
+}
+
+pub(crate) fn private_parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     #[cfg(feature = "debug")]
-    debug!("Parsing file '{}'", file.display());
+    debug!("parsing '{}'", input.extra.full_path().display());
+    let file: std::path::PathBuf = input.extra.file.clone();
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws(eof)), |d| {
         Kconfig {
             file: file.display().to_string(),

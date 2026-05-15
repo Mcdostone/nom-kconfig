@@ -1,5 +1,5 @@
+use crate::attribute::r#macro::{parse_macro, Macro};
 use crate::attribute::Atom;
-use crate::attribute::{parse_function_call, FunctionCall};
 use crate::symbol::parse_symbol;
 use crate::util::wsi;
 use crate::{KconfigInput, Symbol};
@@ -45,7 +45,7 @@ pub struct CompareExpression {
 #[cfg_attr(feature = "serialize", serde(rename = "CompareOperand"))]
 pub enum CompareOperand {
     Symbol(Symbol),
-    Macro(FunctionCall),
+    Macro(Macro),
 }
 
 #[cfg(feature = "display")]
@@ -53,14 +53,14 @@ impl Display for CompareOperand {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             CompareOperand::Symbol(symbol) => write!(f, "{}", symbol),
-            CompareOperand::Macro(function_call) => write!(f, "{}", function_call),
+            CompareOperand::Macro(r#macro) => write!(f, "{}", r#macro),
         }
     }
 }
 
 pub fn parse_compare_operand(input: KconfigInput) -> IResult<KconfigInput, CompareOperand> {
     alt((
-        map(parse_function_call, CompareOperand::Macro),
+        map(parse_macro, CompareOperand::Macro),
         map(parse_symbol, CompareOperand::Symbol),
     ))
     .parse(input)
