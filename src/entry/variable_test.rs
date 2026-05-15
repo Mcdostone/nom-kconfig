@@ -1,3 +1,4 @@
+use crate::attribute::{FunctionCall, Parameter};
 use crate::{
     assert_parsing_eq,
     attribute::ExpressionToken,
@@ -91,6 +92,45 @@ fn test_parse_variable_if_success() {
                     r#"$(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")"#
                         .to_string()
                 )
+            }
+        ))
+    )
+}
+
+#[test]
+fn test_pouet() {
+    let input = r#"module = MCUBOOT_UTIL"#;
+    assert_parsing_eq!(
+        parse_variable_assignment,
+        input,
+        Ok((
+            "",
+            VariableAssignment {
+                identifier: VariableIdentifier::Identifier("module".to_string()),
+                operator: "=".to_string(),
+                right: Value::Literal("MCUBOOT_UTIL".to_string())
+            }
+        ))
+    )
+}
+
+#[test]
+fn test_variable_with_external_function_call() {
+    let input = r#"BOARD_STRING := $(normalize_upper,$(BOARD))"#;
+    assert_parsing_eq!(
+        parse_variable_assignment,
+        input,
+        Ok((
+            "",
+            VariableAssignment {
+                identifier: VariableIdentifier::Identifier("BOARD_STRING".to_string()),
+                operator: ":=".to_string(),
+                right: Value::FunctionCall(FunctionCall {
+                    name: "normalize_upper".to_string(),
+                    parameters: vec![Parameter {
+                        tokens: vec![ExpressionToken::Variable("BOARD".to_string())],
+                    }],
+                })
             }
         ))
     )

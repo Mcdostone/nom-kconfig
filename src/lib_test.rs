@@ -4,10 +4,11 @@ use crate::{
     assert_parsing_eq,
     attribute::{
         expression::{AndExpression, Atom, Expression, Term},
+        r#macro::Macro,
         r#type::{ConfigType, Type},
         DefaultAttribute, ExpressionToken, FunctionCall, Parameter,
     },
-    entry::{config::Config, r#if::If, MenuConfig},
+    entry::{config::Config, r#if::If, MenuConfig, Value, VariableAssignment, VariableIdentifier},
     kconfig::parse_kconfig,
     symbol::Symbol,
     Attribute, Entry, Kconfig, KconfigFile,
@@ -132,26 +133,19 @@ menuconfig GCC_PLUGINS
                             }),
                             Attribute::Default(DefaultAttribute {
                                 expression: Expression::Term(AndExpression::Term(Term::Atom(
-                                    Atom::Function(FunctionCall {
+                                    Atom::Macro(Macro::FunctionCall(FunctionCall {
                                         name: "shell".to_string(),
                                         parameters: vec!(Parameter {
                                             tokens: vec!(
-                                                ExpressionToken::Function(Box::new(FunctionCall {
-                                                    name: "srctree".to_string(),
-                                                    parameters: vec![]
-                                                })),
+                                                ExpressionToken::Variable("srctree".to_string()),
                                                 ExpressionToken::Literal(
                                                     "/scripts/gcc-plugin.sh".to_string()
                                                 ),
                                                 ExpressionToken::Space,
                                                 ExpressionToken::DoubleQuotes(vec![
-                                                    ExpressionToken::Function(Box::new(
-                                                        FunctionCall {
-                                                            name: "preferred-plugin-hostcc"
-                                                                .to_string(),
-                                                            parameters: vec![]
-                                                        }
-                                                    )),
+                                                    ExpressionToken::Variable(
+                                                        "preferred-plugin-hostcc".to_string()
+                                                    )
                                                 ]),
                                                 ExpressionToken::Space,
                                                 ExpressionToken::DoubleQuotes(vec![
@@ -165,7 +159,7 @@ menuconfig GCC_PLUGINS
                                                 ])
                                             )
                                         })
-                                    })
+                                    }))
                                 ))),
                                 r#if: None
                             })
@@ -204,21 +198,18 @@ config AS_WRUSS
                     attributes: vec!(
                         Attribute::Type(ConfigType {
                             r#type: Type::DefBool(Expression::Term(AndExpression::Term(
-                                Term::Atom(Atom::Function(FunctionCall {
+                                Term::Atom(Atom::Macro(Macro::FunctionCall(FunctionCall {
                                     name: "as-instr64".to_string(),
                                     parameters: vec!(Parameter {
                                         tokens: vec!(
                                             ExpressionToken::Literal("wrussq".to_string()),
                                             ExpressionToken::Space,
                                             ExpressionToken::Literal("%rax".to_string()),
-                                            ExpressionToken::Function(Box::new(FunctionCall {
-                                                name: "comma".to_string(),
-                                                parameters: vec!(),
-                                            })),
+                                            ExpressionToken::Variable("comma".to_string()),
                                             ExpressionToken::Literal("(%rbx)".to_string()),
                                         )
                                     })
-                                }))
+                                })))
                             ))),
                             r#if: None
                         },),
@@ -233,6 +224,44 @@ config AS_WRUSS
 #[test]
 fn test_set_envs() {
     let mut file = KconfigFile::new(PathBuf::from("."), PathBuf::from("Kconfig"));
-    file.set_vars(&[("ARCH", "ARCH_64")]);
-    assert_eq!(file.vars.get("ARCH"), Some(&"ARCH_64".to_string()));
+    file.set_global_vars(&[("ARCH", "ARCH_64")]);
+    assert_eq!(file.global_vars.get("ARCH"), Some(&"ARCH_64".to_string()));
+}
+
+#[test]
+/// zephyr/modules/Kconfig.mcuboot
+fn test_weird_variables() {
+    assert_parsing_eq!(
+        parse_kconfig,
+        r#"
+
+if MCUBOOT_BOOTUTIL_LIB_OWN_LOG
+module = MCUBOOT_UTIL
+module-str = MCUboot bootutil
+endif
+"#,
+        Ok((
+            "",
+            Kconfig {
+                file: "".to_string(),
+                entries: vec!(Entry::If(If {
+                    condition: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                        Symbol::NonConstant("MCUBOOT_BOOTUTIL_LIB_OWN_LOG".to_string())
+                    )))),
+                    entries: vec!(
+                        Entry::VariableAssignment(VariableAssignment {
+                            identifier: VariableIdentifier::Identifier("module".to_string()),
+                            operator: "=".to_string(),
+                            right: Value::Literal("MCUBOOT_UTIL".to_string())
+                        }),
+                        Entry::VariableAssignment(VariableAssignment {
+                            identifier: VariableIdentifier::Identifier("module-str".to_string()),
+                            operator: "=".to_string(),
+                            right: Value::Literal("MCUboot bootutil".to_string())
+                        }),
+                    )
+                }))
+            },
+        ))
+    )
 }

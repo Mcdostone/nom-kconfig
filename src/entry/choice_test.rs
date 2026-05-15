@@ -1,4 +1,4 @@
-#[cfg(feature = "coreboot")]
+#[cfg(feature = "named-choice")]
 use crate::attribute::Prompt;
 use crate::{
     assert_parsing_eq,
@@ -6,7 +6,7 @@ use crate::{
     entry::{parse_choice, Choice, Config},
     Attribute, Entry,
 };
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 use crate::{
     attribute::{AndExpression, Atom, DefaultAttribute, Expression, Term},
     entry::Comment,
@@ -14,7 +14,7 @@ use crate::{
 };
 
 #[test]
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 fn test_parse_choice_optional() {
     assert_parsing_eq!(
         parse_choice,
@@ -44,7 +44,7 @@ fn test_parse_choice_optional() {
 // 6.4.9/drivers/usb/mtu3/Kconfig
 // 6.4.9/drivers/usb/dwc2/Kconfig
 #[test]
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "named-choice"))]
 fn test_parse_choice_with_comment() {
     assert_parsing_eq!(
         parse_choice,
@@ -105,8 +105,8 @@ endchoice"#,
 
 /// https://github.com/coreboot/coreboot/blob/4e522f49b6944f336aec5048d0fd84832e1b6ff3/src/device/Kconfig#L522
 #[test]
-#[cfg(feature = "coreboot")]
-fn test_parse_choice_from_coreboot() {
+#[cfg(feature = "named-choice")]
+fn test_parse_named_choice_from_coreboot() {
     assert_parsing_eq!(
         parse_choice,
         r#"choice DEFAULT_SCREEN_ROTATION
@@ -137,8 +137,8 @@ endchoice"#,
 
 /// https://github.com/coreboot/coreboot/blob/main/src/Kconfig#L22
 #[test]
-#[cfg(feature = "coreboot")]
-fn test_parse_choice_from_coreboot_without_extra_name() {
+#[cfg(feature = "named-choice")]
+fn test_parse_named_choice_from_coreboot_without_extra_name() {
     assert_parsing_eq!(
         parse_choice,
         r#"choice 
@@ -162,6 +162,25 @@ endchoice"#,
                         r#if: None
                     }))
                 }))
+            }
+        ))
+    )
+}
+
+/// https://github.com/nrfconnect/sdk-zephyr/blob/main/subsys/logging/Kconfig.template.log_config#L3
+#[test]
+#[cfg(feature = "named-choice")]
+fn test_named_choice_with_double_quotes() {
+    assert_parsing_eq!(
+        parse_choice,
+        r#"choice "MCUBOOT_UTIL_LOG_LEVEL_CHOICE"
+        endchoice"#,
+        Ok((
+            "",
+            Choice {
+                name: Some("MCUBOOT_UTIL_LOG_LEVEL_CHOICE".to_string()),
+                options: vec!(),
+                entries: vec!(),
             }
         ))
     )

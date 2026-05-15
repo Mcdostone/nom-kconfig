@@ -79,3 +79,20 @@ fn test_parse_range_symbol() {
         ))
     )
 }
+
+// https://github.com/nrfconnect/sdk-zephyr/blob/d947269643dd51e4e95d35d148cecb40562fe0d2/subsys/net/lib/ptp/Kconfig#L198
+#[test]
+fn test_parse_range_variable() {
+    assert_parsing_eq!(
+        parse_range,
+        "range 0 $(UINT8_MAX)",
+        Ok((
+            "",
+            Range {
+                lower_bound: RangeBound::Number(0),
+                upper_bound: RangeBound::Variable("UINT8_MAX".to_string()),
+                r#if: None
+            }
+        ))
+    )
+}

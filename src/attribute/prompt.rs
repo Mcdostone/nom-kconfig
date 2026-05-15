@@ -70,7 +70,7 @@ pub fn parse_prompt_value(input: KconfigInput) -> IResult<KconfigInput, String> 
                     tag("\\\""),
                     // TODO
                     //recognize(anychar),
-                    recognize(one_of("&#*|!É{}^<>%[]()+'=,:;μ-?._$/")),
+                    recognize(one_of("\\&#*|!É{}^<>%[]()+'=,:;μ-?._$/")),
                 )))),
                 char('"'),
             ),

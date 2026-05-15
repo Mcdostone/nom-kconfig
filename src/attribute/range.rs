@@ -1,8 +1,10 @@
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::map,
-    sequence::{pair, preceded},
+    character::{complete::alphanumeric1, one_of},
+    combinator::{map, recognize},
+    multi::many1,
+    sequence::{delimited, pair, preceded},
     IResult, Parser,
 };
 #[cfg(feature = "deserialize")]
@@ -91,6 +93,7 @@ pub enum RangeBound {
     Hex(String),
     Number(i64),
     Symbol(String),
+    Variable(String),
 }
 
 fn parse_range_bound(input: KconfigInput) -> IResult<KconfigInput, RangeBound> {
@@ -100,6 +103,7 @@ fn parse_range_bound(input: KconfigInput) -> IResult<KconfigInput, RangeBound> {
         map(parse_non_constant_symbol, |s| {
             RangeBound::Symbol(s.to_string())
         }),
+        map(parse_variable, |v| RangeBound::Variable(v.to_string())),
     ))
     .parse(input)
 }
@@ -111,6 +115,19 @@ impl Display for RangeBound {
             RangeBound::Hex(h) => write!(f, "{}", h),
             RangeBound::Number(n) => write!(f, "{}", n),
             RangeBound::Symbol(s) => write!(f, "{}", s),
+            RangeBound::Variable(v) => write!(f, "$({})", v),
         }
     }
+}
+
+fn parse_variable(input: KconfigInput) -> IResult<KconfigInput, String> {
+    map(
+        delimited(
+            tag("$("),
+            recognize(ws(many1(alt((alphanumeric1, recognize(one_of("_"))))))),
+            tag(")"),
+        ),
+        |d: KconfigInput| d.fragment().to_string(),
+    )
+    .parse(input)
 }
