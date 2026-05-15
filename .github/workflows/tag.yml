@@ -37,34 +37,35 @@ jobs:
         run: git fetch --tags origin
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
       - name: Configure git
         run: |
-          git config --global user.name "$NAME"
-          git config --global user.email "$EMAIL"
+          git config --global user.name "${{ env.NAME }}"
+          git config --global user.email "${{ env.EMAIL }}"
           git config --global push.autoSetupRemote true
+        env:
+          NAME: ${{ github.actor }}
+          EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
       - name: Get the version
         id: current
         run: echo "version=$(cargo pkgid | cut -d '#' -f2)" >> "$GITHUB_OUTPUT"
       - name: Create git tag
         id: tag
         run: |
-          if git tag -a "v${VERSION}" -m "${VERSION}"; then
+          if git tag -a "v${{ env.VERSION }}" -m "${{ env.VERSION }}"; then
             echo "created=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice title=Git tag:: The version ${VERSION} already exists. The \`publish\` workflow won't be executed."
+            echo "::notice title=Git tag:: The version ${{ env.VERSION }} already exists. The \`publish\` workflow won't be executed."
             echo "created=false" >> "$GITHUB_OUTPUT"
           fi
         env:
           VERSION: ${{ steps.current.outputs.version }}
-          NAME: ${{ github.actor }}
-          EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
 
 
   publish:
