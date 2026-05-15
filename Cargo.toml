@@ -32,7 +32,7 @@ nom = "8.0.0"
 nom_locate = "5.0.0"
 regex = "1.12.3"
 serde = { version = "1.0.228", features = ["derive"], optional = true }
-tracing = { version = "0.1.44", features = ["log"] }
+tracing = { version = "0.1.44", features = ["log"], optional = true }
 
 [dev-dependencies]
 criterion = { version = "0.8.2", features = ["html_reports"] }
@@ -46,9 +46,10 @@ name = "my_benchmark"
 harness = false
 
 [features]
-default = ["display", "hash", "serialize", "deserialize"]
+default = ["display", "debug", "hash", "serialize", "deserialize"]
 coreboot = ["dep:glob"]
 display = []
+debug = ["dep:tracing"]
 hash = []
 serialize = ["dep:serde"]
 deserialize = ["dep:serde"]

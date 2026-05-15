@@ -8,6 +8,7 @@ use nom::{
 use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
+#[cfg(feature = "debug")]
 use tracing::debug;
 
 use crate::{
@@ -40,6 +41,7 @@ pub struct Kconfig {
 /// ```
 pub fn parse_kconfig(input: KconfigInput) -> IResult<KconfigInput, Kconfig> {
     let file: std::path::PathBuf = input.extra.file.clone();
+    #[cfg(feature = "debug")]
     debug!("Parsing file '{}'", file.display());
     let (input, result) = map(delimited(ws_comment, many0(parse_entry), ws(eof)), |d| {
         Kconfig {
