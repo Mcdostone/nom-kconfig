@@ -1,3 +1,18 @@
+## What's Changed in 0.11.0
+* chore: Release version v0.11.0 by @Mcdostone
+* feat: support for the kconfiglib by @Mcdostone
+* add debug feature: enables tracing by @julianbraha
+* ci: trying to secure CI by @Mcdostone
+* Changelog for v0.10.0 by @github-actions[bot] in [#140](https://github.com/Mcdostone/nom-kconfig/pull/140)
+* build(deps): bump rust-lang/crates-io-auth-action from 1.0.3 to 1.0.4 by @dependabot[bot] in [#139](https://github.com/Mcdostone/nom-kconfig/pull/139)
+* build(deps): bump codecov/codecov-action from 5.5.4 to 6.0.0 by @dependabot[bot] in [#138](https://github.com/Mcdostone/nom-kconfig/pull/138)
+* build(deps): bump bnjbvr/cargo-machete from db87f5ee388b462ee8c4311742246d599b78a00a to ac30a525c0a8d163a92d727b3ff079ee3f6ecb08 by @dependabot[bot] in [#137](https://github.com/Mcdostone/nom-kconfig/pull/137)
+
+### New Contributors
+* @julianbraha made their first contribution
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.10.0...v0.11.0
+
 ## What's Changed in 0.10.0
 * Develop by @Mcdostone in [#136](https://github.com/Mcdostone/nom-kconfig/pull/136)
 * test: new integration test for linux-next by @Mcdostone
