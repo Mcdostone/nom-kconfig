@@ -1,6 +1,6 @@
 [package]
 name = "nom-kconfig"
-version = "0.11.0"
+version = "0.12.0"
 edition = "2021"
 authors = ["yann Prono <yann.prono@telecomnancy.net>"]
 repository = "https://github.com/Mcdostone/nom-kconfig"
