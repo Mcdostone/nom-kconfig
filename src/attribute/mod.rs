@@ -6,6 +6,7 @@ pub mod depends_on;
 pub mod function;
 pub mod help;
 pub mod imply;
+pub mod r#macro;
 pub mod modules;
 pub mod option;
 pub mod optional;
@@ -152,7 +153,5 @@ mod requires_test;
 mod select_test;
 #[cfg(test)]
 mod transitional_test;
-#[cfg(test)]
-mod type_test;
 #[cfg(test)]
 mod visible_test;

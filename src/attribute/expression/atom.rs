@@ -1,7 +1,6 @@
 use crate::attribute::expression::parse_compare;
-use crate::attribute::{
-    parse_expression, parse_function_call, CompareExpression, Expression, FunctionCall,
-};
+use crate::attribute::r#macro::{parse_macro, Macro};
+use crate::attribute::{parse_expression, CompareExpression, Expression};
 use crate::symbol::parse_symbol;
 use crate::util::wsi;
 use crate::{KconfigInput, Symbol};
@@ -22,7 +21,7 @@ use std::fmt::Display;
 pub enum Atom {
     Symbol(Symbol),
     Compare(CompareExpression),
-    Function(FunctionCall),
+    Macro(Macro),
     Parenthesis(Box<Expression>),
 }
 
@@ -32,7 +31,7 @@ impl Display for Atom {
         match self {
             Atom::Symbol(s) => write!(f, "{}", s),
             Atom::Compare(c) => write!(f, "{}", c),
-            Atom::Function(func) => write!(f, "{}", func),
+            Atom::Macro(m) => write!(f, "{}", m),
             Atom::Parenthesis(d) => write!(f, "({})", d),
         }
     }
@@ -41,7 +40,7 @@ impl Display for Atom {
 pub fn parse_atom(input: KconfigInput) -> IResult<KconfigInput, Atom> {
     alt((
         wsi(parse_compare),
-        map(parse_function_call, Atom::Function),
+        map(parse_macro, Atom::Macro),
         map(
             delimited(wsi(tag("(")), parse_expression, wsi(tag(")"))),
             |expr: Expression| Atom::Parenthesis(Box::new(expr)),

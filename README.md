@@ -45,7 +45,7 @@ There are plenty of other keywords in the Kconfig language, check out [the offic
  - When [`source`](https://www.kernel.org/doc/html/next/kbuild/kconfig-language.html#menu-entries) is met, it reads and parses the specified configuration file.
  - This library uses `clone()` a lot. Do not expect amazing performances.
  - This parser has been tested on the Linux kernel repository from [2.6.11](https://cdn.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.xz) to [6.4.9](https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz) (3733 versions).
- - There is a cargo feature `coreboot` that adds support for some coreboot-specific syntax.
+ - There are cargo features for `coreboot` and `kconfiglib` compatibility. Enabling them adds support for some non-standard entries and attributes used by these projects.
  
 
 ## Getting started
@@ -55,18 +55,22 @@ cargo add nom-kconfig
 ```
 
 ```rust
+use nom_kconfig::{parse_kconfig, KconfigInput};
 use std::path::PathBuf;
-use nom_kconfig::{parse_kconfig, KconfigInput, KconfigFile};
+use nom_kconfig::{KconfigFile};
 use std::collections::HashMap;
 
 // curl https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.9.tar.xz | tar -xJ -C /tmp/
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut variables = HashMap::new();
     variables.insert("SRCARCH", "x86");
+    let linux_dir = PathBuf::from("/tmp/linux-6.4.9");
+
     let kconfig_file = KconfigFile::new_with_vars(
-        PathBuf::from("/tmp/linux-6.4.9"), 
-        PathBuf::from("/tmp/linux-6.4.9/Kconfig"),
-        &variables
+        linux_dir.clone(),
+        linux_dir.join("Kconfig"),
+        &variables,
+        &Default::default(),
     );
     let input = kconfig_file.read_to_string()?;
     let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));

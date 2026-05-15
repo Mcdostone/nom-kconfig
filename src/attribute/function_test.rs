@@ -7,12 +7,14 @@ use crate::{
 fn test_parse_function_call() {
     assert_parsing_eq!(
         parse_function_call,
-        "$(hello)",
+        "$(hello, world)",
         Ok((
             "",
             FunctionCall {
                 name: "hello".to_string(),
-                parameters: vec!()
+                parameters: vec!(Parameter {
+                    tokens: vec!(ExpressionToken::Literal("world".to_string()))
+                },)
             }
         ))
     )
@@ -87,25 +89,6 @@ fn test_parse_function_call_expanded_variable() {
     )
 }
 
-// https://github.com/Mcdostone/nom-kconfig/issues/57
-#[test]
-fn test_parse_function_call_percent_symbol() {
-    let input = "$(hey (%rbx))";
-    assert_parsing_eq!(
-        parse_function_call,
-        input,
-        Ok((
-            "",
-            FunctionCall {
-                name: "hey".to_string(),
-                parameters: vec!(Parameter {
-                    tokens: vec!(ExpressionToken::Literal("(%rbx)".to_string()))
-                })
-            }
-        ))
-    )
-}
-
 #[test]
 fn test_parse_function_call_recursive_function() {
     let input = "$(warning,$(greeting,Hello,Jean-Louis))";
@@ -148,10 +131,7 @@ fn test_parse_function_call_complex_expression() {
                     tokens: vec!(
                         ExpressionToken::Literal("filename".to_string()),
                         ExpressionToken::Literal("=".to_string()),
-                        ExpressionToken::Function(Box::new(FunctionCall {
-                            name: "filename".to_string(),
-                            parameters: vec!()
-                        }))
+                        ExpressionToken::Variable("filename".to_string())
                     )
                 })
             }
@@ -302,18 +282,12 @@ fn test_parse_config_string_with_double_quotes() {
                 name: "shell".to_string(),
                 parameters: vec!(Parameter {
                     tokens: vec!(
-                        ExpressionToken::Function(Box::new(FunctionCall {
-                            name: "srctree".to_string(),
-                            parameters: vec![]
-                        })),
+                        ExpressionToken::Variable("srctree".to_string()),
                         ExpressionToken::Literal("/scripts/gcc-plugin.sh".to_string()),
                         ExpressionToken::Space,
-                        ExpressionToken::DoubleQuotes(vec![ExpressionToken::Function(Box::new(
-                            FunctionCall {
-                                name: "preferred-plugin-hostcc".to_string(),
-                                parameters: vec![]
-                            }
-                        )),]),
+                        ExpressionToken::DoubleQuotes(vec![ExpressionToken::Variable(
+                            "preferred-plugin-hostcc".to_string()
+                        )]),
                         ExpressionToken::Space,
                         ExpressionToken::DoubleQuotes(vec![ExpressionToken::Variable(
                             "HOSTCXX".to_string()

@@ -1,5 +1,7 @@
 use std::{fs, process::Command};
 
+use tracing::info;
+
 mod parsing;
 mod utils;
 
@@ -12,6 +14,7 @@ fn main() -> std::io::Result<()> {
         &destination,
     )?;
 
+    info!("Add git remote for linux-next");
     Command::new("git")
         .args([
             "remote",
@@ -22,20 +25,22 @@ fn main() -> std::io::Result<()> {
         .current_dir(&destination)
         .output()?;
 
+    info!("Fetching the remote");
     Command::new("git")
         .args(["fetch", "linux-next"])
         .current_dir(&destination)
-        .output()?;
+        .spawn()?;
 
+    info!("Fetching tags");
     Command::new("git")
         .args(["fetch", "--tags", "linux-next"])
         .current_dir(&destination)
-        .output()?;
+        .spawn()?;
 
     Command::new("git")
         .args(["checkout", "master"])
         .current_dir(&destination)
-        .output()?;
+        .spawn()?;
 
     Command::new("git")
         .args(["remote", "update"])

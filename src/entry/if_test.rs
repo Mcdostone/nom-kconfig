@@ -23,7 +23,7 @@ fn test_parse_if_entry() {
                     Symbol::NonConstant("NET_VENDOR_AMD".to_string())
                 )))),
                 entries: vec!(Entry::Source(Source {
-                    entries: vec![Kconfig {
+                    kconfigs: vec![Kconfig {
                         file: "$(VAR)/Kconfig".to_string(),
                         ..Default::default()
                     }]

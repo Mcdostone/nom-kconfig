@@ -115,8 +115,6 @@ fn parse_kconfig_files(linux_source: &PathBuf) -> std::io::Result<()> {
             .map(|ext| ext.eq("Kconfig"))
             .unwrap_or(false)
         {
-            eprintln!("Parsing file '{}'", path.display());
-
             let mut file = File::open(&path)?;
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
@@ -130,10 +128,7 @@ fn parse_kconfig_files(linux_source: &PathBuf) -> std::io::Result<()> {
                 parse_kconfig(KconfigInput::new_extra(&input, cur_kconfig_file));
 
             if let Err(e) = kconfig_parse_result {
-                panic!(
-                    "failed to parse kconfig file {:?}, error is {:?}",
-                    path_no_root, e
-                );
+                panic!("{}", e);
             }
             println!("Parsed: {:#?}", kconfig_parse_result.unwrap().1);
         }

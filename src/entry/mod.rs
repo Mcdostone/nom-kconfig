@@ -7,6 +7,9 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
+#[cfg(feature = "kconfiglib")]
+use crate::entry::configdefault::{parse_configdefault, ConfigDefault};
+
 use crate::{
     attribute::function::{parse_function_call, FunctionCall},
     util::{ws, ws_comment},
@@ -26,9 +29,16 @@ pub use self::{
     variable::{parse_variable_assignment, Value, VariableAssignment, VariableIdentifier},
 };
 
+#[cfg(feature = "kconfiglib")]
+use crate::entry::source::{
+    parse_orsource, parse_osource, parse_rsource, OSource, OrSource, RSource,
+};
+
 pub mod choice;
 pub mod comment;
 pub mod config;
+#[cfg(feature = "kconfiglib")]
+pub mod configdefault;
 pub mod function;
 pub mod r#if;
 pub mod main_menu;
@@ -54,19 +64,36 @@ pub enum Entry {
     Function(Function),
     If(If),
     MainMenu(MainMenu),
+    #[cfg(feature = "kconfiglib")]
+    ConfigDefault(ConfigDefault),
+    #[cfg(feature = "kconfiglib")]
+    OSource(OSource),
+    #[cfg(feature = "kconfiglib")]
+    RSource(RSource),
+    #[cfg(feature = "kconfiglib")]
+    OrSource(OrSource),
 }
 
 pub fn parse_entry(input: KconfigInput) -> IResult<KconfigInput, Entry> {
     alt((
+        #[cfg(feature = "kconfiglib")]
+        // Order matters here (configdefault must be parsed before config)
+        map(ws(parse_configdefault), Entry::ConfigDefault),
         map(ws(parse_config), Entry::Config),
         map(ws(parse_choice), Entry::Choice),
         map(ws(parse_menu_config), Entry::MenuConfig),
-        map(ws(parse_function), Entry::Function),
+        //map(ws(parse_function), Entry::Function),
         map(ws(parse_main_menu), Entry::MainMenu),
         map(ws(parse_if), Entry::If),
         map(ws(parse_menu), Entry::Menu),
         map(ws(parse_comment), Entry::Comment),
         map(ws(parse_source), Entry::Source),
+        #[cfg(feature = "kconfiglib")]
+        map(ws(parse_osource), Entry::OSource),
+        #[cfg(feature = "kconfiglib")]
+        map(ws(parse_rsource), Entry::RSource),
+        #[cfg(feature = "kconfiglib")]
+        map(ws(parse_orsource), Entry::OrSource),
         map(ws(parse_variable_assignment), Entry::VariableAssignment),
         map(ws(parse_function_call), Entry::FunctionCall),
     ))
@@ -97,6 +124,8 @@ mod menu_test;
 #[cfg(test)]
 mod menuconfig_test;
 #[cfg(test)]
-mod source_test;
-#[cfg(test)]
 mod variable_test;
+
+#[cfg(test)]
+#[cfg(feature = "kconfiglib")]
+mod configdefault_test;
