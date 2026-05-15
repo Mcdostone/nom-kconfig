@@ -33,9 +33,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -54,13 +54,13 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@d816b04a1df8acb21c922ed8587017899cafcbac # ratchet:taiki-e/install-action@cargo-hack
+      - uses: taiki-e/install-action@184183c2401be73c3bf42c2e61268aa5855379c1 # ratchet:taiki-e/install-action@cargo-hack
       - run: cargo hack check --feature-powerset --no-dev-deps
 
   build:
@@ -99,9 +99,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -120,9 +120,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -141,9 +141,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: EmbarkStudios/cargo-deny-action@91bf2b620e09e18d6eb78b92e7861937469acedb # ratchet:EmbarkStudios/cargo-deny-action@v2
@@ -162,9 +162,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -198,7 +198,7 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@83538410bfc72ccad3cbaf0d868b6c19d1524911 # ratchet:taiki-e/install-action@nextest
+      - uses: taiki-e/install-action@184183c2401be73c3bf42c2e61268aa5855379c1 # ratchet:taiki-e/install-action@nextest
       - run: cargo nextest run --locked --all-features
         env:
           RUST_BACKTRACE: full
@@ -226,9 +226,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -248,9 +248,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
@@ -269,13 +269,13 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${RUST_CHANNEL}
-          rustup component add --toolchain ${RUST_CHANNEL} cargo
-          rustup default ${RUST_CHANNEL}
+          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
+          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
+          rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@5dae987c27acb236e9abb997396c98062d20b68f # ratchet:taiki-e/install-action@cargo-shear
+      - uses: taiki-e/install-action@184183c2401be73c3bf42c2e61268aa5855379c1 # ratchet:taiki-e/install-action@cargo-shear
       - name: Run cargo Shear
         run: cargo shear
 
