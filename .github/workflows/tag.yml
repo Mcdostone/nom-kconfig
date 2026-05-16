@@ -37,17 +37,17 @@ jobs:
         run: git fetch --tags origin
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
-          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
-          rustup default ${{ env.RUST_CHANNEL }}
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
       - name: Configure git
         run: |
-          git config --global user.name "${{ env.NAME }}"
-          git config --global user.email "${{ env.EMAIL }}"
+          git config --global user.name "${NAME}"
+          git config --global user.email "${EMAIL}"
           git config --global push.autoSetupRemote true
         env:
           NAME: ${{ github.actor }}

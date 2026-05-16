@@ -6,17 +6,17 @@ use crate::{
     Attribute, Entry, Kconfig,
 };
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 use crate::attribute::expression::CompareOperand;
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 use crate::attribute::{r#macro::Macro, DefaultAttribute};
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 use crate::attribute::{AndExpression, Atom, CompareExpression, CompareOperator, Expression, Term};
 #[cfg(not(feature = "named-choice"))]
 use crate::entry::Choice;
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 use crate::symbol::ConstantSymbol;
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 use crate::Symbol;
 
 #[test]
@@ -78,7 +78,7 @@ endchoice
 }
 
 #[test]
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 /// https://github.com/Mcdostone/nom-kconfig/issues/107#issuecomment-3736187967
 fn test_parse_kconfig_bool() {
     let input = r#"
