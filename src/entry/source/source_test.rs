@@ -63,7 +63,7 @@ fn test_parse_source_fail_to_parse() {
     assert!(res.is_err())
 }
 
-#[cfg(not(feature = "coreboot"))]
+#[cfg(not(feature = "glob_wildcard"))]
 #[test]
 fn test_parse_source_glob_not_supported_without_feature() {
     let res = parse_source(KconfigInput::new_extra(
@@ -76,7 +76,7 @@ fn test_parse_source_glob_not_supported_without_feature() {
     assert!(res.is_err())
 }
 
-#[cfg(feature = "coreboot")]
+#[cfg(feature = "glob_wildcard")]
 #[test]
 fn test_parse_source_glob_no_match_fails_with_feature() {
     let res = parse_source(KconfigInput::new_extra(

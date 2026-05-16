@@ -46,8 +46,8 @@ harness = false
 
 [features]
 default = ["display", "hash", "serialize", "deserialize", "kconfiglib"]
-coreboot = ["dep:glob", "named-choice"]
-kconfiglib = ["dep:glob", "named-choice"]
+glob_wildcard = ["dep:glob", "named-choice"]
+kconfiglib = ["glob_wildcard", "named-choice"]
 named-choice = []
 display = []
 debug = ["dep:tracing"]
