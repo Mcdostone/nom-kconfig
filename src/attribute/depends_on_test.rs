@@ -4,7 +4,7 @@ use crate::{
     symbol::Symbol,
     Attribute,
 };
-#[cfg(feature = "coreboot")]
+#[cfg(feature = "glob-wildcard")]
 use crate::{
     attribute::{expression::CompareOperand, CompareExpression, CompareOperator},
     symbol::ConstantSymbol,
@@ -73,7 +73,7 @@ fn test_parse_depends_on_backslash() {
 
 /// https://github.com/coreboot/coreboot/blob/main/payloads/external/SeaBIOS/Kconfig#L159
 #[test]
-#[cfg(feature = "coreboot")]
+#[cfg(feature = "glob-wildcard")]
 fn test_parse_depends_on_with_minus_one() {
     assert_parsing_eq!(
         parse_depends_on,

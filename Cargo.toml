@@ -1,6 +1,6 @@
 [package]
 name = "nom-kconfig"
-version = "0.11.0"
+version = "0.12.0"
 edition = "2021"
 authors = ["yann Prono <yann.prono@telecomnancy.net>"]
 repository = "https://github.com/Mcdostone/nom-kconfig"
@@ -46,8 +46,8 @@ harness = false
 
 [features]
 default = ["display", "hash", "serialize", "deserialize", "kconfiglib"]
-coreboot = ["dep:glob", "named-choice"]
-kconfiglib = ["dep:glob", "named-choice"]
+glob-wildcard = ["dep:glob", "named-choice"]
+kconfiglib = ["glob-wildcard", "named-choice"]
 named-choice = []
 display = []
 debug = ["dep:tracing"]

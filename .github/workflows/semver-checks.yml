@@ -17,11 +17,8 @@ on:
     paths-ignore:
       - CHANGELOG.md
   workflow_dispatch:
-  workflow_run:
-    workflows: ['Prepare a release']
-    types:
-      - completed
 
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -57,9 +54,11 @@ jobs:
         continue-on-error: true
         run: |
           gh pr view "${{ github.event.number }}" --json comments --jq '.comments[] | select(.author.login == "github-actions") | .url' | grep -oE 'issuecomment-(.+)' | cut -d '-' -f2 > comments.txt
-          xargs -I % gh api -X DELETE "/repos/${{ github.repository }}/issues/comments/%" < comments.txt
+          xargs -I % gh api -X DELETE "/repos/${GH_REPOSITORY}/issues/comments/%" < comments.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
@@ -97,7 +96,6 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
-          fetch-depth: 0
           persist-credentials: false
       - name: Install Rust
         run: |
@@ -107,8 +105,7 @@ jobs:
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - name: Install cargo-semver-checks
-        run: cargo install cargo-semver-checks
+      - uses: obi1kenobi/cargo-semver-checks-action@v2
       - name: Show release type
         id: semver
         run: |
