@@ -16,7 +16,6 @@ use nom::{
     IResult, Parser,
 };
 
-#[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
 #[cfg(feature = "kconfiglib")]
 pub use self::{
     orsource::parse_orsource, orsource::OrSource, osource::parse_osource, osource::OSource,
@@ -29,16 +28,16 @@ use tracing::{debug, error};
 use crate::{kconfig::private_parse_kconfig, KconfigInput};
 use crate::{util::ws, Kconfig, KconfigFile};
 
-#[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
+#[cfg(feature = "glob_wildcard")]
 pub use glob::glob;
 use std::collections::HashMap;
-#[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
+#[cfg(feature = "glob_wildcard")]
 use std::path::PathBuf;
 
 #[cfg(test)]
 mod source_test;
 
-#[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
+#[cfg(feature = "glob_wildcard")]
 enum JoinPathMode {
     Relative,
 
@@ -139,7 +138,7 @@ fn parse_source_kconfig(
     x
 }
 
-#[cfg(any(feature = "kconfiglib", feature = "coreboot"))]
+#[cfg(feature = "glob_wildcard")]
 fn expand_source_files<'a>(
     input: KconfigInput<'a>,
     file: &str,
