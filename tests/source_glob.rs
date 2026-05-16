@@ -1,10 +1,10 @@
 use std::path::PathBuf;
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 use nom_kconfig::{entry::config::Config, Entry};
 use nom_kconfig::{error::Error, parse_kconfig, Kconfig, KconfigFile, KconfigInput};
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 #[test]
 fn test_source_glob_expands_and_parses_children() {
     let (_content, result) = parse_test_file("source-main.Kconfig");
@@ -38,7 +38,7 @@ fn test_source_glob_expands_and_parses_children() {
 //     assert!(result.is_err());
 // }
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 #[test]
 fn test_source_literal_path_works_with_glob_feature() {
     let (_content, result) = parse_test_file("source-main-literal.Kconfig");
@@ -68,7 +68,7 @@ fn parse_test_file(file_name: &str) -> (String, Result<(KconfigInput<'_>, Kconfi
     )
 }
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 fn source_entry(result: &nom_kconfig::Kconfig) -> &nom_kconfig::entry::Source {
     match result.entries.first() {
         Some(Entry::Source(source)) => source,
@@ -76,7 +76,7 @@ fn source_entry(result: &nom_kconfig::Kconfig) -> &nom_kconfig::entry::Source {
     }
 }
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 fn config_symbol(entry: &Entry) -> Option<&str> {
     match entry {
         Entry::Config(Config { symbol, .. }) => Some(symbol.as_str()),

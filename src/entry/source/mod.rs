@@ -28,16 +28,16 @@ use tracing::{debug, error};
 use crate::{kconfig::private_parse_kconfig, KconfigInput};
 use crate::{util::ws, Kconfig, KconfigFile};
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 pub use glob::glob;
 use std::collections::HashMap;
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 use std::path::PathBuf;
 
 #[cfg(test)]
 mod source_test;
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 enum JoinPathMode {
     Relative,
 
@@ -138,7 +138,7 @@ fn parse_source_kconfig(
     x
 }
 
-#[cfg(feature = "glob_wildcard")]
+#[cfg(feature = "glob-wildcard")]
 fn expand_source_files<'a>(
     input: KconfigInput<'a>,
     file: &str,
