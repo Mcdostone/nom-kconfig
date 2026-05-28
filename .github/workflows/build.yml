@@ -60,7 +60,9 @@ jobs:
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@cargo-hack
+      - uses: taiki-e/install-action@13608cbb45b01feb47ef444ab1a42dc41ad56f1a
+        with:
+          tool: cargo-hack
       - run: cargo hack check --feature-powerset --no-dev-deps
 
   build:
@@ -198,7 +200,9 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses:  taiki-e/install-action@nextest
+      - uses:  taiki-e/install-action@13608cbb45b01feb47ef444ab1a42dc41ad56f1a
+        with:
+          tool: nextest
       - run: cargo nextest run --locked --all-features
         env:
           RUST_BACKTRACE: full
@@ -275,7 +279,9 @@ jobs:
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@cargo-shear
+      - uses: taiki-e/install-action@13608cbb45b01feb47ef444ab1a42dc41ad56f1a
+        with:
+          tool: cargo-shear
       - name: Run cargo Shear
         run: cargo shear
 

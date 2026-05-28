@@ -9,13 +9,15 @@ env:
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      token:
+        required: true
 
 jobs:
   changelog:
     name: Create changelog
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: write
       pull-requests: write
     steps:
@@ -47,7 +49,7 @@ jobs:
         env:
           OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.token || secrets.GITHUB_TOKEN }}
       - name: Commit changelog
         run: |
           git checkout -b "changelog/${VERSION}"
@@ -59,7 +61,7 @@ jobs:
           git push origin "changelog/${VERSION}" --force
         env:
           VERSION: ${{ steps.release.outputs.version }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.token || secrets.GITHUB_TOKEN }}
 
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
@@ -76,5 +78,5 @@ jobs:
             gh pr create --head "$branch" --title "Changelog for ${VERSION}" --body "This PR updates the changelog for version ${VERSION}."
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.token || secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.release.outputs.version }}
