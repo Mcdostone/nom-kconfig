@@ -12,8 +12,7 @@ on:
   schedule:
     - cron: "0 0 1 * *"
   pull_request:
-    branches:
-      - main
+  push:
   workflow_dispatch:
 
 concurrency:
@@ -61,3 +60,44 @@ jobs:
         run: cargo install cargo-audit
       - name: Cargo audit
         run: cargo audit
+
+
+  plumber:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: curl -fsSL https://raw.githubusercontent.com/getplumber/plumber/main/.plumber.yaml -o .plumber.yaml
+      - uses: getplumber/plumber@5ffae3c0c0968875259829e80992863963b3c2d4
+
+  actionlint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: actionlint
+        uses: raven-actions/actionlint@963d4779ef039e217e5d0e6fd73ce9ab7764e493
+        continue-on-error: true
+
+  zizmor:
+    name: Run zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
+      contents: read         # Only needed for private repos. Needed to clone the repo.
+      actions: read          # Only needed for private repos. Needed for upload-sarif to read workflow run info.
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
