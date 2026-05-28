@@ -97,6 +97,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           persist-credentials: false
+          fetch-tags: true
       - name: Install Rust
         run: |
           rustup update --no-self-update ${RUST_CHANNEL}
@@ -105,7 +106,7 @@ jobs:
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses: obi1kenobi/cargo-semver-checks-action@v2
+      - uses: obi1kenobi/cargo-semver-checks-action@5b298c9520f7096a4683c0bd981a7ac5a7e249ae
       - name: Show release type
         id: semver
         run: |
@@ -126,7 +127,7 @@ jobs:
         run: |
           printf "\`cargo-semver-checks\` has detected some issues: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" > report.md
           printf '```bash' >> report.md
-          cargo semver-checks --color never --baseline-rev "$NAME" --release-type "$RELEASE_TYPE" 2>&1 | tee -a report.md
+          cargo semver-checks --color never --baseline-rev "$VERSION" --release-type "$RELEASE_TYPE" 2>&1 | tee -a report.md
           if [[ "${PIPESTATUS[0]}" != "0" ]]; then
             printf '```' >> report.md
             exit 1
@@ -162,7 +163,6 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
-          fetch-depth: 0
           persist-credentials: false
       - name: Install Rust
         run: |

@@ -72,7 +72,8 @@ jobs:
     needs: tag
     if: ${{ needs.tag.outputs.created == 'true' }}
     uses: ./.github/workflows/publish.yml
-    secrets: inherit
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
       actions: write
