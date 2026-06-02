@@ -16,7 +16,8 @@
 //!     let kconfig_file = KconfigFile::new_with_vars(
 //!         PathBuf::from("/tmp/linux-6.4.9"),
 //!         PathBuf::from("/tmp/linux-6.4.9/Kconfig"),
-//!         &variables
+//!         &variables,
+//!         &HashMap::default(),
 //!     );
 //!     let input = kconfig_file.read_to_string().unwrap();
 //!     let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
@@ -27,6 +28,7 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::rc::Rc;
 use std::{fs, io};
 
 /// Represents a Kconfig file.
@@ -38,9 +40,9 @@ pub struct KconfigFile {
     /// The path the the Kconfig you want to parse.
     pub file: PathBuf,
     /// Externally-specified variables to use when including child source files
-    pub global_vars: HashMap<String, String>,
-    pub local_vars: HashMap<String, String>,
-    pub external_functions: HashMap<String, String>,
+    pub global_vars: Rc<HashMap<String, String>>,
+    pub local_vars: Rc<HashMap<String, String>>,
+    pub external_functions: Rc<HashMap<String, String>>,
     pub depth: usize,
     pub parent_file: Option<PathBuf>,
 }
@@ -50,9 +52,9 @@ impl KconfigFile {
         Self {
             root_dir,
             file,
-            global_vars: HashMap::new(),
-            local_vars: HashMap::new(),
-            external_functions: HashMap::new(),
+            global_vars: Rc::new(HashMap::new()),
+            local_vars: Rc::new(HashMap::new()),
+            external_functions: Rc::new(HashMap::new()),
             depth: 0,
             parent_file: None,
         }
@@ -67,25 +69,26 @@ impl KconfigFile {
         Self {
             root_dir,
             file,
-            global_vars: global_vars
-                .iter()
-                .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
-                .collect(),
-            local_vars: local_vars
-                .iter()
-                .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
-                .collect(),
-            external_functions: HashMap::new(),
+            global_vars: Rc::new(
+                global_vars
+                    .iter()
+                    .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
+                    .collect(),
+            ),
+            local_vars: Rc::new(
+                local_vars
+                    .iter()
+                    .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
+                    .collect(),
+            ),
+            external_functions: Rc::new(HashMap::new()),
             depth: 0,
             parent_file: None,
         }
     }
 
-    pub fn with_external_functions(
-        mut self,
-        _external_functions: &HashMap<String, String>,
-    ) -> Self {
-        self.external_functions = self.external_functions.clone();
+    pub fn with_external_functions(mut self, external_functions: &HashMap<String, String>) -> Self {
+        self.external_functions = Rc::new(external_functions.clone());
         self
     }
 
@@ -98,8 +101,8 @@ impl KconfigFile {
     }
 
     pub fn vars(&self) -> HashMap<String, String> {
-        let mut variables = self.global_vars.clone();
-        variables.extend(self.local_vars.clone());
+        let mut variables = (*self.global_vars).clone();
+        variables.extend((*self.local_vars).clone());
         variables
     }
 
@@ -116,23 +119,33 @@ impl KconfigFile {
     }
 
     pub fn set_global_vars<S: AsRef<str>>(&mut self, vars: &[(S, S)]) {
-        self.global_vars = vars
-            .iter()
-            .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
-            .collect();
+        self.global_vars = Rc::new(
+            vars.iter()
+                .map(|(s1, s2)| (s1.as_ref().to_string(), s2.as_ref().to_string()))
+                .collect(),
+        );
     }
 
     pub fn add_local_var<S: AsRef<str>>(&mut self, key: S, value: S) {
-        self.local_vars
-            .insert(key.as_ref().to_string(), value.as_ref().to_string());
+        let mut new_map = (*self.local_vars).clone();
+        new_map.insert(key.as_ref().to_string(), value.as_ref().to_string());
+        self.local_vars = Rc::new(new_map);
     }
 
     pub fn add_local_vars(&mut self, new_vars: HashMap<String, String>) {
-        self.local_vars.extend(new_vars);
+        if new_vars.is_empty() {
+            return;
+        }
+        let mut new_map = (*self.local_vars).clone();
+        new_map.extend(new_vars);
+        self.local_vars = Rc::new(new_map);
     }
 
     pub fn preprocess_content(&self, content: String) -> String {
         let variables = self.vars();
+        if variables.is_empty() {
+            return content;
+        }
         let mut file_copy = content.clone();
         for (var_name, var_value) in variables {
             file_copy = file_copy.replace(&format!("$({var_name})"), &var_value);

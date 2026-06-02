@@ -79,7 +79,7 @@ fn parse_source_kconfig(
                 input.extra.full_path().display()
             );
             return Ok((
-                input.extra.vars().clone(),
+                input.extra.vars(),
                 Kconfig {
                     file: source_kconfig_file.full_path().display().to_string(),
                     entries: vec![],
@@ -95,7 +95,7 @@ fn parse_source_kconfig(
         &source_content,
         source_kconfig_file.clone(),
     )) {
-        Ok((d, kconfig)) => Ok((d.extra.local_vars, kconfig)),
+        Ok((d, kconfig)) => Ok(((*d.extra.local_vars).clone(), kconfig)),
         Err(e) => {
             //debug!("Variables are {:?}", input.extra.vars());
             //error!(
