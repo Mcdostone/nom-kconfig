@@ -148,7 +148,7 @@ jobs:
           rustup default ${{ env.RUST_CHANNEL }}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
-      - uses: EmbarkStudios/cargo-deny-action@91bf2b620e09e18d6eb78b92e7861937469acedb # ratchet:EmbarkStudios/cargo-deny-action@v2
+      - uses: EmbarkStudios/cargo-deny-action@a531616d8ce3b9177443e48a1159bc945a099823 # ratchet:EmbarkStudios/cargo-deny-action@v2
         with:
           command: check all
 
@@ -325,4 +325,4 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: EmbarkStudios/cargo-deny-action@91bf2b620e09e18d6eb78b92e7861937469acedb # ratchet:EmbarkStudios/cargo-deny-action@v2
+      - uses: EmbarkStudios/cargo-deny-action@a531616d8ce3b9177443e48a1159bc945a099823 # ratchet:EmbarkStudios/cargo-deny-action@v2
