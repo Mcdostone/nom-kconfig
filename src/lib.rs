@@ -16,7 +16,8 @@
 //!     let kconfig_file = KconfigFile::new_with_vars(
 //!         PathBuf::from("/tmp/linux-6.4.9"),
 //!         PathBuf::from("/tmp/linux-6.4.9/Kconfig"),
-//!         &variables
+//!         &variables,
+//!         &HashMap::default(),
 //!     );
 //!     let input = kconfig_file.read_to_string().unwrap();
 //!     let kconfig = parse_kconfig(KconfigInput::new_extra(&input, kconfig_file));
