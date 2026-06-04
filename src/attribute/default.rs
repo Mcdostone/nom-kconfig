@@ -51,6 +51,7 @@ impl Display for DefaultAttribute {
 ///         Expression, AndExpression, Atom, OrExpression, Term
 ///     },
 ///     symbol::Symbol,
+///     symbol::ConstantSymbol
 /// };
 ///
 /// assert_parsing_eq!(
@@ -59,7 +60,7 @@ impl Display for DefaultAttribute {
 ///         "",
 ///         DefaultAttribute {
 ///             expression: Expression::Term(AndExpression::Term(Term::Atom(
-///                 Atom::Symbol(Symbol::Constant("0x1".to_string()))
+///                 Atom::Symbol(Symbol::Constant(ConstantSymbol::Hex("0x1".to_string())))
 ///             ))),
 ///             r#if: None
 ///         }

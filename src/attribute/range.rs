@@ -56,8 +56,7 @@ fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (RangeBound, Range
 /// ```
 /// use nom_kconfig::{
 ///     assert_parsing_eq,
-///     attribute::{parse_range, Range},
-///     symbol::Symbol,
+///     attribute::{parse_range, Range, range::RangeBound}
 /// };
 ///
 /// assert_parsing_eq!(
@@ -66,8 +65,8 @@ fn parse_bounds(input: KconfigInput) -> IResult<KconfigInput, (RangeBound, Range
 ///     Ok((
 ///         "",
 ///         Range {
-///             lower_bound: Symbol::Constant("1".to_string()),
-///             upper_bound: Symbol::Constant("5".to_string()),
+///             lower_bound: RangeBound::Number(1),
+///             upper_bound: RangeBound::Number(5),
 ///             r#if: None
 ///         }
 ///     ))
