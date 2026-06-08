@@ -1,6 +1,6 @@
 use crate::{
     assert_parsing_eq, assert_parsing_fail,
-    attribute::{AndExpression, Atom, Expression, Term},
+    attribute::{depends_on::DependsOn, AndExpression, Atom, Expression, Term},
     entry::{parse_menu, Menu},
     symbol::Symbol,
 };
@@ -58,9 +58,12 @@ fn test_parse_menu_depends_on() {
             Menu {
                 prompt: "BPF subsystem".to_string(),
                 visible: None,
-                depends_on: vec!(Expression::Term(AndExpression::Term(Term::Atom(
-                    Atom::Symbol(Symbol::NonConstant("MODULES".to_string()))
-                )))),
+                depends_on: vec!(DependsOn {
+                    expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                        Symbol::NonConstant("MODULES".to_string())
+                    )))),
+                    r#if: None
+                }),
                 ..Default::default()
             }
         ))

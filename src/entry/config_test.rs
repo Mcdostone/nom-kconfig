@@ -1,6 +1,7 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
+        depends_on::DependsOn,
         r#type::{ConfigType, Type},
         AndExpression, Atom, DefaultAttribute, Expression, Term,
     },
@@ -98,9 +99,12 @@ fn test_parse_config_def_bool_multiline_expression() {
             Config {
                 symbol: "SH_CLK_CPG_LEGACY".to_string(),
                 attributes: vec!(
-                    Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                        Atom::Symbol(Symbol::NonConstant("SH_CLK_CPG".to_string()))
-                    )))),
+                    Attribute::DependsOn(DependsOn {
+                        expression: Expression::Term(AndExpression::Term(Term::Atom(
+                            Atom::Symbol(Symbol::NonConstant("SH_CLK_CPG".to_string()))
+                        ))),
+                        r#if: None,
+                    }),
                     Attribute::Type(ConfigType {
                         r#type: Type::DefBool(Expression::Term(AndExpression::Term(Term::Atom(
                             Atom::Symbol(Symbol::Constant(ConstantSymbol::Boolean(true)))
@@ -159,9 +163,12 @@ fn test_parse_config_bootparam_string() {
                         ))),
                         r#if: None
                     }),
-                    Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                        Atom::Symbol(Symbol::NonConstant("BOOTPARAM".to_string()))
-                    )))),
+                    Attribute::DependsOn(DependsOn {
+                        expression: Expression::Term(AndExpression::Term(Term::Atom(
+                            Atom::Symbol(Symbol::NonConstant("BOOTPARAM".to_string()))
+                        ))),
+                        r#if: None,
+                    }),
                 )
             }
         ))
