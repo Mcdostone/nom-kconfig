@@ -5,7 +5,10 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::{
-    attribute::{depends_on::parse_depends_on, prompt::parse_prompt_value, Attribute},
+    attribute::{
+        depends_on::{parse_depends_on, DependsOn},
+        prompt::parse_prompt_value,
+    },
     util::ws,
     KconfigInput,
 };
@@ -17,7 +20,7 @@ use crate::{
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Comment {
     pub prompt: String,
-    pub dependencies: Vec<Attribute>,
+    pub dependencies: Vec<DependsOn>,
 }
 
 pub fn parse_comment(input: KconfigInput) -> IResult<KconfigInput, Comment> {

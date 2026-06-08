@@ -1,3 +1,4 @@
+use crate::attribute::depends_on::DependsOn;
 use crate::attribute::expression::CompareOperand;
 use crate::attribute::parse_attributes;
 use crate::attribute::r#type::{ConfigType, Type};
@@ -38,9 +39,12 @@ fn test_parse_attribute() {
         "depends on KVM",
         Ok((
             "",
-            Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::NonConstant("KVM".to_string()))
-            ))))
+            Attribute::DependsOn(DependsOn {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::NonConstant("KVM".to_string())
+                )))),
+                r#if: None,
+            })
         ))
     );
     assert_parsing_eq!(
@@ -192,7 +196,11 @@ fn test_attributes_to_string() {
         "select NET".to_string()
     );
     assert_eq!(
-        Attribute::DependsOn(expression.clone()).to_string(),
+        Attribute::DependsOn(DependsOn {
+            expression: expression.clone(),
+            r#if: None
+        })
+        .to_string(),
         "depends on KVM".to_string()
     );
     assert_eq!(

@@ -1,8 +1,7 @@
 use crate::{
     assert_parsing_eq,
-    attribute::{parse_depends_on, AndExpression, Atom, Expression, OrExpression, Term},
+    attribute::{depends_on::DependsOn, parse_depends_on, AndExpression, Atom, Expression, Term},
     symbol::Symbol,
-    Attribute,
 };
 #[cfg(feature = "glob-wildcard")]
 use crate::{
@@ -17,9 +16,12 @@ fn test_parse_depends_on() {
         "depends on PCI",
         Ok((
             "",
-            Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::NonConstant("PCI".to_string()))
-            ))))
+            DependsOn {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::NonConstant("PCI".to_string())
+                )))),
+                r#if: None,
+            }
         ))
     )
 }
@@ -32,9 +34,12 @@ fn test_parse_depends_on_weird_tab() {
         "depends 	on LIVEPATCH",
         Ok((
             "",
-            Attribute::DependsOn(OrExpression::Term(AndExpression::Term(Term::Atom(
-                Atom::Symbol(Symbol::NonConstant("LIVEPATCH".to_string()))
-            ))))
+            DependsOn {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::NonConstant("LIVEPATCH".to_string())
+                )))),
+                r#if: None,
+            }
         ))
     )
 }
@@ -48,25 +53,28 @@ fn test_parse_depends_on_backslash() {
 		    || MACH_ARMCORE || ARCH_PXA_PALM)",
         Ok((
             "",
-            Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Parenthesis(Box::new(Expression::Expression(vec!(
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
-                        "ARCH_LUBBOCK".to_string()
-                    )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
-                        "MACH_MAINSTONE".to_string()
-                    )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
-                        "PXA_SHARPSL".to_string()
-                    )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
-                        "MACH_ARMCORE".to_string()
-                    )))),
-                    AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
-                        "ARCH_PXA_PALM".to_string()
-                    )))),
-                ))))
-            ))))
+            DependsOn {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Parenthesis(
+                    Box::new(Expression::Expression(vec!(
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "ARCH_LUBBOCK".to_string()
+                        )))),
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "MACH_MAINSTONE".to_string()
+                        )))),
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "PXA_SHARPSL".to_string()
+                        )))),
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "MACH_ARMCORE".to_string()
+                        )))),
+                        AndExpression::Term(Term::Atom(Atom::Symbol(Symbol::NonConstant(
+                            "ARCH_PXA_PALM".to_string()
+                        )))),
+                    )))
+                )))),
+                r#if: None,
+            }
         ))
     )
 }
@@ -80,15 +88,47 @@ fn test_parse_depends_on_with_minus_one() {
         r"depends on SEABIOS_DEBUG_LEVEL = -1",
         Ok((
             "",
-            Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                Atom::Compare(CompareExpression {
-                    left: CompareOperand::Symbol(Symbol::NonConstant(
-                        "SEABIOS_DEBUG_LEVEL".to_string()
-                    )),
-                    operator: CompareOperator::Equal,
-                    right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(-1)))
-                })
-            ))))
+            DependsOn {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Compare(
+                    CompareExpression {
+                        left: CompareOperand::Symbol(Symbol::NonConstant(
+                            "SEABIOS_DEBUG_LEVEL".to_string()
+                        )),
+                        operator: CompareOperator::Equal,
+                        right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::Integer(
+                            -1
+                        )))
+                    }
+                )))),
+                r#if: None,
+            }
+        ))
+    )
+}
+
+/// https://github.com/Mcdostone/nom-kconfig/issues/166
+/// config USB_CDNS_SUPPORT
+///    tristate "Cadence USB Support"
+///    depends on USB_SUPPORT && HAS_DMA
+///    depends on USB || USB_GADGET
+///    depends on USB if !USB_GADGET
+///    depends on USB_GADGET if !USB
+
+#[test]
+fn test_parse_depends_on_with_if_condition() {
+    assert_parsing_eq!(
+        parse_depends_on,
+        r"depends on USB if !USB_GADGET",
+        Ok((
+            "",
+            DependsOn {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::NonConstant("USB".to_string())
+                )))),
+                r#if: Some(Expression::Term(AndExpression::Term(Term::Not(
+                    Atom::Symbol(Symbol::NonConstant("USB_GADGET".to_string()))
+                )))),
+            }
         ))
     )
 }

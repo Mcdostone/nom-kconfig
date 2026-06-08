@@ -1,6 +1,7 @@
 use crate::{
     assert_parsing_eq,
     attribute::{
+        depends_on::DependsOn,
         r#type::{ConfigType, Type},
         AndExpression, Atom, DefaultAttribute, Expression, Term,
     },
@@ -125,9 +126,12 @@ config COMPACT_UNEVICTABLE_DEFAULT
                         r#type: Type::Int(None),
                         r#if: None
                     }),
-                    Attribute::DependsOn(Expression::Term(AndExpression::Term(Term::Atom(
-                        Atom::Symbol(Symbol::NonConstant("COMPACTION".to_string()))
-                    )))),
+                    Attribute::DependsOn(DependsOn {
+                        expression: Expression::Term(AndExpression::Term(Term::Atom(
+                            Atom::Symbol(Symbol::NonConstant("COMPACTION".to_string()))
+                        ))),
+                        r#if: None,
+                    }),
                     Attribute::Default(DefaultAttribute {
                         expression: Expression::Term(AndExpression::Term(Term::Atom(
                             Atom::Symbol(Symbol::Constant(ConstantSymbol::Integer(0)))
