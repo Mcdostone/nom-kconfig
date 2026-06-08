@@ -13,8 +13,8 @@ use serde::Serialize;
 
 use crate::{
     attribute::{
-        parse_depends_on, parse_prompt_value, parse_visible, visible::Visible, Attribute,
-        Expression,
+        depends_on::DependsOn, parse_depends_on, parse_prompt_value, parse_visible,
+        visible::Visible, Attribute,
     },
     util::ws,
     KconfigInput,
@@ -34,13 +34,13 @@ pub struct Menu {
         serde(skip_serializing_if = "Option::is_none")
     )]
     pub visible: Option<Visible>,
-    pub depends_on: Vec<Expression>,
+    pub depends_on: Vec<DependsOn>,
     pub entries: Vec<Entry>,
 }
 
 fn parse_menu_attributes(input: KconfigInput) -> IResult<KconfigInput, Vec<Attribute>> {
     many0(alt((
-        ws(parse_depends_on),
+        map(ws(parse_depends_on), Attribute::DependsOn),
         map(ws(parse_visible), Attribute::Visible),
     )))
     .parse(input)

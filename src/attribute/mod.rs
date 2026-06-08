@@ -27,7 +27,11 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
-use crate::{attribute::transitional::parse_transitional, util::ws, KconfigInput};
+use crate::{
+    attribute::{depends_on::DependsOn, transitional::parse_transitional},
+    util::ws,
+    KconfigInput,
+};
 
 use self::r#type::ConfigType;
 pub use self::{
@@ -63,7 +67,7 @@ pub enum Attribute {
     Prompt(Prompt),
     Modules,
     Select(Select),
-    DependsOn(Expression),
+    DependsOn(DependsOn),
     Optional,
     Range(Range),
     Visible(Option<Expression>),
@@ -83,7 +87,7 @@ pub fn parse_attribute(input: KconfigInput) -> IResult<KconfigInput, Attribute> 
     alt((
         map(ws(parse_prompt), Attribute::Prompt),
         map(ws(parse_help), Attribute::Help),
-        ws(parse_depends_on),
+        map(ws(parse_depends_on), Attribute::DependsOn),
         map(ws(parse_select), Attribute::Select),
         map(ws(parse_default), Attribute::Default),
         map(ws(parse_requires), Attribute::Requires),

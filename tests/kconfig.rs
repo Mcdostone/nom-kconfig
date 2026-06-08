@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use nom_kconfig::{
     attribute::{
+        depends_on::DependsOn,
         expression::{AndExpression, Atom, Expression, Term},
         r#type::{ConfigType, Type},
         select::Select,
@@ -34,11 +35,14 @@ fn test_parse() {
                     r#type: Type::Tristate(Some("Kernel-based Virtual Machine (KVM) support".to_string())),
                     r#if: None
                 }),
-                Attribute::DependsOn(Expression::Term(AndExpression::Expression(vec!(
-                    Term::Atom(Atom::Symbol(Symbol::NonConstant("HAVE_KVM".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::NonConstant("HIGH_RES_TIMERS".to_string()))),
-                    Term::Atom(Atom::Symbol(Symbol::NonConstant("X86_LOCAL_APIC".to_string())))
-                )))),
+                Attribute::DependsOn(DependsOn {
+                    expression: Expression::Term(AndExpression::Expression(vec!(
+                        Term::Atom(Atom::Symbol(Symbol::NonConstant("HAVE_KVM".to_string()))),
+                        Term::Atom(Atom::Symbol(Symbol::NonConstant("HIGH_RES_TIMERS".to_string()))),
+                        Term::Atom(Atom::Symbol(Symbol::NonConstant("X86_LOCAL_APIC".to_string())))
+                    ))),
+                    r#if: None,
+                }),
                 Attribute::Select(Select { symbol: "PREEMPT_NOTIFIERS".to_string(), r#if: None }),
                 Attribute::Select(Select { symbol: "MMU_NOTIFIER".to_string(), r#if: None }),
                 Attribute::Select(Select { symbol: "HAVE_KVM_IRQCHIP".to_string(), r#if: None }),
