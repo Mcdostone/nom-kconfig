@@ -200,7 +200,7 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # ratchet:Swatinem/rust-cache@v2
-      - uses:  taiki-e/install-action@13608cbb45b01feb47ef444ab1a42dc41ad56f1a
+      - uses: taiki-e/install-action@13608cbb45b01feb47ef444ab1a42dc41ad56f1a
         with:
           tool: nextest
       - run: cargo nextest run --locked --all-features
@@ -326,3 +326,41 @@ jobs:
         with:
           persist-credentials: false
       - uses: EmbarkStudios/cargo-deny-action@a531616d8ce3b9177443e48a1159bc945a099823 # ratchet:EmbarkStudios/cargo-deny-action@v2
+
+  build-for-targets:
+    name: Build for targets
+    needs: check
+    runs-on: ${{ matrix.platforms.os }}
+    continue-on-error: true
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        platforms:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            features: "--all-features"
+          - os: macos-26-intel
+            target: x86_64-apple-darwin
+            features: "--all-features"
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            features: "--all-features"
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            features: "--all-features"
+          - os: windows-latest
+            target: x86_64-pc-windows-gnu
+            features: "--all-features"
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            features: "--all-features"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: houseabsolute/actions-rust-cross@f481cb5e0110765615313e2177ce12a99bf26bbd # ratchet:houseabsolute/actions-rust-cross@v1
+        with:
+          target: ${{ matrix.platforms.target }}
+          args: "--locked ${{ matrix.platforms.features }}"
+          strip: false
