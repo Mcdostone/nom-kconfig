@@ -1,0 +1,25 @@
+--- nom-kconfig-0.10.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ nom-kconfig-0.10.0/Cargo.toml	2026-06-10T21:18:53.390041+00:00
+@@ -123,11 +123,6 @@
+ name = "source_glob"
+ path = "tests/source_glob.rs"
+ 
+-[[bench]]
+-name = "my_benchmark"
+-path = "benches/my_benchmark.rs"
+-harness = false
+-
+ [dependencies.glob]
+ version = "0.3.3"
+ optional = true
+@@ -154,10 +149,6 @@
+ version = "4.3.24"
+ features = ["derive"]
+ 
+-[dev-dependencies.criterion]
+-version = "0.8.2"
+-features = ["html_reports"]
+-
+ [dev-dependencies.reqwest]
+ version = "0.13.2"
+ features = ["blocking"]
