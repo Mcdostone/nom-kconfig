@@ -1,3 +1,27 @@
+## What's Changed in 0.12.0
+* ci: fix CI to publish the crate by @Mcdostone in [#170](https://github.com/Mcdostone/nom-kconfig/pull/170)
+* chore: Release version v0.12.0 by @Mcdostone in [#154](https://github.com/Mcdostone/nom-kconfig/pull/154)
+* fix: 'depends on' can have a if condition by @Mcdostone
+* test: fix doctests by @Mcdostone
+* ci: update dependencies by @Mcdostone
+* examples: add tracing as dev-dep by @julianbraha
+* build: update rust dependencies by @Mcdostone
+* build(deps): bump zizmorcore/zizmor-action from 0.5.3 to 0.5.6 by @dependabot[bot]
+* build(deps): bump actions-rust-lang/setup-rust-toolchain by @dependabot[bot]
+* build(deps): bump crate-ci/typos from 1.45.1 to 1.46.3 by @dependabot[bot]
+* build(deps): bump EmbarkStudios/cargo-deny-action from 2.0.17 to 2.0.19 by @dependabot[bot]
+* build(deps): bump codecov/codecov-action from 6.0.0 to 6.0.1 by @dependabot[bot]
+* use RC for scoping by @julianbraha
+* ci: add plumber to GA by @Mcdostone
+* ci: use immutable tags for GA by @Mcdostone
+* style: rename the rust feature to glob-wildcard by @Mcdostone
+* rename coreboot feature to glob_wildcard by @julianbraha
+* ci: trying to secure the CI by @Mcdostone
+* chore: Release version v0.12.0 by @Mcdostone
+* Changelog for v0.11.0 by @github-actions[bot] in [#153](https://github.com/Mcdostone/nom-kconfig/pull/153)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.11.0...v0.12.0
+
 ## What's Changed in 0.11.0
 * chore: Release version v0.11.0 by @Mcdostone
 * feat: support for the kconfiglib by @Mcdostone
