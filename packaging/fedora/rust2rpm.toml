@@ -1,2 +1,5 @@
 [package]
 cargo-install-bin = false
+cargo-toml-patch-comments = [
+    "Remove the criterion dev-dependency and the bench target that uses it; criterion is not packaged for Fedora.",
+]
