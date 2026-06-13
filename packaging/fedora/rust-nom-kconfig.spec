@@ -8,33 +8,18 @@
 %global crate nom-kconfig
 
 Name:           rust-nom-kconfig
-Version:        0.11.0
+Version:        0.12.0
 Release:        1%{?dist}
 Summary:        Kconfig parser
 
 License:        MIT
 URL:            https://crates.io/crates/nom-kconfig
 Source:         %{crates_source}
-
-ExclusiveArch:  %{rust_arches}
+# Remove the criterion dev-dependency and the bench target that needs it,
+# since criterion is not packaged in Fedora.
+Patch:          nom-kconfig-fix-metadata.diff
 
 BuildRequires:  cargo-rpm-macros >= 26
-BuildRequires:  (crate(glob/default) >= 0.3.3 with crate(glob/default) < 0.4.0~)
-BuildRequires:  (crate(nom/default) >= 8.0.0 with crate(nom/default) < 9.0.0~)
-BuildRequires:  (crate(nom_locate/default) >= 5.0.0 with crate(nom_locate/default) < 6.0.0~)
-BuildRequires:  (crate(serde/default) >= 1.0.228 with crate(serde/default) < 2.0.0~)
-BuildRequires:  (crate(serde/derive) >= 1.0.228 with crate(serde/derive) < 2.0.0~)
-BuildRequires:  rust >= 1.72
-%if %{with check}
-BuildRequires:  (crate(clap/default) >= 4.4.18 with crate(clap/default) < 5.0.0~)
-BuildRequires:  (crate(clap/derive) >= 4.4.18 with crate(clap/derive) < 5.0.0~)
-BuildRequires:  (crate(criterion/default) >= 0.5.1 with crate(criterion/default) < 0.6.0~)
-BuildRequires:  (crate(criterion/html_reports) >= 0.5.1 with crate(criterion/html_reports) < 0.6.0~)
-BuildRequires:  (crate(reqwest/blocking) >= 0.13.3 with crate(reqwest/blocking) < 0.14.0~)
-BuildRequires:  (crate(reqwest/default) >= 0.13.3 with crate(reqwest/default) < 0.14.0~)
-BuildRequires:  (crate(tracing-subscriber/default) >= 0.3.23 with crate(tracing-subscriber/default) < 0.4.0~)
-BuildRequires:  (crate(walkdir/default) >= 2.5.0 with crate(walkdir/default) < 3.0.0~)
-%endif
 
 %global _description %{expand:
 A Kconfig parser.}
@@ -44,11 +29,6 @@ A Kconfig parser.}
 %package        devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig) = 0.11.0
-Requires:       (crate(nom/default) >= 8.0.0 with crate(nom/default) < 9.0.0~)
-Requires:       (crate(nom_locate/default) >= 5.0.0 with crate(nom_locate/default) < 6.0.0~)
-Requires:       cargo
-Requires:       rust >= 1.72
 
 %description    devel %{_description}
 
@@ -64,14 +44,6 @@ use the "%{crate}" crate.
 %package     -n %{name}+default-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/default) = 0.11.0
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
-Requires:       crate(nom-kconfig/deserialize) = 0.11.0
-Requires:       crate(nom-kconfig/display) = 0.11.0
-Requires:       crate(nom-kconfig/hash) = 0.11.0
-Requires:       crate(nom-kconfig/kconfiglib) = 0.11.0
-Requires:       crate(nom-kconfig/serialize) = 0.11.0
 
 %description -n %{name}+default-devel %{_description}
 
@@ -81,31 +53,9 @@ use the "default" feature of the "%{crate}" crate.
 %files       -n %{name}+default-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+coreboot-devel
-Summary:        %{summary}
-BuildArch:      noarch
-Provides:       crate(nom-kconfig/coreboot) = 0.11.0
-Requires:       (crate(glob/default) >= 0.3.3 with crate(glob/default) < 0.4.0~)
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
-Requires:       crate(nom-kconfig/named-choice) = 0.11.0
-
-%description -n %{name}+coreboot-devel %{_description}
-
-This package contains library source intended for building other packages which
-use the "coreboot" feature of the "%{crate}" crate.
-
-%files       -n %{name}+coreboot-devel
-%ghost %{crate_instdir}/Cargo.toml
-
 %package     -n %{name}+debug-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/debug) = 0.11.0
-Requires:       (crate(tracing/default) >= 0.1.44 with crate(tracing/default) < 0.2.0~)
-Requires:       (crate(tracing/log) >= 0.1.44 with crate(tracing/log) < 0.2.0~)
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
 
 %description -n %{name}+debug-devel %{_description}
 
@@ -118,11 +68,6 @@ use the "debug" feature of the "%{crate}" crate.
 %package     -n %{name}+deserialize-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/deserialize) = 0.11.0
-Requires:       (crate(serde/default) >= 1.0.228 with crate(serde/default) < 2.0.0~)
-Requires:       (crate(serde/derive) >= 1.0.228 with crate(serde/derive) < 2.0.0~)
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
 
 %description -n %{name}+deserialize-devel %{_description}
 
@@ -135,9 +80,6 @@ use the "deserialize" feature of the "%{crate}" crate.
 %package     -n %{name}+display-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/display) = 0.11.0
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
 
 %description -n %{name}+display-devel %{_description}
 
@@ -147,12 +89,21 @@ use the "display" feature of the "%{crate}" crate.
 %files       -n %{name}+display-devel
 %ghost %{crate_instdir}/Cargo.toml
 
+%package     -n %{name}+glob-wildcard-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+glob-wildcard-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "glob-wildcard" feature of the "%{crate}" crate.
+
+%files       -n %{name}+glob-wildcard-devel
+%ghost %{crate_instdir}/Cargo.toml
+
 %package     -n %{name}+hash-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/hash) = 0.11.0
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
 
 %description -n %{name}+hash-devel %{_description}
 
@@ -165,11 +116,6 @@ use the "hash" feature of the "%{crate}" crate.
 %package     -n %{name}+kconfiglib-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/kconfiglib) = 0.11.0
-Requires:       (crate(glob/default) >= 0.3.3 with crate(glob/default) < 0.4.0~)
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
-Requires:       crate(nom-kconfig/named-choice) = 0.11.0
 
 %description -n %{name}+kconfiglib-devel %{_description}
 
@@ -182,9 +128,6 @@ use the "kconfiglib" feature of the "%{crate}" crate.
 %package     -n %{name}+named-choice-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/named-choice) = 0.11.0
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
 
 %description -n %{name}+named-choice-devel %{_description}
 
@@ -197,11 +140,6 @@ use the "named-choice" feature of the "%{crate}" crate.
 %package     -n %{name}+serialize-devel
 Summary:        %{summary}
 BuildArch:      noarch
-Provides:       crate(nom-kconfig/serialize) = 0.11.0
-Requires:       (crate(serde/default) >= 1.0.228 with crate(serde/default) < 2.0.0~)
-Requires:       (crate(serde/derive) >= 1.0.228 with crate(serde/derive) < 2.0.0~)
-Requires:       cargo
-Requires:       crate(nom-kconfig) = 0.11.0
 
 %description -n %{name}+serialize-devel %{_description}
 
@@ -214,6 +152,9 @@ use the "serialize" feature of the "%{crate}" crate.
 %prep
 %autosetup -n %{crate}-%{version} -p1
 %cargo_prep
+
+%generate_buildrequires
+%cargo_generate_buildrequires
 
 %build
 %cargo_build
