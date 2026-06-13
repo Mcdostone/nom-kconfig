@@ -16,7 +16,7 @@ pub fn parse_kconfig_file(kconfig_file: KconfigFile) -> std::io::Result<()> {
         error!("{}", e);
         error!(
             "Please run the following command to debug:\n cargo run --all-features --example parse_file -- --root-dir '{}' '{}'",
-            kconfig_file.root_dir.display(), kconfig_file.file.display()
+            kconfig_file.root_dir.display(), e.resolved_path.display()
         );
 
         panic!("");
