@@ -364,3 +364,20 @@ jobs:
           target: ${{ matrix.platforms.target }}
           args: "--locked ${{ matrix.platforms.features }}"
           strip: false
+
+  fedora:
+    name: Package for fedora
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    permissions:
+      contents: read
+    needs: [check]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Build Fedora RPM with mock
+        run: |
+          dnf -y install git uv python3  python-setuptools
+          uvx --system-certs --from https://codeberg.org/rust2rpm/rust2rpm.git rust2rpm --config ./packaging/fedora/rust2rpm.toml nom-kconfig
+    
