@@ -378,6 +378,6 @@ jobs:
           persist-credentials: false
       - name: Build Fedora RPM with mock
         run: |
-          dnf -y install git uv python3  python-setuptools
+          dnf -y install git uv python3  python-setuptools rust cargo
           uvx --system-certs --from https://codeberg.org/rust2rpm/rust2rpm.git rust2rpm --config ./packaging/fedora/rust2rpm.toml nom-kconfig
     
