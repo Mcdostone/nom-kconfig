@@ -33,9 +33,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
-          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
-          rustup default ${{ env.RUST_CHANNEL }}
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       - id: release
@@ -52,7 +52,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Create github release
-        run: gh release create "v${{ env.VERSION }}" --generate-notes
+        run: gh release create "v${VERSION}" --generate-notes
         env:
           GH_TOKEN: ${{ secrets.token || secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.version.outputs.version }}
@@ -85,9 +85,9 @@ jobs:
           persist-credentials: false
       - name: Install Rust
         run: |
-          rustup update --no-self-update ${{ env.RUST_CHANNEL }}
-          rustup component add --toolchain ${{ env.RUST_CHANNEL }} cargo
-          rustup default ${{ env.RUST_CHANNEL }}
+          rustup update --no-self-update ${RUST_CHANNEL}
+          rustup component add --toolchain ${RUST_CHANNEL} cargo
+          rustup default ${RUST_CHANNEL}
         env:
           RUST_CHANNEL: ${{ env.RUST_CHANNEL }}
       
