@@ -43,6 +43,7 @@ pub struct DependsOn {
 ///     assert_parsing_eq,
 ///     attribute::{
 ///         parse_depends_on,
+///         depends_on::DependsOn,
 ///         AndExpression, Atom, Expression, OrExpression, Term,
 ///     },
 ///     symbol::Symbol,
