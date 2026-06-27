@@ -132,3 +132,45 @@ fn test_parse_depends_on_with_if_condition() {
         ))
     )
 }
+
+/// https://android.googlesource.com/kernel/common/+/refs/heads/android16-6.12/drivers/auxdisplay/Kconfig#241
+#[test]
+fn test_parse_depends_on_tmp() {
+    assert_parsing_eq!(
+        parse_depends_on,
+        "depends on PANEL_PROFILE=\"0\" && PANEL_LCD=\"1\" && PANEL_LCD_PROTO=\"0\"",
+        Ok((
+            "",
+            DependsOn {
+                expression: Expression::Term(AndExpression::Expression(vec![
+                    Term::Atom(Atom::Compare(CompareExpression {
+                        left: CompareOperand::Symbol(Symbol::NonConstant(
+                            "PANEL_PROFILE".to_string()
+                        )),
+                        operator: CompareOperator::Equal,
+                        right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::String(
+                            "0".to_string()
+                        )))
+                    })),
+                    Term::Atom(Atom::Compare(CompareExpression {
+                        left: CompareOperand::Symbol(Symbol::NonConstant("PANEL_LCD".to_string())),
+                        operator: CompareOperator::Equal,
+                        right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::String(
+                            "1".to_string()
+                        )))
+                    })),
+                    Term::Atom(Atom::Compare(CompareExpression {
+                        left: CompareOperand::Symbol(Symbol::NonConstant(
+                            "PANEL_LCD_PROTO".to_string()
+                        )),
+                        operator: CompareOperator::Equal,
+                        right: CompareOperand::Symbol(Symbol::Constant(ConstantSymbol::String(
+                            "0".to_string()
+                        )))
+                    }))
+                ])),
+                r#if: None,
+            }
+        ))
+    )
+}
