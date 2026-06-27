@@ -96,3 +96,21 @@ fn test_parse_range_variable() {
         ))
     )
 }
+
+// https://github.com/zephyrproject-rtos/zephyr/blob/e201b84b04e4fab1844658e71da0b7e340f1cc82/subsys/net/lib/zperf/Kconfig#L103
+#[test]
+#[ignore = "not implemented yet"]
+fn test_parse_range_variable_in_zephyr() {
+    assert_parsing_eq!(
+        parse_range,
+        "range $(inc,$(UINT8_MAX)) $(UINT16_MAX)",
+        Ok((
+            "",
+            Range {
+                lower_bound: RangeBound::Variable("inc,UINT8_MAX".to_string()),
+                upper_bound: RangeBound::Variable("UINT16_MAX".to_string()),
+                r#if: None
+            }
+        ))
+    )
+}

@@ -1,3 +1,4 @@
+use crate::{util::ws, KconfigInput};
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -8,8 +9,6 @@ use nom::{
     sequence::delimited,
     IResult, Input, Parser,
 };
-
-use crate::{util::ws, KconfigInput};
 
 pub fn parse_string(input: KconfigInput) -> IResult<KconfigInput, String> {
     map(
@@ -62,12 +61,33 @@ pub fn take_until_unbalanced(
     }
 }
 
-/// A first word is `'something here'` or `"something here"` or just a normal word without spaces. It is used in places where Kconfig allows either a string or a symbol, such as in `default` attributes.
+/// A first word is `'something here'` or `"something here"` or just a normal word without spaces.
+/// It is used in places where Kconfig allows either a string or a symbol, such as in `default` attributes.
 pub fn parse_first_word(input: KconfigInput) -> IResult<KconfigInput, KconfigInput> {
     alt((
-        recognize((tag("'"), take_until_unbalanced('\''), tag("'"))),
-        recognize((tag("\""), take_until_unbalanced('"'), tag("\""))),
+        recognize((tag("'"), take_until_first_word_end('\''), tag("'"))),
+        recognize((tag("\""), take_until_first_word_end('"'), tag("\""))),
         recognize(ws(many1(alt((alphanumeric1, recognize(one_of("-._'\""))))))),
     ))
     .parse(input)
+}
+
+fn take_until_first_word_end(
+    delimiter: char,
+) -> impl Fn(KconfigInput) -> IResult<KconfigInput, KconfigInput> {
+    move |i: KconfigInput| {
+        let input = *i.fragment();
+        let end_of_line = input.find('\n').unwrap_or(input.len());
+        let search_start = 0;
+
+        if let Some(offset) = input[search_start..end_of_line].find(delimiter) {
+            let index = search_start + offset;
+            return Ok(i.take_split(index));
+        }
+
+        Err(nom::Err::Error(Error::from_error_kind(
+            i,
+            ErrorKind::TakeUntil,
+        )))
+    }
 }
