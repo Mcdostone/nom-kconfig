@@ -95,7 +95,7 @@ jobs:
       - name: Generate SBOM
         run:  cargo cyclonedx --all --all-features --override-filename sbom --format json
       
-      - uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26
+      - uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6
         with:
           subject-name: 'nom-kconfig'
           subject-path: '${{ github.workspace }}/Cargo.lock'
