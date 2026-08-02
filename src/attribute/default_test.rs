@@ -146,6 +146,26 @@ fn test_default_attribute_number_2() {
 }
 
 #[test]
+/// https://github.com/torvalds/linux/blob/master/init/Kconfig#L22-L25
+fn test_default_attribute_lll() {
+    assert_parsing_eq!(
+        parse_default,
+        "default 10 if BFLB_BL70X_BLE_M0S1T10",
+        Ok((
+            "",
+            DefaultAttribute {
+                expression: Expression::Term(AndExpression::Term(Term::Atom(Atom::Symbol(
+                    Symbol::Constant(ConstantSymbol::Integer(10))
+                )))),
+                r#if: Some(Expression::Term(AndExpression::Term(Term::Atom(
+                    Atom::Symbol(Symbol::NonConstant("BFLB_BL70X_BLE_M0S1T10".to_string()))
+                ))))
+            }
+        ))
+    )
+}
+
+#[test]
 fn test_default_attribute_number_3() {
     assert_parsing_eq!(
         parse_expression,

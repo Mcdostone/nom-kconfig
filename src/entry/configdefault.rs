@@ -1,6 +1,7 @@
 use nom::{
     bytes::complete::tag,
     combinator::map,
+    multi::many1,
     sequence::{pair, preceded},
     IResult, Parser,
 };
@@ -23,18 +24,18 @@ use crate::{
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct ConfigDefault {
     pub symbol: String,
-    pub default: DefaultAttribute,
+    pub default_attributes: Vec<DefaultAttribute>,
 }
 
 pub fn parse_configdefault(input: KconfigInput) -> IResult<KconfigInput, ConfigDefault> {
     map(
         pair(
             preceded(ws(tag("configdefault")), ws(parse_config_symbol)),
-            parse_default,
+            many1(parse_default),
         ),
-        |(symbol, default_attribute)| ConfigDefault {
+        |(symbol, default_attributes)| ConfigDefault {
             symbol: symbol.to_string(),
-            default: default_attribute,
+            default_attributes,
         },
     )
     .parse(input)
