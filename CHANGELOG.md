@@ -1,3 +1,25 @@
+## What's Changed in 0.13.0
+* release 0.13.0 by @Mcdostone in [#171](https://github.com/Mcdostone/nom-kconfig/pull/171)
+* build: update dependencies by @Mcdostone
+* fix `parse_first_word` function when dealing with expressions like 'PANEL_PROFILE="0" && PANEL_LCD="1" && PANEL_LCD_PROTO="0"' by @Mcdostone
+* build(deps): bump taiki-e/install-action from 2.79.11 to 2.85.1 by @dependabot[bot]
+* build(deps): bump EmbarkStudios/cargo-deny-action from 2.0.19 to 2.1.1 by @dependabot[bot]
+* build(deps): bump actions/attest from 4.1.0 to 4.2.0 by @dependabot[bot]
+* build(deps): bump actions-rust-lang/setup-rust-toolchain by @dependabot[bot]
+* build(deps): bump codecov/codecov-action from 6.0.1 to 7.0.0 by @dependabot[bot]
+* build(deps): bump actions/checkout from 6.0.2 to 7.0.0 by @dependabot[bot]
+* build(deps): bump rust-lang/crates-io-auth-action from 1.0.4 to 1.0.5 by @dependabot[bot]
+* build(deps): bump getplumber/plumber from 0.3.27 to 0.3.71 by @dependabot[bot]
+* ci: new workflow for documentation tests by @Mcdostone
+* packaging: update fedora packaging for release 0.12.0 by @julianbraha
+* add patch to remove criterion when packaging for fedora by @julianbraha
+* move packaging to packaging/ by @julianbraha
+* docs: add SECURITY.md by @Mcdostone
+* ci: fix zizmor warnings by @Mcdostone
+* Changelog for v0.12.0 by @github-actions[bot] in [#169](https://github.com/Mcdostone/nom-kconfig/pull/169)
+
+**Full Changelog**: https://github.com/Mcdostone/nom-kconfig/compare/v0.12.0...v0.13.0
+
 ## What's Changed in 0.12.0
 * ci: fix CI to publish the crate by @Mcdostone in [#170](https://github.com/Mcdostone/nom-kconfig/pull/170)
 * chore: Release version v0.12.0 by @Mcdostone in [#154](https://github.com/Mcdostone/nom-kconfig/pull/154)
