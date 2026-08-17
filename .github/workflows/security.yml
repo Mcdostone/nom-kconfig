@@ -73,6 +73,10 @@ jobs:
           persist-credentials: false
       - run: curl -fsSL https://raw.githubusercontent.com/getplumber/plumber/main/.plumber.yaml -o .plumber.yaml
       - uses: getplumber/plumber@665ca06af5d0d2836fd4fcaf68d3ff9671067fb6
+        with:
+          config-file: .github/plumber.yaml
+          upload-sarif: "true"
+          upload-artifacts: "true"
 
   actionlint:
     runs-on: ubuntu-latest
