@@ -15,4 +15,4 @@ fuzzing/in
 linux-*
 linux-6.18.4
 AGENTS.md
-.plumber.yaml
+!.github/plumber.yaml
