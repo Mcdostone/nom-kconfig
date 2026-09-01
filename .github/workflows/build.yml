@@ -361,7 +361,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: houseabsolute/actions-rust-cross@f481cb5e0110765615313e2177ce12a99bf26bbd # ratchet:houseabsolute/actions-rust-cross@v1
+      - uses: houseabsolute/actions-rust-cross@85826e468eac832e251ac58f6191ba784db237c8 # ratchet:houseabsolute/actions-rust-cross@v1
         with:
           target: ${{ matrix.platforms.target }}
           args: "--locked ${{ matrix.platforms.features }}"
